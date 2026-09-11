@@ -83,6 +83,34 @@ final class AdminController
         redirect('/admin/season/' . $id);
     }
 
+    public static function seasonUpdate(array $params): void
+    {
+        AdminAuth::requireLogin();
+        $id = (int) $params['id'];
+        if (Season::find($id) === null) {
+            http_response_code(404);
+            render('404');
+            return;
+        }
+        if (!csrf_check()) {
+            redirect('/admin/season/' . $id);
+            return;
+        }
+
+        $label = trim((string) ($_POST['label'] ?? ''));
+        $year = (int) ($_POST['year'] ?? 0);
+
+        if ($label === '' || $year === 0) {
+            flash_set('error', 'Bitte Bezeichnung und Jahr angeben.');
+            redirect('/admin/season/' . $id);
+            return;
+        }
+
+        Season::update($id, $label, $year);
+        flash_set('success', 'Saison aktualisiert.');
+        redirect('/admin/season/' . $id);
+    }
+
     public static function teamCreate(array $params): void
     {
         AdminAuth::requireLogin();

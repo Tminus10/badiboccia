@@ -10,6 +10,13 @@
 $isCurrent = (int) $season['is_current'] === 1;
 $pageTitle = 'Gruppe ' . $group['name'];
 $returnTo = '/group/' . $group['id'];
+$anyPlayed = false;
+foreach ($games as $g) {
+    if (Game::isComplete($g)) {
+        $anyPlayed = true;
+        break;
+    }
+}
 ?>
 <div class="page-head">
   <div>
@@ -36,7 +43,7 @@ $returnTo = '/group/' . $group['id'];
       </thead>
       <tbody>
         <?php foreach ($standings as $row): ?>
-          <tr class="<?= $row['rank'] <= 2 ? 'qualifies' : '' ?>">
+          <tr class="<?= ($row['rank'] <= 2 && $anyPlayed) ? 'qualifies' : '' ?>">
             <td class="rank-col"><?= (int) $row['rank'] ?></td>
             <td><?= render_partial('partials/team-dot', ['team' => $row['team']]) ?></td>
             <td><?= (int) $row['played'] ?></td>

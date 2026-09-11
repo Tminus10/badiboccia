@@ -41,6 +41,7 @@ $router->get('/admin', ['AdminController', 'dashboard']);
 $router->post('/admin/season', ['AdminController', 'seasonCreate']);
 $router->get('/admin/season/{id}', ['AdminController', 'seasonManage']);
 $router->post('/admin/season/{id}/activate', ['AdminController', 'seasonActivate']);
+$router->post('/admin/season/{id}/update', ['AdminController', 'seasonUpdate']);
 $router->post('/admin/season/{id}/team', ['AdminController', 'teamCreate']);
 $router->post('/admin/season/{id}/bracket', ['AdminController', 'bracketAssign']);
 $router->get('/admin/season/{id}/audit', ['AdminController', 'auditLog']);

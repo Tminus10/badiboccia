@@ -35,6 +35,12 @@ final class Season
         return $seasonId;
     }
 
+    public static function update(int $id, string $label, int $year): void
+    {
+        $stmt = Db::pdo()->prepare('UPDATE seasons SET label = ?, year = ? WHERE id = ?');
+        $stmt->execute([$label, $year, $id]);
+    }
+
     public static function setCurrent(int $id): void
     {
         $pdo = Db::pdo();

@@ -17,6 +17,16 @@ $isCurrent = (int) $season['is_current'] === 1;
   <a class="btn btn-secondary" href="<?= h(url('/admin/season/' . $season['id'] . '/audit')) ?>">Änderungsprotokoll</a>
 </div>
 
+<details class="add-form">
+  <summary>Saison bearbeiten</summary>
+  <form method="post" action="<?= h(url('/admin/season/' . $season['id'] . '/update')) ?>" class="stack-form">
+    <?= csrf_field() ?>
+    <label>Bezeichnung <input type="text" name="label" value="<?= h($season['label']) ?>" required></label>
+    <label>Jahr <input type="number" name="year" value="<?= (int) $season['year'] ?>" required></label>
+    <button class="btn btn-primary btn-sm" type="submit">Speichern</button>
+  </form>
+</details>
+
 <?php foreach ($groupData as $entry): ?>
   <?php $group = $entry['group']; ?>
   <section class="card">
