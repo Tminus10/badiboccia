@@ -1,0 +1,16 @@
+RewriteEngine On
+
+# Serve real files and directories (assets, uploads) as-is
+RewriteCond %{REQUEST_FILENAME} -f [OR]
+RewriteCond %{REQUEST_FILENAME} -d
+RewriteRule ^ - [L]
+
+# Everything else goes through the front controller
+RewriteRule ^ index.php [L]
+
+# Never let uploaded files be executed as PHP
+<FilesMatch "\.ph(p[3457]?|t|tml)$">
+  <If "%{REQUEST_URI} =~ m#^/uploads/#">
+    Require all denied
+  </If>
+</FilesMatch>

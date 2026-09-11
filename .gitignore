@@ -1,0 +1,8 @@
+config/config.php
+public/uploads/teams/*
+!public/uploads/teams/.gitkeep
+dev/mysql-data/
+dev/mysqld.log
+dev/mysqld.pid
+dev/mysql.sock
+.DS_Store

@@ -1,0 +1,126 @@
+<?php
+/** @var array $admin
+ * @var array $season
+ * @var array[] $groupData
+ * @var array[] $qfGames
+ * @var array[] $allTeams
+ */
+$pageTitle = 'Verwalten – ' . $season['label'];
+$isCurrent = (int) $season['is_current'] === 1;
+?>
+<div class="page-head">
+  <div>
+    <p class="eyebrow"><a href="<?= h(url('/admin')) ?>">Admin</a></p>
+    <h1><?= h($season['label']) ?></h1>
+    <?php if ($isCurrent): ?><span class="badge badge-current">Aktive Saison</span><?php else: ?><span class="badge badge-archive">Archiviert</span><?php endif; ?>
+  </div>
+  <a class="btn btn-secondary" href="<?= h(url('/admin/season/' . $season['id'] . '/audit')) ?>">Änderungsprotokoll</a>
+</div>
+
+<?php foreach ($groupData as $entry): ?>
+  <?php $group = $entry['group']; ?>
+  <section class="card">
+    <header class="group-card-head">
+      <h2>Gruppe <?= h($group['name']) ?></h2>
+      <?php if ($entry['gamesCount'] === 0): ?>
+        <form method="post" action="<?= h(url('/admin/group/' . $group['id'] . '/fixtures')) ?>" class="inline-form" onsubmit="return confirm('Spielplan für Gruppe <?= h($group['name']) ?> jetzt erstellen? Danach können keine weiteren Teams mehr sinnvoll ergänzt werden.');">
+          <?= csrf_field() ?>
+          <button class="btn btn-secondary btn-sm" type="submit" <?= count($entry['teams']) < 2 ? 'disabled' : '' ?>>Spielplan erstellen</button>
+        </form>
+      <?php else: ?>
+        <span class="muted"><?= (int) $entry['gamesCount'] ?> Spiele erstellt</span>
+      <?php endif; ?>
+    </header>
+
+    <?php if (empty($entry['teams'])): ?>
+      <p class="empty-state small">Noch keine Teams.</p>
+    <?php else: ?>
+      <ul class="admin-team-list">
+        <?php foreach ($entry['teams'] as $team): ?>
+          <li class="admin-team-row">
+            <?= render_partial('partials/team-avatar', ['team' => $team, 'size' => 'sm', 'linked' => true]) ?>
+            <div class="admin-team-info">
+              <strong><?= h($team['name']) ?></strong>
+              <span class="muted"><?= h($team['player1']) ?> &amp; <?= h($team['player2']) ?></span>
+            </div>
+            <details class="admin-team-edit">
+              <summary>Bearbeiten</summary>
+
+              <form method="post" action="<?= h(url('/admin/team/' . $team['id'])) ?>" class="stack-form">
+                <?= csrf_field() ?>
+                <label>Teamname <input type="text" name="name" value="<?= h($team['name']) ?>" required></label>
+                <label>Spieler 1 <input type="text" name="player1" value="<?= h($team['player1']) ?>" required></label>
+                <label>Spieler 2 <input type="text" name="player2" value="<?= h($team['player2']) ?>" required></label>
+                <label>Gruppe
+                  <select name="group_id">
+                    <?php foreach ($groupData as $opt): ?>
+                      <option value="<?= (int) $opt['group']['id'] ?>" <?= (int) $opt['group']['id'] === (int) $team['group_id'] ? 'selected' : '' ?>>Gruppe <?= h($opt['group']['name']) ?></option>
+                    <?php endforeach; ?>
+                  </select>
+                </label>
+                <button class="btn btn-primary btn-sm" type="submit">Speichern</button>
+              </form>
+
+              <form method="post" action="<?= h(url('/admin/team/' . $team['id'] . '/photo')) ?>" enctype="multipart/form-data" class="stack-form">
+                <?= csrf_field() ?>
+                <label>Foto <input type="file" name="photo" accept="image/png,image/jpeg,image/webp"></label>
+                <button class="btn btn-secondary btn-sm" type="submit">Foto hochladen</button>
+              </form>
+
+              <div class="admin-team-actions">
+                <form method="post" action="<?= h(url('/admin/team/' . $team['id'] . '/pin')) ?>" class="inline-form" onsubmit="return confirm('Neuen PIN für <?= h(addslashes($team['name'])) ?> erstellen? Der alte PIN wird ungültig.');">
+                  <?= csrf_field() ?>
+                  <button class="btn btn-ghost btn-sm" type="submit">PIN zurücksetzen</button>
+                </form>
+                <form method="post" action="<?= h(url('/admin/team/' . $team['id'] . '/delete')) ?>" class="inline-form" onsubmit="return confirm('Team <?= h(addslashes($team['name'])) ?> wirklich löschen? Alle zugehörigen Spiele werden ebenfalls gelöscht.');">
+                  <?= csrf_field() ?>
+                  <button class="btn btn-ghost btn-sm btn-danger" type="submit">Team löschen</button>
+                </form>
+              </div>
+            </details>
+          </li>
+        <?php endforeach; ?>
+      </ul>
+    <?php endif; ?>
+
+    <details class="add-form">
+      <summary>+ Team hinzufügen</summary>
+      <form method="post" action="<?= h(url('/admin/season/' . $season['id'] . '/team')) ?>" class="stack-form">
+        <?= csrf_field() ?>
+        <input type="hidden" name="group_id" value="<?= (int) $group['id'] ?>">
+        <label>Teamname <input type="text" name="name" placeholder="z.B. Debi &amp; Erika" required></label>
+        <label>Spieler 1 <input type="text" name="player1" required></label>
+        <label>Spieler 2 <input type="text" name="player2" required></label>
+        <button class="btn btn-primary btn-sm" type="submit">Team erstellen</button>
+      </form>
+    </details>
+  </section>
+<?php endforeach; ?>
+
+<section class="card">
+  <h2>Viertelfinal-Paarungen</h2>
+  <p class="muted">Weise die acht qualifizierten Teams (Erste &amp; Zweite jeder Gruppe) den vier Viertelfinal-Spielen zu.</p>
+  <form method="post" action="<?= h(url('/admin/season/' . $season['id'] . '/bracket')) ?>" class="stack-form">
+    <?= csrf_field() ?>
+    <?php foreach ($qfGames as $game): ?>
+      <?php $slot = (int) $game['slot_index']; ?>
+      <div class="qf-pair">
+        <span class="qf-label">Viertelfinal <?= $slot ?></span>
+        <select name="qf<?= $slot ?>_a">
+          <option value="">– Team A wählen –</option>
+          <?php foreach ($allTeams as $t): ?>
+            <option value="<?= (int) $t['id'] ?>" <?= (int) $game['team_a_id'] === (int) $t['id'] ? 'selected' : '' ?>><?= h($t['name']) ?></option>
+          <?php endforeach; ?>
+        </select>
+        <span class="vs">–</span>
+        <select name="qf<?= $slot ?>_b">
+          <option value="">– Team B wählen –</option>
+          <?php foreach ($allTeams as $t): ?>
+            <option value="<?= (int) $t['id'] ?>" <?= (int) $game['team_b_id'] === (int) $t['id'] ? 'selected' : '' ?>><?= h($t['name']) ?></option>
+          <?php endforeach; ?>
+        </select>
+      </div>
+    <?php endforeach; ?>
+    <button class="btn btn-primary" type="submit">Paarungen speichern</button>
+  </form>
+</section>
