@@ -49,6 +49,12 @@ final class Season
         $stmt->execute([$id]);
     }
 
+    public static function deactivate(int $id): void
+    {
+        $stmt = Db::pdo()->prepare('UPDATE seasons SET is_current = 0 WHERE id = ?');
+        $stmt->execute([$id]);
+    }
+
     public static function groups(int $seasonId): array
     {
         $stmt = Db::pdo()->prepare('SELECT * FROM team_groups WHERE season_id = ? ORDER BY name ASC');

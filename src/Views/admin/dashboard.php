@@ -18,6 +18,10 @@ $pageTitle = 'Admin';
           <a href="<?= h(url('/admin/season/' . $s['id'])) ?>"><strong><?= h($s['label']) ?></strong></a>
           <?php if ((int) $s['is_current'] === 1): ?>
             <span class="badge badge-current">Aktiv</span>
+            <form method="post" action="<?= h(url('/admin/season/' . $s['id'] . '/deactivate')) ?>" class="inline-form">
+              <?= csrf_field() ?>
+              <button class="btn btn-ghost btn-sm" type="submit">Deaktivieren</button>
+            </form>
           <?php else: ?>
             <form method="post" action="<?= h(url('/admin/season/' . $s['id'] . '/activate')) ?>" class="inline-form">
               <?= csrf_field() ?>

@@ -83,6 +83,19 @@ final class AdminController
         redirect('/admin/season/' . $id);
     }
 
+    public static function seasonDeactivate(array $params): void
+    {
+        AdminAuth::requireLogin();
+        if (!csrf_check()) {
+            redirect('/admin');
+            return;
+        }
+        $id = (int) $params['id'];
+        Season::deactivate($id);
+        flash_set('success', 'Saison ist jetzt archiviert (nicht mehr bearbeitbar).');
+        redirect('/admin/season/' . $id);
+    }
+
     public static function seasonUpdate(array $params): void
     {
         AdminAuth::requireLogin();

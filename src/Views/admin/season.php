@@ -14,7 +14,20 @@ $isCurrent = (int) $season['is_current'] === 1;
     <h1><?= h($season['label']) ?></h1>
     <?php if ($isCurrent): ?><span class="badge badge-current">Aktive Saison</span><?php else: ?><span class="badge badge-archive">Archiviert</span><?php endif; ?>
   </div>
-  <a class="btn btn-secondary" href="<?= h(url('/admin/season/' . $season['id'] . '/audit')) ?>">Änderungsprotokoll</a>
+  <div class="page-head-actions">
+    <?php if ($isCurrent): ?>
+      <form method="post" action="<?= h(url('/admin/season/' . $season['id'] . '/deactivate')) ?>" class="inline-form">
+        <?= csrf_field() ?>
+        <button class="btn btn-secondary btn-sm" type="submit">Deaktivieren</button>
+      </form>
+    <?php else: ?>
+      <form method="post" action="<?= h(url('/admin/season/' . $season['id'] . '/activate')) ?>" class="inline-form">
+        <?= csrf_field() ?>
+        <button class="btn btn-secondary btn-sm" type="submit">Als aktiv setzen</button>
+      </form>
+    <?php endif; ?>
+    <a class="btn btn-secondary" href="<?= h(url('/admin/season/' . $season['id'] . '/audit')) ?>">Änderungsprotokoll</a>
+  </div>
 </div>
 
 <details class="add-form">
