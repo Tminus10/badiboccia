@@ -46,26 +46,41 @@ Then visit `/admin/login` to sign in and set up a season, groups, and teams.
 
 ## Deployment (hostpoint.ch)
 
-One-time server setup:
+Live at **https://boccia.reutener.swiss**, deployed to hostpoint's Standard plan.
+
+Server layout: hostpoint requires the document root to live inside `~/www/`, so
+the whole project is deployed to `/home/reutener/www/boccia.reutener.swiss/`
+with the subdomain's document root pointed at the `public/` subfolder within
+it (set via the hostpoint subdomain wizard: `boccia.reutener.swiss/public`).
+That keeps `config/`, `src/`, and `migrations/` next to `public/` but outside
+the web-reachable root.
+
+One-time server setup (already done for this deployment; repeat only for a
+fresh environment):
 
 1. In the hostpoint control panel, create a MySQL/MariaDB database.
 2. Import the schema: open phpMyAdmin and run `migrations/001_init.sql`, or via SSH:
-   `mysql -u <user> -p <database> < migrations/001_init.sql`.
+   `mysql -h <db-internal-host> -u <user> -p <database> < migrations/001_init.sql`.
 3. Copy `config/config.example.php` to `config/config.php` on the server and fill
-   in the real DB credentials. This file is intentionally excluded from the repo
-   and from deploys (it holds secrets and differs per environment).
-4. Point the `boccia.reutener.swiss` (sub)domain's document root at this project's
-   `public/` folder.
+   in the real DB credentials (use the **internal** DB host, e.g.
+   `reutener.mysql.db.internal` — the external host is only for connecting from
+   your own computer). This file is intentionally excluded from the repo and
+   from deploys (it holds secrets and differs per environment).
+4. Enable SSH under the hostpoint control panel's Advanced → SSH-Zugang, add a
+   public key there, and connect as `<user>@<user>.ssh.cloud.hostpoint.ch`.
 5. Over SSH, run `php scripts/create-admin.php <username> <password> "<display name>"`
    to create the first admin account.
 
 Every deploy after that:
 
 ```
-export HOSTPOINT_SSH=myuser@myuser.hostpoint.ch
-export HOSTPOINT_PATH=/home/myuser/boccia.reutener.swiss
+export HOSTPOINT_SSH=reutener@reutener.ssh.cloud.hostpoint.ch
+export HOSTPOINT_PATH=/home/reutener/www/boccia.reutener.swiss
 ./scripts/deploy.sh
 ```
+
+(Locally, `~/.ssh/config` has a `hostpoint-badiboccia` alias set up for this,
+so `ssh hostpoint-badiboccia` also works directly.)
 
 This rsyncs the project over SSH, skipping `config/config.php` (server-only secrets)
 and `public/uploads/` (live team photos) so neither gets clobbered.
