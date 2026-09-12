@@ -25,7 +25,7 @@
 
   <h2>Terminplanung</h2>
   <p>
-    Die Termine für die Gruppenspiele vereinbart ihr direkt mit eurem Gegner.
+    Die Termine für die Spiele vereinbart ihr direkt mit eurem Gegner.
     Alle <strong>Gruppenspiele</strong> müssen <strong>bis Ende Juli</strong> ausgetragen sein, damit rechtzeitig
     genug Zeit für die K.-o.-Phase bleibt.
   </p>
