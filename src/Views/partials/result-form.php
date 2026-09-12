@@ -82,16 +82,16 @@ if ($teamA === null || $teamB === null) {
     <form method="post" action="<?= h(url('/game/' . $game['id'] . '/result')) ?>" class="score-form">
       <?= csrf_field() ?>
       <input type="hidden" name="return_to" value="<?= h($returnTo) ?>">
+      <label class="date-field">
+        <span>Datum</span>
+        <input type="date" name="played_date" value="<?= h($defaultDate) ?>" max="<?= h($today) ?>" required>
+      </label>
       <p class="score-hint">Zum Speichern das Ergebnis antippen:</p>
       <div class="score-buttons">
         <?php foreach ($options as [$value, $label]): ?>
           <button type="submit" name="score" value="<?= h($value) ?>" class="score-btn"><?= h($label) ?></button>
         <?php endforeach; ?>
       </div>
-      <label class="date-field">
-        <span>Datum</span>
-        <input type="date" name="played_date" value="<?= h($defaultDate) ?>" max="<?= h($today) ?>" required>
-      </label>
     </form>
   </details>
 <?php endif; ?>
