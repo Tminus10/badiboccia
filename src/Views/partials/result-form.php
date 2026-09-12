@@ -20,6 +20,7 @@ if ($seasonDefaultDate > $today) {
     $seasonDefaultDate = $today;
 }
 $defaultDate = $game['played_date'] ?? $seasonDefaultDate;
+$currentValue = $complete ? $game['sets_a'] . '-' . $game['sets_b'] : null;
 
 if ($teamA === null || $teamB === null) {
     $options = [];
@@ -89,7 +90,8 @@ if ($teamA === null || $teamB === null) {
       <p class="score-hint">Zum Speichern das Ergebnis antippen:</p>
       <div class="score-buttons">
         <?php foreach ($options as [$value, $label]): ?>
-          <button type="submit" name="score" value="<?= h($value) ?>" class="score-btn"><?= h($label) ?></button>
+          <?php $isCurrent = $value === $currentValue; ?>
+          <button type="submit" name="score" value="<?= h($value) ?>" class="score-btn<?= $isCurrent ? ' score-btn-current' : '' ?>"><?= h($label) ?><?= $isCurrent ? ' (aktuell)' : '' ?></button>
         <?php endforeach; ?>
       </div>
     </form>
