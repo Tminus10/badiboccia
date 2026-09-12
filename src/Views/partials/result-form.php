@@ -53,6 +53,27 @@ if ($teamA === null || $teamB === null) {
   </div>
 <?php elseif ($teamA === null || $teamB === null): ?>
   <span class="result-pending">Gegner steht noch nicht fest</span>
+<?php elseif (!empty($game['played_date'])): ?>
+  <div class="result-chip result-chip-scheduled">
+    <span class="scheduled-label">Geplant</span>
+    <?php if (!$hideDate): ?><span class="played-date"><?= h(format_date_ch($game['played_date'])) ?></span><?php endif; ?>
+  </div>
+<?php endif; ?>
+
+<?php if ($canEdit && $teamA !== null && $teamB !== null && !$complete): ?>
+  <details class="result-entry">
+    <summary><?= empty($game['played_date']) ? 'Termin festlegen' : 'Termin ändern' ?></summary>
+    <form method="post" action="<?= h(url('/game/' . $game['id'] . '/schedule')) ?>" class="score-form">
+      <?= csrf_field() ?>
+      <input type="hidden" name="return_to" value="<?= h($returnTo) ?>">
+      <p class="score-hint">Für die anderen Teams sichtbar, sobald gespeichert.</p>
+      <label class="date-field">
+        <span>Datum</span>
+        <input type="date" name="played_date" value="<?= h($game['played_date'] ?? $today) ?>" required>
+      </label>
+      <button class="btn btn-primary btn-sm" type="submit">Termin speichern</button>
+    </form>
+  </details>
 <?php endif; ?>
 
 <?php if ($canEdit && $options): ?>

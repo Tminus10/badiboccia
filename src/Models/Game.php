@@ -11,7 +11,10 @@ final class Game
 
     public static function forGroup(int $groupId): array
     {
-        $stmt = Db::pdo()->prepare("SELECT * FROM games WHERE group_id = ? AND phase = 'group' ORDER BY id ASC");
+        $stmt = Db::pdo()->prepare(
+            "SELECT * FROM games WHERE group_id = ? AND phase = 'group'
+             ORDER BY (played_date IS NULL) ASC, played_date ASC, id ASC"
+        );
         $stmt->execute([$groupId]);
         return $stmt->fetchAll();
     }
@@ -19,7 +22,8 @@ final class Game
     public static function forTeam(int $teamId): array
     {
         $stmt = Db::pdo()->prepare(
-            'SELECT * FROM games WHERE team_a_id = ? OR team_b_id = ? ORDER BY phase ASC, id ASC'
+            "SELECT * FROM games WHERE team_a_id = ? OR team_b_id = ?
+             ORDER BY FIELD(phase, 'group','qf','sf','final'), (played_date IS NULL) ASC, played_date ASC, id ASC"
         );
         $stmt->execute([$teamId, $teamId]);
         return $stmt->fetchAll();
@@ -126,6 +130,29 @@ final class Game
             $winnerId = $setsA > $setsB ? (int) $game['team_a_id'] : (int) $game['team_b_id'];
             self::setQfTeam((int) $game['next_game_id'], $game['next_game_slot'], $winnerId);
         }
+    }
+
+    /** Sets a scheduled/played date without recording a result (sets_a/sets_b stay untouched). */
+    public static function scheduleDate(int $gameId, string $date, string $actorType, int $actorId, string $actorLabel): void
+    {
+        $pdo = Db::pdo();
+        $game = self::find($gameId);
+        if ($game === null) {
+            throw new RuntimeException('Game not found');
+        }
+
+        $stmt = $pdo->prepare('UPDATE games SET played_date = ?, updated_by_type = ?, updated_by_id = ? WHERE id = ?');
+        $stmt->execute([$date, $actorType, $actorId, $gameId]);
+
+        $audit = $pdo->prepare(
+            'INSERT INTO audit_log (game_id, actor_type, actor_id, actor_label, old_sets_a, old_sets_b, old_played_date, new_sets_a, new_sets_b, new_played_date)
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)'
+        );
+        $audit->execute([
+            $gameId, $actorType, $actorId, $actorLabel,
+            $game['sets_a'], $game['sets_b'], $game['played_date'],
+            $game['sets_a'], $game['sets_b'], $date,
+        ]);
     }
 
     public static function recentAuditLog(int $seasonId, int $limit = 50): array

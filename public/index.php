@@ -36,6 +36,7 @@ $router->post('/logout', ['AuthController', 'logout']);
 
 // Result entry (team or admin)
 $router->post('/game/{id}/result', ['GameController', 'submitResult']);
+$router->post('/game/{id}/schedule', ['GameController', 'scheduleDate']);
 
 // Admin area
 $router->get('/admin', ['AdminController', 'dashboard']);

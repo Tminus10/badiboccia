@@ -43,7 +43,7 @@ $phaseLabels = ['group' => 'Gruppenphase', 'qf' => 'Viertelfinal', 'sf' => 'Halb
           $viewerTeamId = $viewerTeam['id'] ?? null;
           $canEdit = $isCurrent && ($admin !== null || ($viewerTeamId !== null && Game::isParticipant($game, (int) $viewerTeamId)));
         ?>
-        <?php $dateLabel = Game::isComplete($game) ? format_date_ch($game['played_date']) : ''; ?>
+        <?php $dateLabel = !empty($game['played_date']) ? format_date_ch($game['played_date']) : ''; ?>
         <li class="fixture-card team-fixture-card">
           <div class="fixture-teams">
             <?= render_partial('partials/team-dot', ['team' => $targetTeam]) ?>
