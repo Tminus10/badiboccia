@@ -303,6 +303,7 @@ input:focus, select:focus, button:focus, a:focus {
 }
 .date-field { flex-direction: row; align-items: center; gap: 0.6rem; font-weight: 600; color: var(--text); }
 .date-field input { flex: 1; }
+.score-hint { margin: 0; font-size: 0.85rem; font-weight: 600; color: var(--text-muted); }
 .score-buttons { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; }
 .score-btn {
   -webkit-appearance: none; appearance: none;

@@ -61,6 +61,7 @@ if ($teamA === null || $teamB === null) {
     <form method="post" action="<?= h(url('/game/' . $game['id'] . '/result')) ?>" class="score-form">
       <?= csrf_field() ?>
       <input type="hidden" name="return_to" value="<?= h($returnTo) ?>">
+      <p class="score-hint">Zum Speichern das Ergebnis antippen:</p>
       <div class="score-buttons">
         <?php foreach ($options as [$value, $label]): ?>
           <button type="submit" name="score" value="<?= h($value) ?>" class="score-btn"><?= h($label) ?></button>
