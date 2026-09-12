@@ -264,7 +264,7 @@ input:focus, select:focus, button:focus, a:focus {
 .fixture-teams { display: flex; align-items: center; gap: 0.6rem; flex-wrap: wrap; }
 .fixture-num, .vs-label { color: var(--text-muted); font-size: 0.85rem; }
 .vs { color: var(--text-muted); }
-.fixture-result { display: flex; align-items: center; gap: 0.6rem; flex-wrap: wrap; }
+.fixture-result { display: flex; align-items: center; gap: 0.6rem; flex-wrap: wrap; margin-left: auto; }
 
 .result-chip { display: flex; align-items: center; gap: 0.5rem; }
 .result-chip .score { font-weight: 800; font-size: 1.05rem; background: var(--surface-alt); padding: 0.2rem 0.6rem; border-radius: var(--radius-sm); }
