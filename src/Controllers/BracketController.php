@@ -41,8 +41,20 @@ final class BracketController
             }
         }
 
+        $groupData = [];
+        foreach (Season::groups($seasonId) as $group) {
+            $teams = Team::byGroup((int) $group['id']);
+            $games = Game::forGroup((int) $group['id']);
+            $groupData[] = [
+                'group' => $group,
+                'standings' => StandingsCalculator::compute($teams, $games),
+                'anyPlayed' => count(array_filter($games, fn ($g) => Game::isComplete($g))) > 0,
+            ];
+        }
+
         render('bracket', [
             'season' => $season,
+            'groupData' => $groupData,
             'phases' => BracketService::byPhase($bracketGames),
             'teamsById' => $teamsById,
             'viewerTeam' => TeamAuth::current(),

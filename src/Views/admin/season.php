@@ -64,7 +64,9 @@ $isCurrent = (int) $season['is_current'] === 1;
             <?= render_partial('partials/team-avatar', ['team' => $team, 'size' => 'sm', 'linked' => true]) ?>
             <div class="admin-team-info">
               <strong><?= h($team['name']) ?></strong>
-              <span class="muted"><?= h($team['player1']) ?> &amp; <?= h($team['player2']) ?></span>
+              <?php $subtitle = team_players_subtitle($team); ?>
+              <?php if ($subtitle !== null): ?><span class="muted"><?= h($subtitle) ?></span><?php endif; ?>
+              <span class="muted pin-display">PIN: <strong><?= h($team['pin']) ?></strong></span>
             </div>
             <details class="admin-team-edit">
               <summary>Bearbeiten</summary>

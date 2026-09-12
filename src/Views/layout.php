@@ -23,6 +23,7 @@ $flashes = flash_take();
       <a href="<?= h(url('/')) ?>">Übersicht</a>
       <a href="<?= h(url('/bracket')) ?>">Turnierbaum</a>
       <a href="<?= h(url('/archive')) ?>">Archiv</a>
+      <a href="<?= h(url('/regeln')) ?>">Regeln</a>
     </nav>
     <div class="account">
       <?php if ($currentAdmin): ?>

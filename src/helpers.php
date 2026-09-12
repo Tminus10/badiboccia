@@ -89,6 +89,16 @@ function json_response(array $data, int $status = 200): void
     exit;
 }
 
+/** Returns "Player1 & Player2" only if it differs from the team name (avoids showing the same text twice). */
+function team_players_subtitle(array $team): ?string
+{
+    $players = trim($team['player1']) . ' & ' . trim($team['player2']);
+    if (mb_strtolower(trim($team['name'])) === mb_strtolower($players)) {
+        return null;
+    }
+    return $players;
+}
+
 function initials(string $name): string
 {
     $parts = preg_split('/\s*&\s*|\s+/', trim($name)) ?: [];

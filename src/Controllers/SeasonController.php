@@ -6,7 +6,11 @@ final class SeasonController
     {
         $season = Season::current();
         if ($season === null) {
-            render('no-season');
+            if (empty(Season::all())) {
+                render('no-season');
+                return;
+            }
+            redirect('/archive');
             return;
         }
         self::renderDashboard($season);

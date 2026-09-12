@@ -17,7 +17,8 @@ $phaseLabels = ['group' => 'Gruppenphase', 'qf' => 'Viertelfinal', 'sf' => 'Halb
   <div>
     <p class="eyebrow"><a href="<?= h(url('/group/' . $group['id'])) ?>">Gruppe <?= h($group['name']) ?></a> &middot; <?= h($season['label']) ?></p>
     <h1><?= h($targetTeam['name']) ?></h1>
-    <p class="muted"><?= h($targetTeam['player1']) ?> &amp; <?= h($targetTeam['player2']) ?></p>
+    <?php $subtitle = team_players_subtitle($targetTeam); ?>
+    <?php if ($subtitle !== null): ?><p class="muted"><?= h($subtitle) ?></p><?php endif; ?>
   </div>
 </div>
 

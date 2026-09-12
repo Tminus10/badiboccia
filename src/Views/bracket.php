@@ -1,5 +1,6 @@
 <?php
 /** @var array $season
+ * @var array[] $groupData
  * @var array $phases
  * @var array[] $teamsById
  * @var array|null $viewerTeam
@@ -18,6 +19,30 @@ $phaseLabels = ['qf' => 'Viertelfinal', 'sf' => 'Halbfinal', 'final' => 'Final']
 </div>
 
 <div class="bracket">
+  <div class="bracket-col bracket-col-groups">
+    <h2>Gruppenphase</h2>
+    <?php foreach ($groupData as $entry): ?>
+      <?php $group = $entry['group']; ?>
+      <div class="bracket-group-card">
+        <a class="bracket-group-title" href="<?= h(url('/group/' . $group['id'])) ?>">Gruppe <?= h($group['name']) ?></a>
+        <?php if (empty($entry['standings'])): ?>
+          <p class="empty-state small">Noch keine Teams.</p>
+        <?php else: ?>
+          <table class="standings-table standings-compact">
+            <tbody>
+              <?php foreach ($entry['standings'] as $row): ?>
+                <tr class="<?= ($row['rank'] <= 2 && $entry['anyPlayed']) ? 'qualifies' : '' ?>">
+                  <td class="rank-col"><?= (int) $row['rank'] ?></td>
+                  <td><?= render_partial('partials/team-dot', ['team' => $row['team']]) ?></td>
+                  <td class="pts"><?= (int) $row['points'] ?></td>
+                </tr>
+              <?php endforeach; ?>
+            </tbody>
+          </table>
+        <?php endif; ?>
+      </div>
+    <?php endforeach; ?>
+  </div>
   <?php foreach (['qf', 'sf', 'final'] as $phase): ?>
     <div class="bracket-col bracket-col-<?= h($phase) ?>">
       <h2><?= h($phaseLabels[$phase]) ?></h2>

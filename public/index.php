@@ -24,6 +24,7 @@ $router->get('/team/{id}', ['TeamController', 'show']);
 $router->get('/bracket', ['BracketController', 'current']);
 $router->get('/bracket/{id}', ['BracketController', 'forSeason']);
 $router->get('/archive', ['ArchiveController', 'index']);
+$router->get('/regeln', ['PageController', 'rules']);
 
 // Login / logout
 $router->get('/login', ['AuthController', 'teamLoginForm']);

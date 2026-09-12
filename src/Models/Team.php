@@ -37,9 +37,9 @@ final class Team
         $color = ColorAssigner::colorForIndex($colorIndex);
 
         $stmt = $pdo->prepare(
-            'INSERT INTO teams (season_id, group_id, name, player1, player2, color_hex, pin_hash) VALUES (?, ?, ?, ?, ?, ?, ?)'
+            'INSERT INTO teams (season_id, group_id, name, player1, player2, color_hex, pin) VALUES (?, ?, ?, ?, ?, ?, ?)'
         );
-        $stmt->execute([$seasonId, $groupId, $name, $player1, $player2, $color, password_hash($pin, PASSWORD_DEFAULT)]);
+        $stmt->execute([$seasonId, $groupId, $name, $player1, $player2, $color, $pin]);
 
         return (int) $pdo->lastInsertId();
     }
@@ -60,8 +60,8 @@ final class Team
 
     public static function resetPin(int $id, string $newPin): void
     {
-        $stmt = Db::pdo()->prepare('UPDATE teams SET pin_hash = ? WHERE id = ?');
-        $stmt->execute([password_hash($newPin, PASSWORD_DEFAULT), $id]);
+        $stmt = Db::pdo()->prepare('UPDATE teams SET pin = ? WHERE id = ?');
+        $stmt->execute([$newPin, $id]);
     }
 
     public static function delete(int $id): void
@@ -72,6 +72,6 @@ final class Team
 
     public static function verifyPin(array $team, string $pin): bool
     {
-        return password_verify($pin, $team['pin_hash']);
+        return hash_equals($team['pin'], $pin);
     }
 }
