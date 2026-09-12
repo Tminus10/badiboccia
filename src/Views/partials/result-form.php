@@ -7,6 +7,7 @@
  * @var bool $canEdit
  * @var int|null $targetTeamId whose page this is being shown on, for score orientation (null = absolute team A:B score)
  * @var bool|null $hideDate omit the date from the chip (caller renders it separately)
+ * @var int|null $seasonYear the season's year, used to default the date picker to the right year for past seasons
  */
 $targetTeamId = $targetTeamId ?? null;
 $hideDate = $hideDate ?? false;
@@ -14,7 +15,11 @@ $complete = Game::isComplete($game);
 $viewerIsA = $viewerTeamId !== null && $teamA !== null && (int) $game['team_a_id'] === $viewerTeamId;
 $viewerIsB = $viewerTeamId !== null && $teamB !== null && (int) $game['team_b_id'] === $viewerTeamId;
 $today = date('Y-m-d');
-$defaultDate = $game['played_date'] ?? $today;
+$seasonDefaultDate = sprintf('%04d-07-15', $seasonYear ?? (int) date('Y'));
+if ($seasonDefaultDate > $today) {
+    $seasonDefaultDate = $today;
+}
+$defaultDate = $game['played_date'] ?? $seasonDefaultDate;
 
 if ($teamA === null || $teamB === null) {
     $options = [];

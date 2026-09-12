@@ -87,6 +87,7 @@ foreach ($games as $g) {
                 'returnTo' => $returnTo,
                 'viewerTeamId' => $viewerTeamId,
                 'canEdit' => $canEdit,
+                'seasonYear' => (int) $season['year'],
             ]) ?>
           </div>
         </li>

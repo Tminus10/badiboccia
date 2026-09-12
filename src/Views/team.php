@@ -65,6 +65,7 @@ $phaseLabels = ['group' => 'Gruppenphase', 'qf' => 'Viertelfinal', 'sf' => 'Halb
                 'canEdit' => $canEdit,
                 'targetTeamId' => (int) $targetTeam['id'],
                 'hideDate' => true,
+                'seasonYear' => (int) $season['year'],
             ]) ?>
           </div>
         </li>

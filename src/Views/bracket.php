@@ -64,6 +64,7 @@ $phaseLabels = ['qf' => 'Viertelfinal', 'sf' => 'Halbfinal', 'final' => 'Final']
                 'returnTo' => $returnTo,
                 'viewerTeamId' => $viewerTeamId,
                 'canEdit' => $canEdit,
+                'seasonYear' => (int) $season['year'],
             ]) ?>
           </div>
         </div>
