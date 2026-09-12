@@ -15,38 +15,40 @@ $flashes = flash_take();
 <body>
 <header class="topbar">
   <div class="topbar-inner">
-    <a class="brand" href="<?= h(url('/')) ?>">
-      <span class="brand-mark" aria-hidden="true"></span>
-      Badi Boccia Buochs
-    </a>
+    <div class="topbar-row">
+      <a class="brand" href="<?= h(url('/')) ?>">
+        <span class="brand-mark" aria-hidden="true"></span>
+        Badi Boccia Buochs
+      </a>
+      <div class="account">
+        <?php if ($currentAdmin): ?>
+          <span class="pill pill-admin">Admin: <?= h($currentAdmin['display_name']) ?></span>
+          <a class="btn btn-ghost btn-sm" href="<?= h(url('/admin')) ?>">Admin-Bereich</a>
+          <form method="post" action="<?= h(url('/logout')) ?>" class="inline-form">
+            <?= csrf_field() ?>
+            <input type="hidden" name="return_to" value="<?= h($_SERVER['REQUEST_URI']) ?>">
+            <button class="btn btn-ghost btn-sm" type="submit">Abmelden</button>
+          </form>
+        <?php elseif ($currentTeam): ?>
+          <a class="pill team-pill" href="<?= h(url('/team/' . $currentTeam['id'])) ?>" style="--dot: <?= h($currentTeam['color_hex']) ?>">
+            <span class="dot" aria-hidden="true"></span><?= h($currentTeam['name']) ?>
+          </a>
+          <form method="post" action="<?= h(url('/logout')) ?>" class="inline-form">
+            <?= csrf_field() ?>
+            <input type="hidden" name="return_to" value="<?= h($_SERVER['REQUEST_URI']) ?>">
+            <button class="btn btn-ghost btn-sm" type="submit">Abmelden</button>
+          </form>
+        <?php else: ?>
+          <a class="btn btn-primary btn-sm" href="<?= h(url('/login')) ?>">Anmelden</a>
+        <?php endif; ?>
+      </div>
+    </div>
     <nav class="topnav">
       <a href="<?= h(url('/')) ?>">Übersicht</a>
       <a href="<?= h(url('/bracket')) ?>">Turnierbaum</a>
       <a href="<?= h(url('/archive')) ?>">Archiv</a>
       <a href="<?= h(url('/regeln')) ?>">Regeln</a>
     </nav>
-    <div class="account">
-      <?php if ($currentAdmin): ?>
-        <span class="pill pill-admin">Admin: <?= h($currentAdmin['display_name']) ?></span>
-        <a class="btn btn-ghost btn-sm" href="<?= h(url('/admin')) ?>">Admin-Bereich</a>
-        <form method="post" action="<?= h(url('/logout')) ?>" class="inline-form">
-          <?= csrf_field() ?>
-          <input type="hidden" name="return_to" value="<?= h($_SERVER['REQUEST_URI']) ?>">
-          <button class="btn btn-ghost btn-sm" type="submit">Abmelden</button>
-        </form>
-      <?php elseif ($currentTeam): ?>
-        <a class="pill team-pill" href="<?= h(url('/team/' . $currentTeam['id'])) ?>" style="--dot: <?= h($currentTeam['color_hex']) ?>">
-          <span class="dot" aria-hidden="true"></span><?= h($currentTeam['name']) ?>
-        </a>
-        <form method="post" action="<?= h(url('/logout')) ?>" class="inline-form">
-          <?= csrf_field() ?>
-          <input type="hidden" name="return_to" value="<?= h($_SERVER['REQUEST_URI']) ?>">
-          <button class="btn btn-ghost btn-sm" type="submit">Abmelden</button>
-        </form>
-      <?php else: ?>
-        <a class="btn btn-primary btn-sm" href="<?= h(url('/login')) ?>">Anmelden</a>
-      <?php endif; ?>
-    </div>
   </div>
 </header>
 
