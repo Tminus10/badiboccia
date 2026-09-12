@@ -5,7 +5,9 @@
  * @var string $returnTo
  * @var int|null $viewerTeamId
  * @var bool $canEdit
+ * @var int|null $targetTeamId whose page this is being shown on, for score orientation (null = absolute team A:B score)
  */
+$targetTeamId = $targetTeamId ?? null;
 $complete = Game::isComplete($game);
 $viewerIsA = $viewerTeamId !== null && $teamA !== null && (int) $game['team_a_id'] === $viewerTeamId;
 $viewerIsB = $viewerTeamId !== null && $teamB !== null && (int) $game['team_b_id'] === $viewerTeamId;
@@ -39,7 +41,7 @@ if ($teamA === null || $teamB === null) {
 ?>
 <?php if ($complete): ?>
   <div class="result-chip">
-    <span class="score"><?= h(format_result($game)) ?></span>
+    <span class="score"><?= h(format_result($game, $targetTeamId)) ?></span>
     <?php if (!empty($game['played_date'])): ?><span class="played-date"><?= h(format_date_ch($game['played_date'])) ?></span><?php endif; ?>
   </div>
 <?php elseif ($teamA === null || $teamB === null): ?>

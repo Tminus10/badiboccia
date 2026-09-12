@@ -60,6 +60,7 @@ $phaseLabels = ['group' => 'Gruppenphase', 'qf' => 'Viertelfinal', 'sf' => 'Halb
                 'returnTo' => $returnTo,
                 'viewerTeamId' => $viewerTeamId,
                 'canEdit' => $canEdit,
+                'targetTeamId' => (int) $targetTeam['id'],
             ]) ?>
           </div>
         </li>

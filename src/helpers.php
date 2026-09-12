@@ -112,10 +112,18 @@ function initials(string $name): string
     return mb_strtoupper(mb_substr($parts[0], 0, 1) . mb_substr($parts[count($parts) - 1], 0, 1));
 }
 
-function format_result(array $game): string
+/**
+ * Formats the set score. Pass $perspectiveTeamId to orient it as "this team : opponent"
+ * (used on a team's own page, where only the opponent's name is shown); leave it null
+ * for an absolute "team A : team B" score (used wherever both team names are shown).
+ */
+function format_result(array $game, ?int $perspectiveTeamId = null): string
 {
     if (!Game::isComplete($game)) {
         return '–';
+    }
+    if ($perspectiveTeamId !== null && (int) $game['team_b_id'] === $perspectiveTeamId) {
+        return $game['sets_b'] . ':' . $game['sets_a'];
     }
     return $game['sets_a'] . ':' . $game['sets_b'];
 }
