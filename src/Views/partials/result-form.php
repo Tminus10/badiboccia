@@ -6,8 +6,10 @@
  * @var int|null $viewerTeamId
  * @var bool $canEdit
  * @var int|null $targetTeamId whose page this is being shown on, for score orientation (null = absolute team A:B score)
+ * @var bool|null $hideDate omit the date from the chip (caller renders it separately)
  */
 $targetTeamId = $targetTeamId ?? null;
+$hideDate = $hideDate ?? false;
 $complete = Game::isComplete($game);
 $viewerIsA = $viewerTeamId !== null && $teamA !== null && (int) $game['team_a_id'] === $viewerTeamId;
 $viewerIsB = $viewerTeamId !== null && $teamB !== null && (int) $game['team_b_id'] === $viewerTeamId;
@@ -42,7 +44,7 @@ if ($teamA === null || $teamB === null) {
 <?php if ($complete): ?>
   <div class="result-chip">
     <span class="score"><?= h(format_result($game, $targetTeamId)) ?></span>
-    <?php if (!empty($game['played_date'])): ?><span class="played-date"><?= h(format_date_ch($game['played_date'])) ?></span><?php endif; ?>
+    <?php if (!$hideDate && !empty($game['played_date'])): ?><span class="played-date"><?= h(format_date_ch($game['played_date'])) ?></span><?php endif; ?>
   </div>
 <?php elseif ($teamA === null || $teamB === null): ?>
   <span class="result-pending">Gegner steht noch nicht fest</span>

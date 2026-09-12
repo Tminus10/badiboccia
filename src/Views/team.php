@@ -43,9 +43,11 @@ $phaseLabels = ['group' => 'Gruppenphase', 'qf' => 'Viertelfinal', 'sf' => 'Halb
           $viewerTeamId = $viewerTeam['id'] ?? null;
           $canEdit = $isCurrent && ($admin !== null || ($viewerTeamId !== null && Game::isParticipant($game, (int) $viewerTeamId)));
         ?>
-        <li class="fixture-card">
+        <?php $dateLabel = Game::isComplete($game) ? format_date_ch($game['played_date']) : ''; ?>
+        <li class="fixture-card team-fixture-card">
           <div class="fixture-teams">
-            <span class="vs-label">gegen</span>
+            <?= render_partial('partials/team-dot', ['team' => $targetTeam]) ?>
+            <span class="vs">vs.</span>
             <?php if ($opponent): ?>
               <?= render_partial('partials/team-dot', ['team' => $opponent]) ?>
             <?php else: ?>
@@ -53,6 +55,7 @@ $phaseLabels = ['group' => 'Gruppenphase', 'qf' => 'Viertelfinal', 'sf' => 'Halb
             <?php endif; ?>
           </div>
           <div class="fixture-result">
+            <span class="fixture-date"><?= h($dateLabel) ?></span>
             <?= render_partial('partials/result-form', [
                 'game' => $game,
                 'teamA' => $teamA,
@@ -61,6 +64,7 @@ $phaseLabels = ['group' => 'Gruppenphase', 'qf' => 'Viertelfinal', 'sf' => 'Halb
                 'viewerTeamId' => $viewerTeamId,
                 'canEdit' => $canEdit,
                 'targetTeamId' => (int) $targetTeam['id'],
+                'hideDate' => true,
             ]) ?>
           </div>
         </li>
