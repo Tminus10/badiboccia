@@ -19,14 +19,14 @@
   <h2>Viertelfinale und K.-o.-Phase</h2>
   <p>
     Die ersten beiden Teams jeder Gruppe erreichen das Viertelfinale. Ab hier
-    wird im K.-o.-System gespielt – Viertelfinale, Halbfinale, Final – und die
+    wird im K.-o.-System gespielt – Viertelfinale, Halbfinale, Finale – und die
     Sätze gehen neu bis 21 Punkte.
   </p>
 
   <h2>Terminplanung</h2>
   <p>
     Die Termine für die Gruppenspiele vereinbart ihr direkt mit eurem Gegner.
-    Alle Gruppenspiele müssen bis Ende Juli ausgetragen sein, damit rechtzeitig
+    Alle <strong>Gruppenspiele</strong> müssen <strong>bis Ende Juli</strong> ausgetragen sein, damit rechtzeitig
     genug Zeit für die K.-o.-Phase bleibt.
   </p>
 </section>
