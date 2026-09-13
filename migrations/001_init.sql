@@ -16,19 +16,31 @@ CREATE TABLE team_groups (
   UNIQUE KEY uniq_season_group (season_id, name)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
+-- A team is a persistent pairing (e.g. "Debi & Erika"): it keeps the same id,
+-- PIN, photo and color across every season it plays. Which group/season it's
+-- enrolled in for a given year lives in team_seasons below.
 CREATE TABLE teams (
   id INT AUTO_INCREMENT PRIMARY KEY,
-  season_id INT NOT NULL,
-  group_id INT NOT NULL,
   name VARCHAR(150) NOT NULL,
   player1 VARCHAR(100) NOT NULL,
   player2 VARCHAR(100) NOT NULL,
   color_hex CHAR(7) NOT NULL,
   photo_path VARCHAR(255) NULL,
-  pin_hash VARCHAR(255) NOT NULL,
+  pin VARCHAR(4) NOT NULL,
+  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- One row per team per season it's enrolled in: which group it plays in.
+CREATE TABLE team_seasons (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  team_id INT NOT NULL,
+  season_id INT NOT NULL,
+  group_id INT NOT NULL,
   created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (team_id) REFERENCES teams(id) ON DELETE CASCADE,
   FOREIGN KEY (season_id) REFERENCES seasons(id) ON DELETE CASCADE,
-  FOREIGN KEY (group_id) REFERENCES team_groups(id) ON DELETE CASCADE
+  FOREIGN KEY (group_id) REFERENCES team_groups(id) ON DELETE CASCADE,
+  UNIQUE KEY uniq_team_season (team_id, season_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE admins (

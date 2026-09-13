@@ -38,6 +38,7 @@ final class AdminController
         $bracketGames = Game::bracketGames((int) $season['id']);
         $qfGames = array_values(array_filter($bracketGames, fn ($g) => $g['phase'] === 'qf'));
         $allTeams = Team::bySeason((int) $season['id']);
+        $availableTeams = Team::availableForSeason((int) $season['id']);
 
         render('admin/season', [
             'admin' => $admin,
@@ -45,6 +46,7 @@ final class AdminController
             'groupData' => $groupData,
             'qfGames' => $qfGames,
             'allTeams' => $allTeams,
+            'availableTeams' => $availableTeams,
         ]);
     }
 
@@ -144,10 +146,35 @@ final class AdminController
             return;
         }
 
-        $pin = str_pad((string) random_int(0, 9999), 4, '0', STR_PAD_LEFT);
-        $teamId = Team::create($seasonId, $groupId, $name, $player1, $player2, $pin);
+        $teamId = Team::createAndEnroll($seasonId, $groupId, $name, $player1, $player2);
+        $pin = Team::find($teamId)['pin'];
 
         flash_set('success', "Team \"$name\" erstellt. PIN für den Login: $pin (bitte dem Team mitteilen).");
+        redirect('/admin/season/' . $seasonId);
+    }
+
+    /** Enrolls a team that already exists from a previous season into this one. */
+    public static function teamEnroll(array $params): void
+    {
+        AdminAuth::requireLogin();
+        $seasonId = (int) $params['id'];
+        if (!csrf_check()) {
+            redirect('/admin/season/' . $seasonId);
+            return;
+        }
+
+        $teamId = (int) ($_POST['team_id'] ?? 0);
+        $groupId = (int) ($_POST['group_id'] ?? 0);
+        $team = Team::find($teamId);
+
+        if ($team === null || $groupId === 0) {
+            flash_set('error', 'Bitte ein Team und eine Gruppe wählen.');
+            redirect('/admin/season/' . $seasonId);
+            return;
+        }
+
+        Team::enroll($teamId, $seasonId, $groupId);
+        flash_set('success', 'Team "' . $team['name'] . '" zur Saison hinzugefügt.');
         redirect('/admin/season/' . $seasonId);
     }
 
@@ -156,27 +183,31 @@ final class AdminController
         AdminAuth::requireLogin();
         $teamId = (int) $params['id'];
         $team = Team::find($teamId);
+        $seasonId = (int) ($_POST['season_id'] ?? 0);
         if ($team === null) {
             http_response_code(404);
             render('404');
             return;
         }
         if (!csrf_check()) {
-            redirect('/admin/season/' . $team['season_id']);
+            redirect('/admin/season/' . $seasonId);
             return;
         }
 
         $name = trim((string) ($_POST['name'] ?? ''));
         $player1 = trim((string) ($_POST['player1'] ?? ''));
         $player2 = trim((string) ($_POST['player2'] ?? ''));
-        $groupId = (int) ($_POST['group_id'] ?? $team['group_id']);
+        $groupId = (int) ($_POST['group_id'] ?? 0);
 
         if ($name !== '' && $player1 !== '' && $player2 !== '') {
-            Team::update($teamId, $name, $player1, $player2, $groupId);
+            Team::update($teamId, $name, $player1, $player2);
+            if ($groupId !== 0) {
+                Team::updateGroup($teamId, $seasonId, $groupId);
+            }
             flash_set('success', 'Team aktualisiert.');
         }
 
-        redirect('/admin/season/' . $team['season_id']);
+        redirect('/admin/season/' . $seasonId);
     }
 
     public static function teamPhoto(array $params): void
@@ -184,13 +215,14 @@ final class AdminController
         AdminAuth::requireLogin();
         $teamId = (int) $params['id'];
         $team = Team::find($teamId);
+        $seasonId = (int) ($_POST['season_id'] ?? 0);
         if ($team === null) {
             http_response_code(404);
             render('404');
             return;
         }
         if (!csrf_check()) {
-            redirect('/admin/season/' . $team['season_id']);
+            redirect('/admin/season/' . $seasonId);
             return;
         }
 
@@ -202,7 +234,7 @@ final class AdminController
             flash_set('error', $e->getMessage());
         }
 
-        redirect('/admin/season/' . $team['season_id']);
+        redirect('/admin/season/' . $seasonId);
     }
 
     public static function teamPinReset(array $params): void
@@ -210,40 +242,42 @@ final class AdminController
         AdminAuth::requireLogin();
         $teamId = (int) $params['id'];
         $team = Team::find($teamId);
+        $seasonId = (int) ($_POST['season_id'] ?? 0);
         if ($team === null) {
             http_response_code(404);
             render('404');
             return;
         }
         if (!csrf_check()) {
-            redirect('/admin/season/' . $team['season_id']);
+            redirect('/admin/season/' . $seasonId);
             return;
         }
 
         $pin = str_pad((string) random_int(0, 9999), 4, '0', STR_PAD_LEFT);
         Team::resetPin($teamId, $pin);
         flash_set('success', 'Neuer PIN für ' . $team['name'] . ': ' . $pin);
-        redirect('/admin/season/' . $team['season_id']);
+        redirect('/admin/season/' . $seasonId);
     }
 
+    /** Removes a team from this season only; the team itself (and its history) is kept unless this was its only season. */
     public static function teamDelete(array $params): void
     {
         AdminAuth::requireLogin();
         $teamId = (int) $params['id'];
         $team = Team::find($teamId);
+        $seasonId = (int) ($_POST['season_id'] ?? 0);
         if ($team === null) {
             http_response_code(404);
             render('404');
             return;
         }
         if (!csrf_check()) {
-            redirect('/admin/season/' . $team['season_id']);
+            redirect('/admin/season/' . $seasonId);
             return;
         }
 
-        $seasonId = $team['season_id'];
-        Team::delete($teamId);
-        flash_set('success', 'Team gelöscht.');
+        Team::removeFromSeason($teamId, $seasonId);
+        flash_set('success', 'Team aus der Saison entfernt.');
         redirect('/admin/season/' . $seasonId);
     }
 

@@ -10,8 +10,9 @@ final class TeamController
             render('404');
             return;
         }
-        $season = Season::find((int) $team['season_id']);
-        $group = TeamGroup::find((int) $team['group_id']);
+        $enrollment = Team::currentEnrollment((int) $team['id']);
+        $season = $enrollment !== null ? Season::find((int) $enrollment['season_id']) : null;
+        $group = $enrollment !== null ? TeamGroup::find((int) $enrollment['group_id']) : null;
         $games = Game::forTeam((int) $team['id']);
 
         $teamIds = [];

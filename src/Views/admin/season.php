@@ -4,6 +4,7 @@
  * @var array[] $groupData
  * @var array[] $qfGames
  * @var array[] $allTeams
+ * @var array[] $availableTeams
  */
 $pageTitle = 'Verwalten – ' . $season['label'];
 $isCurrent = (int) $season['is_current'] === 1;
@@ -73,6 +74,7 @@ $isCurrent = (int) $season['is_current'] === 1;
 
               <form method="post" action="<?= h(url('/admin/team/' . $team['id'])) ?>" class="stack-form">
                 <?= csrf_field() ?>
+                <input type="hidden" name="season_id" value="<?= (int) $season['id'] ?>">
                 <label>Teamname <input type="text" name="name" value="<?= h($team['name']) ?>" required></label>
                 <label>Spieler 1 <input type="text" name="player1" value="<?= h($team['player1']) ?>" required></label>
                 <label>Spieler 2 <input type="text" name="player2" value="<?= h($team['player2']) ?>" required></label>
@@ -83,23 +85,27 @@ $isCurrent = (int) $season['is_current'] === 1;
                     <?php endforeach; ?>
                   </select>
                 </label>
+                <p class="muted small">Name, Spieler, PIN und Foto gelten für dieses Team über alle Saisons hinweg.</p>
                 <button class="btn btn-primary btn-sm" type="submit">Speichern</button>
               </form>
 
               <form method="post" action="<?= h(url('/admin/team/' . $team['id'] . '/photo')) ?>" enctype="multipart/form-data" class="stack-form">
                 <?= csrf_field() ?>
+                <input type="hidden" name="season_id" value="<?= (int) $season['id'] ?>">
                 <label>Foto <input type="file" name="photo" accept="image/png,image/jpeg,image/webp"></label>
                 <button class="btn btn-secondary btn-sm" type="submit">Foto hochladen</button>
               </form>
 
               <div class="admin-team-actions">
-                <form method="post" action="<?= h(url('/admin/team/' . $team['id'] . '/pin')) ?>" class="inline-form" onsubmit="return confirm('Neuen PIN für <?= h(addslashes($team['name'])) ?> erstellen? Der alte PIN wird ungültig.');">
+                <form method="post" action="<?= h(url('/admin/team/' . $team['id'] . '/pin')) ?>" class="inline-form" onsubmit="return confirm('Neuen PIN für <?= h(addslashes($team['name'])) ?> erstellen? Der alte PIN wird ungültig – in jeder Saison.');">
                   <?= csrf_field() ?>
+                  <input type="hidden" name="season_id" value="<?= (int) $season['id'] ?>">
                   <button class="btn btn-ghost btn-sm" type="submit">PIN zurücksetzen</button>
                 </form>
-                <form method="post" action="<?= h(url('/admin/team/' . $team['id'] . '/delete')) ?>" class="inline-form" onsubmit="return confirm('Team <?= h(addslashes($team['name'])) ?> wirklich löschen? Alle zugehörigen Spiele werden ebenfalls gelöscht.');">
+                <form method="post" action="<?= h(url('/admin/team/' . $team['id'] . '/delete')) ?>" class="inline-form" onsubmit="return confirm('Team <?= h(addslashes($team['name'])) ?> aus dieser Saison entfernen? Das Team bleibt erhalten, wenn es auch in anderen Saisons mitspielt.');">
                   <?= csrf_field() ?>
-                  <button class="btn btn-ghost btn-sm btn-danger" type="submit">Team löschen</button>
+                  <input type="hidden" name="season_id" value="<?= (int) $season['id'] ?>">
+                  <button class="btn btn-ghost btn-sm btn-danger" type="submit">Aus Saison entfernen</button>
                 </form>
               </div>
             </details>
@@ -108,8 +114,27 @@ $isCurrent = (int) $season['is_current'] === 1;
       </ul>
     <?php endif; ?>
 
+    <?php if (!empty($availableTeams)): ?>
+      <details class="add-form">
+        <summary>+ Bestehendes Team hinzufügen</summary>
+        <form method="post" action="<?= h(url('/admin/season/' . $season['id'] . '/team/enroll')) ?>" class="stack-form">
+          <?= csrf_field() ?>
+          <input type="hidden" name="group_id" value="<?= (int) $group['id'] ?>">
+          <label>Team
+            <select name="team_id" required>
+              <option value="">– Team wählen –</option>
+              <?php foreach ($availableTeams as $t): ?>
+                <option value="<?= (int) $t['id'] ?>"><?= h($t['name']) ?></option>
+              <?php endforeach; ?>
+            </select>
+          </label>
+          <button class="btn btn-secondary btn-sm" type="submit">Team hinzufügen</button>
+        </form>
+      </details>
+    <?php endif; ?>
+
     <details class="add-form">
-      <summary>+ Team hinzufügen</summary>
+      <summary>+ Neues Team erstellen</summary>
       <form method="post" action="<?= h(url('/admin/season/' . $season['id'] . '/team')) ?>" class="stack-form">
         <?= csrf_field() ?>
         <input type="hidden" name="group_id" value="<?= (int) $group['id'] ?>">

@@ -1,13 +1,13 @@
 <?php
-/** @var array $season
- * @var array $group
+/** @var array|null $season
+ * @var array|null $group
  * @var array $targetTeam
  * @var array[] $games
  * @var array[] $teamsById
  * @var array|null $viewerTeam
  * @var array|null $admin
  */
-$isCurrent = (int) $season['is_current'] === 1;
+$isCurrent = $season !== null && (int) $season['is_current'] === 1;
 $pageTitle = $targetTeam['name'];
 $returnTo = '/team/' . $targetTeam['id'];
 $phaseLabels = ['group' => 'Gruppenphase', 'qf' => 'Viertelfinal', 'sf' => 'Halbfinal', 'final' => 'Final'];
@@ -15,7 +15,9 @@ $phaseLabels = ['group' => 'Gruppenphase', 'qf' => 'Viertelfinal', 'sf' => 'Halb
 <div class="team-header card">
   <?= render_partial('partials/team-avatar', ['team' => $targetTeam, 'size' => 'lg', 'linked' => false]) ?>
   <div>
-    <p class="eyebrow"><a href="<?= h(url('/group/' . $group['id'])) ?>">Gruppe <?= h($group['name']) ?></a> &middot; <?= h($season['label']) ?></p>
+    <?php if ($season !== null && $group !== null): ?>
+      <p class="eyebrow"><a href="<?= h(url('/group/' . $group['id'])) ?>">Gruppe <?= h($group['name']) ?></a> &middot; <?= h($season['label']) ?></p>
+    <?php endif; ?>
     <h1><?= h($targetTeam['name']) ?></h1>
     <?php $subtitle = team_players_subtitle($targetTeam); ?>
     <?php if ($subtitle !== null): ?><p class="muted"><?= h($subtitle) ?></p><?php endif; ?>
@@ -65,7 +67,7 @@ $phaseLabels = ['group' => 'Gruppenphase', 'qf' => 'Viertelfinal', 'sf' => 'Halb
                 'canEdit' => $canEdit,
                 'targetTeamId' => (int) $targetTeam['id'],
                 'hideDate' => true,
-                'seasonYear' => (int) $season['year'],
+                'seasonYear' => $season !== null ? (int) $season['year'] : null,
             ]) ?>
           </div>
         </li>
