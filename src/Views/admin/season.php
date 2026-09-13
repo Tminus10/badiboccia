@@ -85,7 +85,7 @@ $isCurrent = (int) $season['is_current'] === 1;
                     <?php endforeach; ?>
                   </select>
                 </label>
-                <p class="muted small">Name, Spieler, PIN und Foto gelten für dieses Team über alle Saisons hinweg.</p>
+                <p class="muted">Name, Spieler, PIN und Foto gelten für dieses Team über alle Saisons hinweg.</p>
                 <button class="btn btn-primary btn-sm" type="submit">Speichern</button>
               </form>
 

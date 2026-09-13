@@ -40,6 +40,9 @@ $router->post('/game/{id}/schedule', ['GameController', 'scheduleDate']);
 
 // Admin area
 $router->get('/admin', ['AdminController', 'dashboard']);
+$router->get('/admin/teams', ['AdminController', 'teamsIndex']);
+$router->post('/admin/teams/create', ['AdminController', 'teamCreateGlobal']);
+$router->post('/admin/team/{id}/delete-all', ['AdminController', 'teamDeleteCompletely']);
 $router->post('/admin/season', ['AdminController', 'seasonCreate']);
 $router->get('/admin/season/{id}', ['AdminController', 'seasonManage']);
 $router->post('/admin/season/{id}/activate', ['AdminController', 'seasonActivate']);

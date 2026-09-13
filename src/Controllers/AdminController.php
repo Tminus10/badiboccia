@@ -12,6 +12,70 @@ final class AdminController
         ]);
     }
 
+    public static function teamsIndex(array $params): void
+    {
+        $admin = AdminAuth::requireLogin();
+        $teams = [];
+        foreach (Team::all() as $team) {
+            $teams[] = $team + ['seasons' => Team::seasonHistory((int) $team['id'])];
+        }
+
+        render('admin/teams', [
+            'admin' => $admin,
+            'teams' => $teams,
+            'groups' => TeamGroup::allWithSeason(),
+        ]);
+    }
+
+    /** Creates a brand-new persistent team from the central team-management page. */
+    public static function teamCreateGlobal(array $params): void
+    {
+        AdminAuth::requireLogin();
+        if (!csrf_check()) {
+            redirect('/admin/teams');
+            return;
+        }
+
+        $name = trim((string) ($_POST['name'] ?? ''));
+        $player1 = trim((string) ($_POST['player1'] ?? ''));
+        $player2 = trim((string) ($_POST['player2'] ?? ''));
+        $groupId = (int) ($_POST['group_id'] ?? 0);
+        $group = $groupId !== 0 ? TeamGroup::find($groupId) : null;
+
+        if ($name === '' || $player1 === '' || $player2 === '' || $group === null) {
+            flash_set('error', 'Bitte alle Felder ausfüllen.');
+            redirect('/admin/teams');
+            return;
+        }
+
+        $teamId = Team::createAndEnroll((int) $group['season_id'], $groupId, $name, $player1, $player2);
+        $pin = Team::find($teamId)['pin'];
+
+        flash_set('success', "Team \"$name\" erstellt. PIN für den Login: $pin (bitte dem Team mitteilen).");
+        redirect('/admin/teams');
+    }
+
+    /** Permanently deletes a team and its entire history, from every season. */
+    public static function teamDeleteCompletely(array $params): void
+    {
+        AdminAuth::requireLogin();
+        $teamId = (int) $params['id'];
+        $team = Team::find($teamId);
+        if ($team === null) {
+            http_response_code(404);
+            render('404');
+            return;
+        }
+        if (!csrf_check()) {
+            redirect('/admin/teams');
+            return;
+        }
+
+        Team::deleteCompletely($teamId);
+        flash_set('success', 'Team "' . $team['name'] . '" und seine gesamte Geschichte wurden gelöscht.');
+        redirect('/admin/teams');
+    }
+
     public static function seasonManage(array $params): void
     {
         $admin = AdminAuth::requireLogin();
@@ -178,6 +242,12 @@ final class AdminController
         redirect('/admin/season/' . $seasonId);
     }
 
+    /** /admin/season/{id} when a season context was posted (season page), otherwise the central /admin/teams page. */
+    private static function redirectAfterTeamAction(int $seasonId): void
+    {
+        redirect($seasonId !== 0 ? '/admin/season/' . $seasonId : '/admin/teams');
+    }
+
     public static function teamUpdate(array $params): void
     {
         AdminAuth::requireLogin();
@@ -190,7 +260,7 @@ final class AdminController
             return;
         }
         if (!csrf_check()) {
-            redirect('/admin/season/' . $seasonId);
+            self::redirectAfterTeamAction($seasonId);
             return;
         }
 
@@ -201,13 +271,13 @@ final class AdminController
 
         if ($name !== '' && $player1 !== '' && $player2 !== '') {
             Team::update($teamId, $name, $player1, $player2);
-            if ($groupId !== 0) {
+            if ($groupId !== 0 && $seasonId !== 0) {
                 Team::updateGroup($teamId, $seasonId, $groupId);
             }
             flash_set('success', 'Team aktualisiert.');
         }
 
-        redirect('/admin/season/' . $seasonId);
+        self::redirectAfterTeamAction($seasonId);
     }
 
     public static function teamPhoto(array $params): void
@@ -222,7 +292,7 @@ final class AdminController
             return;
         }
         if (!csrf_check()) {
-            redirect('/admin/season/' . $seasonId);
+            self::redirectAfterTeamAction($seasonId);
             return;
         }
 
@@ -234,7 +304,7 @@ final class AdminController
             flash_set('error', $e->getMessage());
         }
 
-        redirect('/admin/season/' . $seasonId);
+        self::redirectAfterTeamAction($seasonId);
     }
 
     public static function teamPinReset(array $params): void
@@ -249,14 +319,14 @@ final class AdminController
             return;
         }
         if (!csrf_check()) {
-            redirect('/admin/season/' . $seasonId);
+            self::redirectAfterTeamAction($seasonId);
             return;
         }
 
         $pin = str_pad((string) random_int(0, 9999), 4, '0', STR_PAD_LEFT);
         Team::resetPin($teamId, $pin);
         flash_set('success', 'Neuer PIN für ' . $team['name'] . ': ' . $pin);
-        redirect('/admin/season/' . $seasonId);
+        self::redirectAfterTeamAction($seasonId);
     }
 
     /** Removes a team from this season only; the team itself (and its history) is kept unless this was its only season. */

@@ -8,6 +8,12 @@ $pageTitle = 'Admin';
 <div class="page-head"><div><h1>Admin-Bereich</h1><p class="muted">Angemeldet als <?= h($admin['display_name']) ?></p></div></div>
 
 <section class="card">
+  <h2>Teams</h2>
+  <p class="muted">Alle Teams über alle Saisons hinweg verwalten: Namen, Spieler, Fotos, PINs.</p>
+  <a class="btn btn-secondary" href="<?= h(url('/admin/teams')) ?>">Teams verwalten</a>
+</section>
+
+<section class="card">
   <h2>Saisons</h2>
   <?php if (empty($seasons)): ?>
     <p class="empty-state small">Noch keine Saison angelegt.</p>

@@ -24,6 +24,7 @@ $flashes = flash_take();
         <?php if ($currentAdmin): ?>
           <span class="pill pill-admin">Admin: <?= h($currentAdmin['display_name']) ?></span>
           <a class="btn btn-ghost btn-sm" href="<?= h(url('/admin')) ?>">Admin-Bereich</a>
+          <a class="btn btn-ghost btn-sm" href="<?= h(url('/admin/teams')) ?>">Teams</a>
           <form method="post" action="<?= h(url('/logout')) ?>" class="inline-form">
             <?= csrf_field() ?>
             <input type="hidden" name="return_to" value="<?= h($_SERVER['REQUEST_URI']) ?>">
