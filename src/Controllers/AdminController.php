@@ -23,11 +23,10 @@ final class AdminController
         render('admin/teams', [
             'admin' => $admin,
             'teams' => $teams,
-            'groups' => TeamGroup::allWithSeason(),
         ]);
     }
 
-    /** Creates a brand-new persistent team from the central team-management page. */
+    /** Creates a brand-new persistent team from the central team-management page, not yet enrolled in any season. */
     public static function teamCreateGlobal(array $params): void
     {
         AdminAuth::requireLogin();
@@ -39,19 +38,17 @@ final class AdminController
         $name = trim((string) ($_POST['name'] ?? ''));
         $player1 = trim((string) ($_POST['player1'] ?? ''));
         $player2 = trim((string) ($_POST['player2'] ?? ''));
-        $groupId = (int) ($_POST['group_id'] ?? 0);
-        $group = $groupId !== 0 ? TeamGroup::find($groupId) : null;
 
-        if ($name === '' || $player1 === '' || $player2 === '' || $group === null) {
+        if ($name === '' || $player1 === '' || $player2 === '') {
             flash_set('error', 'Bitte alle Felder ausfüllen.');
             redirect('/admin/teams');
             return;
         }
 
-        $teamId = Team::createAndEnroll((int) $group['season_id'], $groupId, $name, $player1, $player2);
+        $teamId = Team::create($name, $player1, $player2);
         $pin = Team::find($teamId)['pin'];
 
-        flash_set('success', "Team \"$name\" erstellt. PIN für den Login: $pin (bitte dem Team mitteilen).");
+        flash_set('success', "Team \"$name\" erstellt. PIN für den Login: $pin. Füge das Team über eine Saison einer Gruppe hinzu.");
         redirect('/admin/teams');
     }
 

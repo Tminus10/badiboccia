@@ -92,8 +92,8 @@ final class Team
         return (int) Db::pdo()->query('SELECT COUNT(*) FROM teams')->fetchColumn();
     }
 
-    /** Creates a brand-new persistent team (PIN + color for life) and enrolls it in a season/group. */
-    public static function createAndEnroll(int $seasonId, int $groupId, string $name, string $player1, string $player2): int
+    /** Creates a brand-new persistent team (PIN + color for life), not yet enrolled in any season. */
+    public static function create(string $name, string $player1, string $player2): int
     {
         $pdo = Db::pdo();
         $color = ColorAssigner::colorForIndex(self::count());
@@ -103,8 +103,14 @@ final class Team
             'INSERT INTO teams (name, player1, player2, color_hex, pin) VALUES (?, ?, ?, ?, ?)'
         );
         $stmt->execute([$name, $player1, $player2, $color, $pin]);
-        $teamId = (int) $pdo->lastInsertId();
 
+        return (int) $pdo->lastInsertId();
+    }
+
+    /** Creates a brand-new persistent team and enrolls it in a season/group. */
+    public static function createAndEnroll(int $seasonId, int $groupId, string $name, string $player1, string $player2): int
+    {
+        $teamId = self::create($name, $player1, $player2);
         self::enroll($teamId, $seasonId, $groupId);
 
         return $teamId;

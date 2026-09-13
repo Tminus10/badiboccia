@@ -1,7 +1,6 @@
 <?php
 /** @var array $admin
  * @var array[] $teams each with a 'seasons' key: array of {season_id, group_id, season_label, year, group_name}
- * @var array[] $groups every team_group joined with its season_label/year
  */
 $pageTitle = 'Teams';
 ?>
@@ -15,7 +14,7 @@ $pageTitle = 'Teams';
 
 <section class="card">
   <?php if (empty($teams)): ?>
-    <p class="empty-state">Noch keine Teams. Lege zuerst eine Saison an und füge dort ein Team hinzu.</p>
+    <p class="empty-state">Noch keine Teams. Erstelle unten dein erstes Team.</p>
   <?php else: ?>
     <ul class="admin-team-list">
       <?php foreach ($teams as $team): ?>
@@ -30,6 +29,8 @@ $pageTitle = 'Teams';
               <span class="muted">
                 <?php foreach ($team['seasons'] as $i => $s): ?><?= $i > 0 ? ', ' : '' ?><a href="<?= h(url('/admin/season/' . $s['season_id'])) ?>"><?= h($s['season_label']) ?> (Gruppe <?= h($s['group_name']) ?>)</a><?php endforeach; ?>
               </span>
+            <?php else: ?>
+              <span class="muted">Noch keiner Saison zugeteilt</span>
             <?php endif; ?>
           </div>
           <details class="admin-team-edit">
@@ -65,24 +66,15 @@ $pageTitle = 'Teams';
     </ul>
   <?php endif; ?>
 
-  <?php if (!empty($groups)): ?>
-    <details class="add-form">
-      <summary>+ Neues Team erstellen</summary>
-      <form method="post" action="<?= h(url('/admin/teams/create')) ?>" class="stack-form">
-        <?= csrf_field() ?>
-        <label>Teamname <input type="text" name="name" placeholder="z.B. Debi &amp; Erika" required></label>
-        <label>Spieler 1 <input type="text" name="player1" required></label>
-        <label>Spieler 2 <input type="text" name="player2" required></label>
-        <label>Saison &amp; Gruppe
-          <select name="group_id" required>
-            <option value="">– wählen –</option>
-            <?php foreach ($groups as $g): ?>
-              <option value="<?= (int) $g['id'] ?>"><?= h($g['season_label']) ?> – Gruppe <?= h($g['name']) ?></option>
-            <?php endforeach; ?>
-          </select>
-        </label>
-        <button class="btn btn-primary btn-sm" type="submit">Team erstellen</button>
-      </form>
-    </details>
-  <?php endif; ?>
+  <details class="add-form">
+    <summary>+ Neues Team erstellen</summary>
+    <form method="post" action="<?= h(url('/admin/teams/create')) ?>" class="stack-form">
+      <?= csrf_field() ?>
+      <label>Teamname <input type="text" name="name" placeholder="z.B. Debi &amp; Erika" required></label>
+      <label>Spieler 1 <input type="text" name="player1" required></label>
+      <label>Spieler 2 <input type="text" name="player2" required></label>
+      <p class="muted">Weise das Team danach über eine Saison einer Gruppe zu.</p>
+      <button class="btn btn-primary btn-sm" type="submit">Team erstellen</button>
+    </form>
+  </details>
 </section>
