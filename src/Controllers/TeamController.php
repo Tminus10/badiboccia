@@ -10,10 +10,27 @@ final class TeamController
             render('404');
             return;
         }
-        $enrollment = Team::currentEnrollment((int) $team['id']);
-        $season = $enrollment !== null ? Season::find((int) $enrollment['season_id']) : null;
-        $group = $enrollment !== null ? TeamGroup::find((int) $enrollment['group_id']) : null;
-        $games = Game::forTeam((int) $team['id']);
+        $teamId = (int) $team['id'];
+
+        // By default (no ?season=) a team's page shows only its current/most recent season -
+        // matching wherever the visitor navigated from. ?season=<id> scopes it to that specific
+        // season instead (used when linking from within that season's own pages), and
+        // ?season=all shows the full cross-season history as an explicit opt-in.
+        $seasonParam = $_GET['season'] ?? null;
+        $showAllSeasons = $seasonParam === 'all';
+
+        if ($showAllSeasons) {
+            $season = null;
+            $group = null;
+            $games = Game::forTeam($teamId);
+        } else {
+            $enrollment = $seasonParam !== null
+                ? Team::enrollmentFor($teamId, (int) $seasonParam)
+                : Team::currentEnrollment($teamId);
+            $season = $enrollment !== null ? Season::find((int) $enrollment['season_id']) : null;
+            $group = $enrollment !== null ? TeamGroup::find((int) $enrollment['group_id']) : null;
+            $games = $enrollment !== null ? Game::forTeamInSeason($teamId, (int) $enrollment['season_id']) : [];
+        }
 
         $teamIds = [];
         foreach ($games as $g) {
@@ -54,6 +71,7 @@ final class TeamController
             'teamsById' => $teamsById,
             'seasonsById' => $seasonsById,
             'groupsById' => $groupsById,
+            'showAllSeasons' => $showAllSeasons,
             'viewerTeam' => TeamAuth::current(),
             'admin' => AdminAuth::current(),
         ]);

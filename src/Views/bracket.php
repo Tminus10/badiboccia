@@ -33,7 +33,7 @@ $phaseLabels = ['qf' => 'Viertelfinal', 'sf' => 'Halbfinal', 'final' => 'Final']
               <?php foreach ($entry['standings'] as $row): ?>
                 <tr class="<?= ($row['rank'] <= 2 && $entry['anyPlayed']) ? 'qualifies' : '' ?>">
                   <td class="rank-col"><?= (int) $row['rank'] ?></td>
-                  <td><?= render_partial('partials/team-dot', ['team' => $row['team']]) ?></td>
+                  <td><?= render_partial('partials/team-dot', ['team' => $row['team'], 'seasonId' => (int) $season['id']]) ?></td>
                   <td class="pts"><?= (int) $row['points'] ?></td>
                 </tr>
               <?php endforeach; ?>
@@ -54,8 +54,8 @@ $phaseLabels = ['qf' => 'Viertelfinal', 'sf' => 'Halbfinal', 'final' => 'Final']
           $canEdit = $isCurrent && ($admin !== null || ($viewerTeamId !== null && Game::isParticipant($game, (int) $viewerTeamId)));
         ?>
         <div class="bracket-game">
-          <div class="bracket-team"><?= render_bracket_slot($teamA) ?></div>
-          <div class="bracket-team"><?= render_bracket_slot($teamB) ?></div>
+          <div class="bracket-team"><?= render_bracket_slot($teamA, (int) $season['id']) ?></div>
+          <div class="bracket-team"><?= render_bracket_slot($teamB, (int) $season['id']) ?></div>
           <div class="fixture-result">
             <?= render_partial('partials/result-form', [
                 'game' => $game,

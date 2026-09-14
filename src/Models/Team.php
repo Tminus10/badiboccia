@@ -73,6 +73,16 @@ final class Team
         return $stmt->fetchAll();
     }
 
+    /** This team's enrollment (group) in one specific season, if it played there. */
+    public static function enrollmentFor(int $teamId, int $seasonId): ?array
+    {
+        $stmt = Db::pdo()->prepare(
+            'SELECT * FROM team_seasons WHERE team_id = ? AND season_id = ?'
+        );
+        $stmt->execute([$teamId, $seasonId]);
+        return $stmt->fetch() ?: null;
+    }
+
     /** The season/group this team is currently or was most recently enrolled in (for its profile header). */
     public static function currentEnrollment(int $teamId): ?array
     {

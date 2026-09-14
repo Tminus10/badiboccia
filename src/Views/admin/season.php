@@ -62,7 +62,7 @@ $isCurrent = (int) $season['is_current'] === 1;
       <ul class="admin-team-list">
         <?php foreach ($entry['teams'] as $team): ?>
           <li class="admin-team-row">
-            <?= render_partial('partials/team-avatar', ['team' => $team, 'size' => 'sm', 'linked' => true]) ?>
+            <?= render_partial('partials/team-avatar', ['team' => $team, 'size' => 'sm', 'linked' => true, 'seasonId' => (int) $season['id']]) ?>
             <div class="admin-team-info">
               <strong><?= h($team['name']) ?></strong>
               <?php $subtitle = team_players_subtitle($team); ?>

@@ -45,7 +45,7 @@ foreach ($games as $g) {
         <?php foreach ($standings as $row): ?>
           <tr class="<?= ($row['rank'] <= 2 && $anyPlayed) ? 'qualifies' : '' ?>">
             <td class="rank-col"><?= (int) $row['rank'] ?></td>
-            <td><?= render_partial('partials/team-dot', ['team' => $row['team']]) ?></td>
+            <td><?= render_partial('partials/team-dot', ['team' => $row['team'], 'seasonId' => (int) $season['id']]) ?></td>
             <td><?= (int) $row['played'] ?></td>
             <td><?= (int) $row['won'] ?></td>
             <td><?= (int) $row['lost'] ?></td>
@@ -75,9 +75,9 @@ foreach ($games as $g) {
         <li class="fixture-card">
           <div class="fixture-teams">
             <span class="fixture-num">Spiel <?= $i + 1 ?></span>
-            <?php if ($teamA): ?><?= render_partial('partials/team-dot', ['team' => $teamA]) ?><?php endif; ?>
+            <?php if ($teamA): ?><?= render_partial('partials/team-dot', ['team' => $teamA, 'seasonId' => (int) $season['id']]) ?><?php endif; ?>
             <span class="vs">–</span>
-            <?php if ($teamB): ?><?= render_partial('partials/team-dot', ['team' => $teamB]) ?><?php endif; ?>
+            <?php if ($teamB): ?><?= render_partial('partials/team-dot', ['team' => $teamB, 'seasonId' => (int) $season['id']]) ?><?php endif; ?>
           </div>
           <div class="fixture-result">
             <?= render_partial('partials/result-form', [

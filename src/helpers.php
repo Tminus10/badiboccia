@@ -128,12 +128,25 @@ function format_result(array $game, ?int $perspectiveTeamId = null): string
     return $game['sets_a'] . ':' . $game['sets_b'];
 }
 
-function render_bracket_slot(?array $team): string
+function render_bracket_slot(?array $team, ?int $seasonId = null): string
 {
     if ($team === null) {
         return '<span class="bracket-slot bracket-slot-empty">?</span>';
     }
-    return render_partial('partials/team-dot', ['team' => $team]);
+    return render_partial('partials/team-dot', ['team' => $team, 'seasonId' => $seasonId]);
+}
+
+/**
+ * A team's page URL. Pass the season being browsed so the page shows that team's games in
+ * that season only, instead of defaulting to its current season or (with 'all') its full
+ * cross-season history.
+ */
+function team_url(int $teamId, int|string|null $seasonId = null): string
+{
+    if ($seasonId === null) {
+        return url('/team/' . $teamId);
+    }
+    return url('/team/' . $teamId) . '?season=' . $seasonId;
 }
 
 function team_photo_url(array $team): ?string

@@ -6,22 +6,31 @@
  * @var array[] $teamsById
  * @var array[] $seasonsById keyed by season_id, for labeling games from any season this team played
  * @var array[] $groupsById keyed by group_id, for labeling games from any season this team played
+ * @var bool $showAllSeasons
  * @var array|null $viewerTeam
  * @var array|null $admin
  */
 $pageTitle = $targetTeam['name'];
-$returnTo = '/team/' . $targetTeam['id'];
+$teamId = (int) $targetTeam['id'];
+$returnTo = $showAllSeasons ? url('/team/' . $teamId) . '?season=all' : url('/team/' . $teamId);
 $phaseLabels = ['group' => 'Gruppenphase', 'qf' => 'Viertelfinal', 'sf' => 'Halbfinal', 'final' => 'Final'];
 ?>
 <div class="team-header card">
   <?= render_partial('partials/team-avatar', ['team' => $targetTeam, 'size' => 'lg', 'linked' => false]) ?>
   <div>
-    <?php if ($season !== null && $group !== null): ?>
+    <?php if ($showAllSeasons): ?>
+      <p class="eyebrow">Alle Saisons</p>
+    <?php elseif ($season !== null && $group !== null): ?>
       <p class="eyebrow"><a href="<?= h(url('/group/' . $group['id'])) ?>">Gruppe <?= h($group['name']) ?></a> &middot; <?= h($season['label']) ?></p>
     <?php endif; ?>
     <h1><?= h($targetTeam['name']) ?></h1>
     <?php $subtitle = team_players_subtitle($targetTeam); ?>
     <?php if ($subtitle !== null): ?><p class="muted"><?= h($subtitle) ?></p><?php endif; ?>
+    <?php if ($showAllSeasons): ?>
+      <a class="card-link" href="<?= h(url('/team/' . $teamId)) ?>">← Nur aktuelle Saison anzeigen</a>
+    <?php else: ?>
+      <a class="card-link" href="<?= h(url('/team/' . $teamId)) ?>?season=all">Alle Saisons anzeigen →</a>
+    <?php endif; ?>
   </div>
 </div>
 
@@ -57,10 +66,10 @@ $phaseLabels = ['group' => 'Gruppenphase', 'qf' => 'Viertelfinal', 'sf' => 'Halb
         <?php $dateLabel = !empty($game['played_date']) ? format_date_ch($game['played_date']) : ''; ?>
         <li class="fixture-card team-fixture-card">
           <div class="fixture-teams">
-            <?= render_partial('partials/team-dot', ['team' => $targetTeam]) ?>
+            <?= render_partial('partials/team-dot', ['team' => $targetTeam, 'seasonId' => (int) $game['season_id']]) ?>
             <span class="vs">vs.</span>
             <?php if ($opponent): ?>
-              <?= render_partial('partials/team-dot', ['team' => $opponent]) ?>
+              <?= render_partial('partials/team-dot', ['team' => $opponent, 'seasonId' => (int) $game['season_id']]) ?>
             <?php else: ?>
               <span class="result-pending">noch offen</span>
             <?php endif; ?>

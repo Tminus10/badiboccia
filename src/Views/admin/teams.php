@@ -19,7 +19,7 @@ $pageTitle = 'Teams';
     <ul class="admin-team-list">
       <?php foreach ($teams as $team): ?>
         <li class="admin-team-row">
-          <?= render_partial('partials/team-avatar', ['team' => $team, 'size' => 'sm', 'linked' => true]) ?>
+          <?= render_partial('partials/team-avatar', ['team' => $team, 'size' => 'sm', 'linked' => true, 'seasonId' => 'all']) ?>
           <div class="admin-team-info">
             <strong><?= h($team['name']) ?></strong>
             <?php $subtitle = team_players_subtitle($team); ?>

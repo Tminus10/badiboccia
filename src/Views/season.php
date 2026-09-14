@@ -38,7 +38,7 @@ $pageTitle = $season['label'];
             <?php foreach ($standings as $row): ?>
               <tr class="<?= ($row['rank'] <= 2 && $entry['gamesPlayed'] > 0) ? 'qualifies' : '' ?>">
                 <td class="rank-col"><?= (int) $row['rank'] ?></td>
-                <td><?= render_partial('partials/team-dot', ['team' => $row['team']]) ?></td>
+                <td><?= render_partial('partials/team-dot', ['team' => $row['team'], 'seasonId' => (int) $season['id']]) ?></td>
                 <td><?= (int) $row['played'] ?></td>
                 <td class="pts"><?= (int) $row['points'] ?></td>
               </tr>

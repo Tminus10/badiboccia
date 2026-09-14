@@ -33,6 +33,17 @@ final class Game
         return $stmt->fetchAll();
     }
 
+    /** A team's games within one specific season only. */
+    public static function forTeamInSeason(int $teamId, int $seasonId): array
+    {
+        $stmt = Db::pdo()->prepare(
+            "SELECT * FROM games WHERE season_id = ? AND (team_a_id = ? OR team_b_id = ?)
+             ORDER BY FIELD(phase, 'group','qf','sf','final'), (played_date IS NULL) ASC, played_date ASC, id ASC"
+        );
+        $stmt->execute([$seasonId, $teamId, $teamId]);
+        return $stmt->fetchAll();
+    }
+
     public static function bracketGames(int $seasonId): array
     {
         $stmt = Db::pdo()->prepare(
