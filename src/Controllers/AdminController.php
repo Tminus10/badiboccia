@@ -195,6 +195,11 @@ final class AdminController
             redirect('/admin/season/' . $seasonId);
             return;
         }
+        if (!self::isSeasonCurrent($seasonId)) {
+            flash_set('error', 'Diese Saison ist archiviert. Teams können nur in der aktiven Saison hinzugefügt werden.');
+            redirect('/admin/season/' . $seasonId);
+            return;
+        }
 
         $name = trim((string) ($_POST['name'] ?? ''));
         $player1 = trim((string) ($_POST['player1'] ?? ''));
@@ -223,6 +228,11 @@ final class AdminController
             redirect('/admin/season/' . $seasonId);
             return;
         }
+        if (!self::isSeasonCurrent($seasonId)) {
+            flash_set('error', 'Diese Saison ist archiviert. Teams können nur in der aktiven Saison hinzugefügt werden.');
+            redirect('/admin/season/' . $seasonId);
+            return;
+        }
 
         $teamId = (int) ($_POST['team_id'] ?? 0);
         $groupId = (int) ($_POST['group_id'] ?? 0);
@@ -237,6 +247,13 @@ final class AdminController
         Team::enroll($teamId, $seasonId, $groupId);
         flash_set('success', 'Team "' . $team['name'] . '" zur Saison hinzugefügt.');
         redirect('/admin/season/' . $seasonId);
+    }
+
+    /** Whether teams may still be added to / moved within this season's groups. */
+    private static function isSeasonCurrent(int $seasonId): bool
+    {
+        $season = Season::find($seasonId);
+        return $season !== null && (int) $season['is_current'] === 1;
     }
 
     /** /admin/season/{id} when a season context was posted (season page), otherwise the central /admin/teams page. */
@@ -269,7 +286,11 @@ final class AdminController
         if ($name !== '' && $player1 !== '' && $player2 !== '') {
             Team::update($teamId, $name, $player1, $player2);
             if ($groupId !== 0 && $seasonId !== 0) {
-                Team::updateGroup($teamId, $seasonId, $groupId);
+                if (self::isSeasonCurrent($seasonId)) {
+                    Team::updateGroup($teamId, $seasonId, $groupId);
+                } else {
+                    flash_set('error', 'Diese Saison ist archiviert. Die Gruppe wurde nicht geändert.');
+                }
             }
             flash_set('success', 'Team aktualisiert.');
         }
