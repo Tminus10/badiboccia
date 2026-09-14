@@ -10,7 +10,7 @@ $pageTitle = 'Archiv';
   <ul class="season-list">
     <?php foreach ($seasons as $season): ?>
       <li class="card season-list-item">
-        <a href="<?= h(url('/season/' . $season['id'])) ?>">
+        <a href="<?= h(url('/bracket/' . $season['id'])) ?>">
           <strong><?= h($season['label']) ?></strong>
           <span class="muted"><?= (int) $season['year'] ?></span>
         </a>

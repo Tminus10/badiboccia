@@ -13,9 +13,10 @@ $phaseLabels = ['qf' => 'Viertelfinal', 'sf' => 'Halbfinal', 'final' => 'Final']
 ?>
 <div class="page-head">
   <div>
-    <p class="eyebrow"><a href="<?= h(url($isCurrent ? '/' : '/season/' . $season['id'])) ?>"><?= h($season['label']) ?></a></p>
+    <p class="eyebrow"><?= h($season['label']) ?></p>
     <h1>Turnierbaum</h1>
   </div>
+  <a class="btn btn-secondary" href="<?= h(url($isCurrent ? '/' : '/season/' . $season['id'])) ?>">Übersicht ansehen →</a>
 </div>
 
 <div class="bracket">
