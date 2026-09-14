@@ -32,12 +32,28 @@ final class TeamController
             }
         }
 
+        // A team's games can span multiple seasons; look up each game's own season/group
+        // (not just the "current" one above) so the fixture list can label them correctly.
+        $seasonsById = [];
+        $groupsById = [];
+        foreach ($games as $g) {
+            $sid = (int) $g['season_id'];
+            if (!isset($seasonsById[$sid])) {
+                $seasonsById[$sid] = Season::find($sid);
+            }
+            if ($g['group_id'] !== null && !isset($groupsById[$g['group_id']])) {
+                $groupsById[$g['group_id']] = TeamGroup::find((int) $g['group_id']);
+            }
+        }
+
         render('team', [
             'season' => $season,
             'group' => $group,
             'targetTeam' => $team,
             'games' => $games,
             'teamsById' => $teamsById,
+            'seasonsById' => $seasonsById,
+            'groupsById' => $groupsById,
             'viewerTeam' => TeamAuth::current(),
             'admin' => AdminAuth::current(),
         ]);

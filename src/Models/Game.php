@@ -19,11 +19,15 @@ final class Game
         return $stmt->fetchAll();
     }
 
+    /** A team's full history, oldest season first; each season's games grouped together and ordered group -> qf -> sf -> final within it. */
     public static function forTeam(int $teamId): array
     {
         $stmt = Db::pdo()->prepare(
-            "SELECT * FROM games WHERE team_a_id = ? OR team_b_id = ?
-             ORDER BY FIELD(phase, 'group','qf','sf','final'), (played_date IS NULL) ASC, played_date ASC, id ASC"
+            "SELECT games.* FROM games
+             JOIN seasons ON seasons.id = games.season_id
+             WHERE games.team_a_id = ? OR games.team_b_id = ?
+             ORDER BY seasons.year ASC, FIELD(games.phase, 'group','qf','sf','final'),
+                      (games.played_date IS NULL) ASC, games.played_date ASC, games.id ASC"
         );
         $stmt->execute([$teamId, $teamId]);
         return $stmt->fetchAll();

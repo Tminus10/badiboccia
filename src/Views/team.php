@@ -4,10 +4,11 @@
  * @var array $targetTeam
  * @var array[] $games
  * @var array[] $teamsById
+ * @var array[] $seasonsById keyed by season_id, for labeling games from any season this team played
+ * @var array[] $groupsById keyed by group_id, for labeling games from any season this team played
  * @var array|null $viewerTeam
  * @var array|null $admin
  */
-$isCurrent = $season !== null && (int) $season['is_current'] === 1;
 $pageTitle = $targetTeam['name'];
 $returnTo = '/team/' . $targetTeam['id'];
 $phaseLabels = ['group' => 'Gruppenphase', 'qf' => 'Viertelfinal', 'sf' => 'Halbfinal', 'final' => 'Final'];
@@ -30,11 +31,18 @@ $phaseLabels = ['group' => 'Gruppenphase', 'qf' => 'Viertelfinal', 'sf' => 'Halb
     <p class="empty-state">Noch keine Spiele.</p>
   <?php else: ?>
     <ol class="fixture-list">
-      <?php $lastPhase = null; ?>
+      <?php $lastGroupKey = null; ?>
       <?php foreach ($games as $game): ?>
-        <?php if ($game['phase'] !== $lastPhase): ?>
-          <?php $lastPhase = $game['phase']; ?>
-          <li class="fixture-phase-label"><?= h($phaseLabels[$game['phase']] ?? $game['phase']) ?></li>
+        <?php
+          $gameSeason = $seasonsById[$game['season_id']] ?? null;
+          $gameGroup = $game['group_id'] !== null ? ($groupsById[$game['group_id']] ?? null) : null;
+          $groupKey = $game['season_id'] . '-' . $game['phase'];
+        ?>
+        <?php if ($groupKey !== $lastGroupKey): ?>
+          <?php $lastGroupKey = $groupKey; ?>
+          <li class="fixture-phase-label">
+            <?= h($phaseLabels[$game['phase']] ?? $game['phase']) ?><?php if ($gameSeason !== null): ?> &middot; <?= h($gameSeason['label']) ?><?php if ($gameGroup !== null): ?> (Gruppe <?= h($gameGroup['name']) ?>)<?php endif; ?><?php endif; ?>
+          </li>
         <?php endif; ?>
         <?php
           $isTeamA = (int) $game['team_a_id'] === (int) $targetTeam['id'];
@@ -43,7 +51,8 @@ $phaseLabels = ['group' => 'Gruppenphase', 'qf' => 'Viertelfinal', 'sf' => 'Halb
           $teamA = $game['team_a_id'] !== null ? ($teamsById[$game['team_a_id']] ?? null) : null;
           $teamB = $game['team_b_id'] !== null ? ($teamsById[$game['team_b_id']] ?? null) : null;
           $viewerTeamId = $viewerTeam['id'] ?? null;
-          $canEdit = $isCurrent && ($admin !== null || ($viewerTeamId !== null && Game::isParticipant($game, (int) $viewerTeamId)));
+          $gameIsCurrent = $gameSeason !== null && (int) $gameSeason['is_current'] === 1;
+          $canEdit = $gameIsCurrent && ($admin !== null || ($viewerTeamId !== null && Game::isParticipant($game, (int) $viewerTeamId)));
         ?>
         <?php $dateLabel = !empty($game['played_date']) ? format_date_ch($game['played_date']) : ''; ?>
         <li class="fixture-card team-fixture-card">
@@ -67,7 +76,7 @@ $phaseLabels = ['group' => 'Gruppenphase', 'qf' => 'Viertelfinal', 'sf' => 'Halb
                 'canEdit' => $canEdit,
                 'targetTeamId' => (int) $targetTeam['id'],
                 'hideDate' => true,
-                'seasonYear' => $season !== null ? (int) $season['year'] : null,
+                'seasonYear' => $gameSeason !== null ? (int) $gameSeason['year'] : null,
             ]) ?>
           </div>
         </li>
