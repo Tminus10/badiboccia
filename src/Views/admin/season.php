@@ -39,6 +39,11 @@ $isCurrent = (int) $season['is_current'] === 1;
     <label>Jahr <input type="number" name="year" value="<?= (int) $season['year'] ?>" required></label>
     <button class="btn btn-primary btn-sm" type="submit">Speichern</button>
   </form>
+
+  <form method="post" action="<?= h(url('/admin/season/' . $season['id'] . '/delete')) ?>" class="inline-form" onsubmit="return confirm('Saison \'<?= h(addslashes($season['label'])) ?>\' wirklich unwiderruflich löschen? Alle Gruppen, Spiele und Resultate dieser Saison gehen dabei verloren.');">
+    <?= csrf_field() ?>
+    <button class="btn btn-ghost btn-sm btn-danger" type="submit">Saison löschen</button>
+  </form>
 </details>
 
 <?php foreach ($groupData as $entry): ?>

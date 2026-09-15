@@ -187,6 +187,26 @@ final class AdminController
         redirect('/admin/season/' . $id);
     }
 
+    public static function seasonDelete(array $params): void
+    {
+        AdminAuth::requireLogin();
+        $id = (int) $params['id'];
+        $season = Season::find($id);
+        if ($season === null) {
+            http_response_code(404);
+            render('404');
+            return;
+        }
+        if (!csrf_check()) {
+            redirect('/admin/season/' . $id);
+            return;
+        }
+
+        Season::delete($id);
+        flash_set('success', 'Saison "' . $season['label'] . '" und alle zugehörigen Gruppen, Spiele und Resultate wurden gelöscht.');
+        redirect('/admin');
+    }
+
     public static function teamCreate(array $params): void
     {
         AdminAuth::requireLogin();

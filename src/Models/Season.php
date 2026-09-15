@@ -55,6 +55,13 @@ final class Season
         $stmt->execute([$id]);
     }
 
+    /** Permanently deletes a season and everything scoped to it (groups, team enrollments, games, audit log) via cascade. */
+    public static function delete(int $id): void
+    {
+        $stmt = Db::pdo()->prepare('DELETE FROM seasons WHERE id = ?');
+        $stmt->execute([$id]);
+    }
+
     public static function groups(int $seasonId): array
     {
         $stmt = Db::pdo()->prepare('SELECT * FROM team_groups WHERE season_id = ? ORDER BY name ASC');
