@@ -49,9 +49,16 @@ final class GameController
             return;
         }
 
-        // Left blank when the exact date isn't known -- stored as no date rather than guessed.
-        $date = (string) ($_POST['played_date'] ?? '');
-        $date = preg_match('/^\d{4}-\d{2}-\d{2}$/', $date) ? $date : null;
+        // The date field is pre-filled with a guessed default so the picker opens on the right
+        // year; if the submitted value still matches that guess, nothing was deliberately
+        // entered, so keep whatever the game already had (often no date) rather than the guess.
+        $submittedDate = (string) ($_POST['played_date'] ?? '');
+        $defaultMarker = (string) ($_POST['played_date_default'] ?? '');
+        if ($submittedDate === $defaultMarker) {
+            $date = $game['played_date'];
+        } else {
+            $date = preg_match('/^\d{4}-\d{2}-\d{2}$/', $submittedDate) ? $submittedDate : null;
+        }
 
         Game::recordResult($gameId, $setsA, $setsB, $date, $actorType, $actorId, $actorLabel);
 

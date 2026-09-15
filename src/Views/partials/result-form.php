@@ -78,9 +78,11 @@ if ($teamA === null || $teamB === null) {
     <form method="post" action="<?= h(url('/game/' . $game['id'] . '/result')) ?>" class="score-form">
       <?= csrf_field() ?>
       <input type="hidden" name="return_to" value="<?= h($returnTo) ?>">
+      <?php $resultDateDefault = $game['played_date'] ?? $scheduleDefaultDate; ?>
+      <input type="hidden" name="played_date_default" value="<?= h($resultDateDefault) ?>">
       <label class="date-field">
         <span>Datum <span class="muted">(optional, falls bekannt)</span></span>
-        <input type="date" name="played_date" value="<?= h($game['played_date'] ?? '') ?>" max="<?= h($today) ?>">
+        <input type="date" name="played_date" value="<?= h($resultDateDefault) ?>" max="<?= h($today) ?>">
       </label>
       <p class="score-hint">Zum Speichern das Ergebnis antippen:</p>
       <div class="score-buttons">
