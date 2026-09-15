@@ -43,14 +43,15 @@ final class StandingsCalculator
             $rows[$bId]['sets_for'] += $setsB;
             $rows[$bId]['sets_against'] += $setsA;
 
-            $margin = max($setsA, $setsB);
-            $winnerPoints = $margin === 2 && min($setsA, $setsB) === 0 ? 3 : 2;
+            $shutout = min($setsA, $setsB) === 0;
+            $winnerPoints = $shutout ? 3 : 2;
+            $loserPoints = $shutout ? 0 : 1;
             [$winnerId, $loserId] = $setsA > $setsB ? [$aId, $bId] : [$bId, $aId];
 
             $rows[$winnerId]['won']++;
             $rows[$winnerId]['points'] += $winnerPoints;
             $rows[$loserId]['lost']++;
-            $rows[$loserId]['points'] += 1;
+            $rows[$loserId]['points'] += $loserPoints;
         }
 
         $result = array_values($rows);
