@@ -17,6 +17,7 @@ final class StandingsCalculator
                 'played' => 0,
                 'won' => 0,
                 'lost' => 0,
+                'tied' => 0,
                 'points' => 0,
                 'sets_for' => 0,
                 'sets_against' => 0,
@@ -43,15 +44,23 @@ final class StandingsCalculator
             $rows[$bId]['sets_for'] += $setsB;
             $rows[$bId]['sets_against'] += $setsA;
 
-            $shutout = min($setsA, $setsB) === 0;
-            $winnerPoints = $shutout ? 3 : 2;
-            $loserPoints = $shutout ? 0 : 1;
-            [$winnerId, $loserId] = $setsA > $setsB ? [$aId, $bId] : [$bId, $aId];
+            if ($setsA === $setsB) {
+                // Unfinished (e.g. weather) group-phase game, recorded 1:1 -- both teams get 1 point.
+                $rows[$aId]['tied']++;
+                $rows[$aId]['points'] += 1;
+                $rows[$bId]['tied']++;
+                $rows[$bId]['points'] += 1;
+            } else {
+                $shutout = min($setsA, $setsB) === 0;
+                $winnerPoints = $shutout ? 3 : 2;
+                $loserPoints = $shutout ? 0 : 1;
+                [$winnerId, $loserId] = $setsA > $setsB ? [$aId, $bId] : [$bId, $aId];
 
-            $rows[$winnerId]['won']++;
-            $rows[$winnerId]['points'] += $winnerPoints;
-            $rows[$loserId]['lost']++;
-            $rows[$loserId]['points'] += $loserPoints;
+                $rows[$winnerId]['won']++;
+                $rows[$winnerId]['points'] += $winnerPoints;
+                $rows[$loserId]['lost']++;
+                $rows[$loserId]['points'] += $loserPoints;
+            }
         }
 
         $result = array_values($rows);

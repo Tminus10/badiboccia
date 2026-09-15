@@ -2,7 +2,7 @@
 
 final class GameController
 {
-    private const VALID_SCORES = [[2, 0], [2, 1], [1, 2], [0, 2]];
+    private const VALID_SCORES = [[2, 0], [2, 1], [1, 2], [0, 2], [1, 1]];
 
     public static function submitResult(array $params): void
     {
@@ -37,14 +37,19 @@ final class GameController
         $score = (string) ($_POST['score'] ?? '');
         $parts = explode('-', $score);
         if (count($parts) !== 2 || !ctype_digit($parts[0]) || !ctype_digit($parts[1])) {
-            flash_set('error', 'Ungültiges Resultat. Erlaubt sind 2:0, 2:1, 1:2, 0:2.');
+            flash_set('error', 'Ungültiges Resultat. Erlaubt sind 2:0, 2:1, 1:2, 0:2, 1:1.');
             redirect($returnTo);
             return;
         }
         $setsA = (int) $parts[0];
         $setsB = (int) $parts[1];
         if (!in_array([$setsA, $setsB], self::VALID_SCORES, true)) {
-            flash_set('error', 'Ungültiges Resultat. Erlaubt sind 2:0, 2:1, 1:2, 0:2.');
+            flash_set('error', 'Ungültiges Resultat. Erlaubt sind 2:0, 2:1, 1:2, 0:2, 1:1.');
+            redirect($returnTo);
+            return;
+        }
+        if ($setsA === $setsB && $game['phase'] !== 'group') {
+            flash_set('error', 'Ein Unentschieden ist nur in der Gruppenphase möglich, da hier ein Sieger feststehen muss.');
             redirect($returnTo);
             return;
         }

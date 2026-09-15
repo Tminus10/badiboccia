@@ -329,6 +329,7 @@ input:focus, select:focus, button:focus, a:focus {
 }
 .score-btn:hover { border-color: var(--accent); background: var(--accent-tint); }
 .score-btn-current { border-color: var(--accent); border-width: 2px; background: var(--accent-tint); color: var(--accent-dark); }
+.score-btn-tie { grid-column: 1 / -1; color: var(--text-muted); }
 
 /* ---------- Bracket ---------- */
 

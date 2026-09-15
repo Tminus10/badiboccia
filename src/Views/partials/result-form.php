@@ -22,6 +22,8 @@ if ($scheduleDefaultDate > $today) {
     $scheduleDefaultDate = $today;
 }
 $currentValue = $complete ? $game['sets_a'] . '-' . $game['sets_b'] : null;
+// A tie (1:1) only makes sense in the group phase -- knockout games need a winner to advance.
+$allowTie = ($game['phase'] ?? 'group') === 'group';
 
 if ($teamA === null || $teamB === null) {
     $options = [];
@@ -90,6 +92,10 @@ if ($teamA === null || $teamB === null) {
           <?php $isCurrent = $value === $currentValue; ?>
           <button type="submit" name="score" value="<?= h($value) ?>" class="score-btn<?= $isCurrent ? ' score-btn-current' : '' ?>"><?= h($label) ?><?= $isCurrent ? ' (aktuell)' : '' ?></button>
         <?php endforeach; ?>
+        <?php if ($allowTie): ?>
+          <?php $isCurrentTie = $currentValue === '1-1'; ?>
+          <button type="submit" name="score" value="1-1" class="score-btn score-btn-tie<?= $isCurrentTie ? ' score-btn-current' : '' ?>">Unentschieden 1:1<?= $isCurrentTie ? ' (aktuell)' : '' ?></button>
+        <?php endif; ?>
       </div>
     </form>
   </details>

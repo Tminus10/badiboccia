@@ -141,7 +141,7 @@ final class Game
             $setsA, $setsB, $playedDate,
         ]);
 
-        if ($game['phase'] !== 'group' && $game['next_game_id'] !== null) {
+        if ($game['phase'] !== 'group' && $game['next_game_id'] !== null && $setsA !== $setsB) {
             $winnerId = $setsA > $setsB ? (int) $game['team_a_id'] : (int) $game['team_b_id'];
             self::setQfTeam((int) $game['next_game_id'], $game['next_game_slot'], $winnerId);
         }

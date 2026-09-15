@@ -37,6 +37,7 @@ foreach ($games as $g) {
           <th>Sp</th>
           <th>S</th>
           <th>N</th>
+          <th>U</th>
           <th>Sätze</th>
           <th>Pkt</th>
         </tr>
@@ -49,6 +50,7 @@ foreach ($games as $g) {
             <td><?= (int) $row['played'] ?></td>
             <td><?= (int) $row['won'] ?></td>
             <td><?= (int) $row['lost'] ?></td>
+            <td><?= (int) $row['tied'] ?></td>
             <td><?= (int) $row['sets_for'] ?>:<?= (int) $row['sets_against'] ?></td>
             <td class="pts"><?= (int) $row['points'] ?></td>
           </tr>

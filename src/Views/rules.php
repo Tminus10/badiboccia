@@ -11,9 +11,9 @@
 
   <h2>Punkte für die Tabelle</h2>
   <ul>
-    <li><strong>Sieg 2:0</strong> – 3 Punkte</li>
-    <li><strong>Sieg 2:1</strong> – 2 Punkte</li>
-    <li><strong>Niederlage</strong> – 1 Punkt</li>
+    <li><strong>Sieg 2:0</strong> – 3 Punkte, <strong>Niederlage 0:2</strong> – 0 Punkte</li>
+    <li><strong>Sieg 2:1</strong> – 2 Punkte, <strong>Niederlage 1:2</strong> – 1 Punkt</li>
+    <li><strong>Unentschieden 1:1</strong> – je 1 Punkt (falls ein Spiel nicht zu Ende gespielt werden kann, z.B. wegen Wetter)</li>
   </ul>
 
   <h2>Viertelfinale und K.-o.-Phase</h2>
