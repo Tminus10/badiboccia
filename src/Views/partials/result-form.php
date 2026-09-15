@@ -12,7 +12,10 @@
 $targetTeamId = $targetTeamId ?? null;
 $hideDate = $hideDate ?? false;
 $complete = Game::isComplete($game);
-$viewerIsB = $viewerTeamId !== null && $teamB !== null && (int) $game['team_b_id'] === $viewerTeamId;
+// Whose name goes on the left: the page we're on (a team's own page) takes priority over
+// who happens to be logged in, so admins/spectators see the same layout as the team itself.
+$orientTeamId = $targetTeamId ?? $viewerTeamId;
+$orientIsB = $orientTeamId !== null && $teamB !== null && (int) $game['team_b_id'] === $orientTeamId;
 $today = date('Y-m-d');
 $seasonDefaultDate = sprintf('%04d-07-15', $seasonYear ?? (int) date('Y'));
 if ($seasonDefaultDate > $today) {
@@ -24,9 +27,8 @@ $currentValue = $complete ? $game['sets_a'] . '-' . $game['sets_b'] : null;
 if ($teamA === null || $teamB === null) {
     $options = [];
 } else {
-    // Left column is always the logged-in team's own team (defaulting to team A when
-    // viewing as admin/a spectator); right column is always the opponent.
-    if ($viewerIsB) {
+    // Left column is always the oriented team (see $orientTeamId above); right is the opponent.
+    if ($orientIsB) {
         [$leftTeam, $rightTeam] = [$teamB, $teamA];
         [$leftWin20, $leftWin21, $rightWin20, $rightWin21] = ['0-2', '1-2', '2-0', '2-1'];
     } else {
