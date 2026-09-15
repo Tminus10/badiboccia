@@ -13,7 +13,7 @@
 $pageTitle = $targetTeam['name'];
 $teamId = (int) $targetTeam['id'];
 $returnTo = $showAllSeasons ? url('/team/' . $teamId) . '?season=all' : url('/team/' . $teamId);
-$phaseLabels = ['group' => 'Gruppenphase', 'qf' => 'Viertelfinal', 'sf' => 'Halbfinal', 'final' => 'Final'];
+$phaseLabels = ['group' => 'Gruppenphase', 'qf' => 'Viertelfinal', 'sf' => 'Halbfinal', 'final' => 'Final', 'third' => 'Spiel um Platz 3'];
 ?>
 <div class="team-header card">
   <?= render_partial('partials/team-avatar', ['team' => $targetTeam, 'size' => 'lg', 'linked' => false]) ?>

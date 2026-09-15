@@ -3,10 +3,10 @@
 /** Helpers for the knockout bracket admin assignment screen. */
 final class BracketService
 {
-    /** Groups bracket games by phase for display: ['qf' => [...], 'sf' => [...], 'final' => [...]] */
+    /** Groups bracket games by phase for display: ['qf' => [...], 'sf' => [...], 'final' => [...], 'third' => [...]] */
     public static function byPhase(array $bracketGames): array
     {
-        $out = ['qf' => [], 'sf' => [], 'final' => []];
+        $out = ['qf' => [], 'sf' => [], 'final' => [], 'third' => []];
         foreach ($bracketGames as $game) {
             $out[$game['phase']][] = $game;
         }

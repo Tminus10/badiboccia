@@ -19,14 +19,14 @@ final class Game
         return $stmt->fetchAll();
     }
 
-    /** A team's full history, oldest season first; each season's games grouped together and ordered group -> qf -> sf -> final within it. */
+    /** A team's full history, oldest season first; each season's games grouped together and ordered group -> qf -> sf -> final -> third within it. */
     public static function forTeam(int $teamId): array
     {
         $stmt = Db::pdo()->prepare(
             "SELECT games.* FROM games
              JOIN seasons ON seasons.id = games.season_id
              WHERE games.team_a_id = ? OR games.team_b_id = ?
-             ORDER BY seasons.year ASC, FIELD(games.phase, 'group','qf','sf','final'),
+             ORDER BY seasons.year ASC, FIELD(games.phase, 'group','qf','sf','final','third'),
                       (games.played_date IS NULL) ASC, games.played_date ASC, games.id ASC"
         );
         $stmt->execute([$teamId, $teamId]);
@@ -38,7 +38,7 @@ final class Game
     {
         $stmt = Db::pdo()->prepare(
             "SELECT * FROM games WHERE season_id = ? AND (team_a_id = ? OR team_b_id = ?)
-             ORDER BY FIELD(phase, 'group','qf','sf','final'), (played_date IS NULL) ASC, played_date ASC, id ASC"
+             ORDER BY FIELD(phase, 'group','qf','sf','final','third'), (played_date IS NULL) ASC, played_date ASC, id ASC"
         );
         $stmt->execute([$seasonId, $teamId, $teamId]);
         return $stmt->fetchAll();
@@ -47,7 +47,7 @@ final class Game
     public static function bracketGames(int $seasonId): array
     {
         $stmt = Db::pdo()->prepare(
-            "SELECT * FROM games WHERE season_id = ? AND phase != 'group' ORDER BY FIELD(phase, 'qf','sf','final'), slot_index ASC"
+            "SELECT * FROM games WHERE season_id = ? AND phase != 'group' ORDER BY FIELD(phase, 'qf','sf','final','third'), slot_index ASC"
         );
         $stmt->execute([$seasonId]);
         return $stmt->fetchAll();
@@ -83,7 +83,7 @@ final class Game
         }
     }
 
-    /** Creates the empty QF/SF/Final skeleton for a season, wired via next_game_id, if it doesn't exist yet. */
+    /** Creates the empty QF/SF/Final/third-place skeleton for a season, wired via next_game_id, if it doesn't exist yet. */
     public static function ensureBracketSkeleton(int $seasonId): void
     {
         $pdo = Db::pdo();
@@ -105,10 +105,21 @@ final class Game
         $insert->execute([$seasonId, 'sf', 2, $finalId, 'b']);
         $sf2Id = (int) $pdo->lastInsertId();
 
+        // Fed by the two SF losers -- see recordResult().
+        $insert->execute([$seasonId, 'third', 1, null, null]);
+
         $insert->execute([$seasonId, 'qf', 1, $sf1Id, 'a']);
         $insert->execute([$seasonId, 'qf', 2, $sf1Id, 'b']);
         $insert->execute([$seasonId, 'qf', 3, $sf2Id, 'a']);
         $insert->execute([$seasonId, 'qf', 4, $sf2Id, 'b']);
+    }
+
+    /** The season's "Spiel um Platz 3" game, fed by the two SF losers, or null if not created yet. */
+    public static function thirdPlaceGame(int $seasonId): ?array
+    {
+        $stmt = Db::pdo()->prepare("SELECT * FROM games WHERE season_id = ? AND phase = 'third' LIMIT 1");
+        $stmt->execute([$seasonId]);
+        return $stmt->fetch() ?: null;
     }
 
     public static function setQfTeam(int $gameId, string $slot, ?int $teamId): void
@@ -144,6 +155,15 @@ final class Game
         if ($game['phase'] !== 'group' && $game['next_game_id'] !== null && $setsA !== $setsB) {
             $winnerId = $setsA > $setsB ? (int) $game['team_a_id'] : (int) $game['team_b_id'];
             self::setQfTeam((int) $game['next_game_id'], $game['next_game_slot'], $winnerId);
+        }
+
+        if ($game['phase'] === 'sf' && $setsA !== $setsB) {
+            $loserId = $setsA > $setsB ? (int) $game['team_b_id'] : (int) $game['team_a_id'];
+            $thirdPlace = self::thirdPlaceGame((int) $game['season_id']);
+            if ($thirdPlace !== null) {
+                $slot = (int) $game['slot_index'] === 1 ? 'a' : 'b';
+                self::setQfTeam((int) $thirdPlace['id'], $slot, $loserId);
+            }
         }
     }
 

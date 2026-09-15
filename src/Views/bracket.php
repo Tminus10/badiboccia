@@ -9,7 +9,7 @@
 $isCurrent = (int) $season['is_current'] === 1;
 $pageTitle = 'Turnierbaum – ' . $season['label'];
 $returnTo = $isCurrent ? '/bracket' : '/bracket/' . $season['id'];
-$phaseLabels = ['qf' => 'Viertelfinal', 'sf' => 'Halbfinal', 'final' => 'Final'];
+$phaseLabels = ['qf' => 'Viertelfinal', 'sf' => 'Halbfinal', 'final' => 'Final', 'third' => 'Spiel um Platz 3'];
 ?>
 <div class="page-head">
   <div>
@@ -44,7 +44,7 @@ $phaseLabels = ['qf' => 'Viertelfinal', 'sf' => 'Halbfinal', 'final' => 'Final']
       </div>
     <?php endforeach; ?>
   </div>
-  <?php foreach (['qf', 'sf', 'final'] as $phase): ?>
+  <?php foreach (['qf', 'sf', 'final', 'third'] as $phase): ?>
     <div class="bracket-col bracket-col-<?= h($phase) ?>">
       <h2><?= h($phaseLabels[$phase]) ?></h2>
       <?php foreach ($phases[$phase] as $game): ?>

@@ -20,7 +20,8 @@
   <p>
     Die ersten beiden Teams jeder Gruppe erreichen das Viertelfinale. Ab hier
     wird im K.-o.-System gespielt – Viertelfinale, Halbfinale, Finale – und die
-    Sätze gehen neu bis 21 Punkte.
+    Sätze gehen neu bis 21 Punkte. Die beiden Verlierer der Halbfinals spielen
+    zusätzlich im <strong>Spiel um Platz 3</strong> gegeneinander.
   </p>
 
   <h2>Terminplanung</h2>
