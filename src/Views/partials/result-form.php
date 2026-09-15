@@ -12,7 +12,6 @@
 $targetTeamId = $targetTeamId ?? null;
 $hideDate = $hideDate ?? false;
 $complete = Game::isComplete($game);
-$viewerIsA = $viewerTeamId !== null && $teamA !== null && (int) $game['team_a_id'] === $viewerTeamId;
 $viewerIsB = $viewerTeamId !== null && $teamB !== null && (int) $game['team_b_id'] === $viewerTeamId;
 $today = date('Y-m-d');
 $seasonDefaultDate = sprintf('%04d-07-15', $seasonYear ?? (int) date('Y'));
@@ -24,26 +23,21 @@ $currentValue = $complete ? $game['sets_a'] . '-' . $game['sets_b'] : null;
 
 if ($teamA === null || $teamB === null) {
     $options = [];
-} elseif ($viewerIsA) {
-    $options = [
-        ['2-0', 'Sieg 2:0'],
-        ['0-2', 'Niederlage 0:2'],
-        ['2-1', 'Sieg 2:1'],
-        ['1-2', 'Niederlage 1:2'],
-    ];
-} elseif ($viewerIsB) {
-    $options = [
-        ['0-2', 'Sieg 2:0'],
-        ['2-0', 'Niederlage 0:2'],
-        ['1-2', 'Sieg 2:1'],
-        ['2-1', 'Niederlage 1:2'],
-    ];
 } else {
+    // Left column is always the logged-in team's own team (defaulting to team A when
+    // viewing as admin/a spectator); right column is always the opponent.
+    if ($viewerIsB) {
+        [$leftTeam, $rightTeam] = [$teamB, $teamA];
+        [$leftWin20, $leftWin21, $rightWin20, $rightWin21] = ['0-2', '1-2', '2-0', '2-1'];
+    } else {
+        [$leftTeam, $rightTeam] = [$teamA, $teamB];
+        [$leftWin20, $leftWin21, $rightWin20, $rightWin21] = ['2-0', '2-1', '0-2', '1-2'];
+    }
     $options = [
-        ['2-0', $teamA['name'] . ' gewinnt 2:0'],
-        ['0-2', $teamB['name'] . ' gewinnt 2:0'],
-        ['2-1', $teamA['name'] . ' gewinnt 2:1'],
-        ['1-2', $teamB['name'] . ' gewinnt 2:1'],
+        [$leftWin20, $leftTeam['name'] . ' gewinnt 2:0'],
+        [$rightWin20, $rightTeam['name'] . ' gewinnt 2:0'],
+        [$leftWin21, $leftTeam['name'] . ' gewinnt 2:1'],
+        [$rightWin21, $rightTeam['name'] . ' gewinnt 2:1'],
     ];
 }
 ?>
