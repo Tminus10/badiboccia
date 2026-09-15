@@ -47,7 +47,7 @@ $isCurrent = (int) $season['is_current'] === 1;
 
 <?php foreach ($groupData as $entry): ?>
   <?php $group = $entry['group']; ?>
-  <section class="card">
+  <section class="card" id="group-<?= (int) $group['id'] ?>">
     <header class="group-card-head">
       <h2>Gruppe <?= h($group['name']) ?></h2>
       <?php if ($entry['gamesCount'] === 0): ?>

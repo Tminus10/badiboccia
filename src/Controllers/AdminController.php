@@ -211,24 +211,24 @@ final class AdminController
     {
         AdminAuth::requireLogin();
         $seasonId = (int) $params['id'];
+        $groupId = (int) ($_POST['group_id'] ?? 0);
         if (!csrf_check()) {
-            redirect('/admin/season/' . $seasonId);
+            self::redirectAfterTeamAction($seasonId, $groupId);
             return;
         }
         if (!self::isSeasonCurrent($seasonId)) {
             flash_set('error', 'Diese Saison ist archiviert. Teams können nur in der aktiven Saison hinzugefügt werden.');
-            redirect('/admin/season/' . $seasonId);
+            self::redirectAfterTeamAction($seasonId, $groupId);
             return;
         }
 
         $name = trim((string) ($_POST['name'] ?? ''));
         $player1 = trim((string) ($_POST['player1'] ?? ''));
         $player2 = trim((string) ($_POST['player2'] ?? ''));
-        $groupId = (int) ($_POST['group_id'] ?? 0);
 
         if ($name === '' || $player1 === '' || $player2 === '' || $groupId === 0) {
             flash_set('error', 'Bitte alle Felder ausfüllen.');
-            redirect('/admin/season/' . $seasonId);
+            self::redirectAfterTeamAction($seasonId, $groupId);
             return;
         }
 
@@ -236,7 +236,7 @@ final class AdminController
         $pin = Team::find($teamId)['pin'];
 
         flash_set('success', "Team \"$name\" erstellt. PIN für den Login: $pin (bitte dem Team mitteilen).");
-        redirect('/admin/season/' . $seasonId);
+        self::redirectAfterTeamAction($seasonId, $groupId);
     }
 
     /** Enrolls a team that already exists from a previous season into this one. */
@@ -244,29 +244,29 @@ final class AdminController
     {
         AdminAuth::requireLogin();
         $seasonId = (int) $params['id'];
+        $groupId = (int) ($_POST['group_id'] ?? 0);
         if (!csrf_check()) {
-            redirect('/admin/season/' . $seasonId);
+            self::redirectAfterTeamAction($seasonId, $groupId);
             return;
         }
         if (!self::isSeasonCurrent($seasonId)) {
             flash_set('error', 'Diese Saison ist archiviert. Teams können nur in der aktiven Saison hinzugefügt werden.');
-            redirect('/admin/season/' . $seasonId);
+            self::redirectAfterTeamAction($seasonId, $groupId);
             return;
         }
 
         $teamId = (int) ($_POST['team_id'] ?? 0);
-        $groupId = (int) ($_POST['group_id'] ?? 0);
         $team = Team::find($teamId);
 
         if ($team === null || $groupId === 0) {
             flash_set('error', 'Bitte ein Team und eine Gruppe wählen.');
-            redirect('/admin/season/' . $seasonId);
+            self::redirectAfterTeamAction($seasonId, $groupId);
             return;
         }
 
         Team::enroll($teamId, $seasonId, $groupId);
         flash_set('success', 'Team "' . $team['name'] . '" zur Saison hinzugefügt.');
-        redirect('/admin/season/' . $seasonId);
+        self::redirectAfterTeamAction($seasonId, $groupId);
     }
 
     /** Whether teams may still be added to / moved within this season's groups. */
@@ -276,10 +276,18 @@ final class AdminController
         return $season !== null && (int) $season['is_current'] === 1;
     }
 
-    /** /admin/season/{id} when a season context was posted (season page), otherwise the central /admin/teams page. */
-    private static function redirectAfterTeamAction(int $seasonId): void
+    /**
+     * /admin/season/{id}, anchored at a group's section when known (so the browser lands back
+     * where the admin was instead of jumping to the top of the page), or the central
+     * /admin/teams page when there's no season context.
+     */
+    private static function redirectAfterTeamAction(int $seasonId, int $groupId = 0): void
     {
-        redirect($seasonId !== 0 ? '/admin/season/' . $seasonId : '/admin/teams');
+        if ($seasonId === 0) {
+            redirect('/admin/teams');
+            return;
+        }
+        redirect('/admin/season/' . $seasonId . ($groupId !== 0 ? '#group-' . $groupId : ''));
     }
 
     public static function teamUpdate(array $params): void
@@ -293,19 +301,22 @@ final class AdminController
             render('404');
             return;
         }
+        $groupId = (int) ($_POST['group_id'] ?? 0);
+        if ($groupId === 0) {
+            $groupId = self::currentGroupId($teamId, $seasonId);
+        }
         if (!csrf_check()) {
-            self::redirectAfterTeamAction($seasonId);
+            self::redirectAfterTeamAction($seasonId, $groupId);
             return;
         }
 
         $name = trim((string) ($_POST['name'] ?? ''));
         $player1 = trim((string) ($_POST['player1'] ?? ''));
         $player2 = trim((string) ($_POST['player2'] ?? ''));
-        $groupId = (int) ($_POST['group_id'] ?? 0);
 
         if ($name !== '' && $player1 !== '' && $player2 !== '') {
             Team::update($teamId, $name, $player1, $player2);
-            if ($groupId !== 0 && $seasonId !== 0) {
+            if ($groupId !== 0 && $seasonId !== 0 && (int) ($_POST['group_id'] ?? 0) !== 0) {
                 if (self::isSeasonCurrent($seasonId)) {
                     Team::updateGroup($teamId, $seasonId, $groupId);
                 } else {
@@ -315,7 +326,7 @@ final class AdminController
             flash_set('success', 'Team aktualisiert.');
         }
 
-        self::redirectAfterTeamAction($seasonId);
+        self::redirectAfterTeamAction($seasonId, $groupId);
     }
 
     public static function teamPhoto(array $params): void
@@ -329,8 +340,9 @@ final class AdminController
             render('404');
             return;
         }
+        $groupId = self::currentGroupId($teamId, $seasonId);
         if (!csrf_check()) {
-            self::redirectAfterTeamAction($seasonId);
+            self::redirectAfterTeamAction($seasonId, $groupId);
             return;
         }
 
@@ -342,7 +354,7 @@ final class AdminController
             flash_set('error', $e->getMessage());
         }
 
-        self::redirectAfterTeamAction($seasonId);
+        self::redirectAfterTeamAction($seasonId, $groupId);
     }
 
     public static function teamPinReset(array $params): void
@@ -356,15 +368,26 @@ final class AdminController
             render('404');
             return;
         }
+        $groupId = self::currentGroupId($teamId, $seasonId);
         if (!csrf_check()) {
-            self::redirectAfterTeamAction($seasonId);
+            self::redirectAfterTeamAction($seasonId, $groupId);
             return;
         }
 
         $pin = str_pad((string) random_int(0, 9999), 4, '0', STR_PAD_LEFT);
         Team::resetPin($teamId, $pin);
         flash_set('success', 'Neuer PIN für ' . $team['name'] . ': ' . $pin);
-        self::redirectAfterTeamAction($seasonId);
+        self::redirectAfterTeamAction($seasonId, $groupId);
+    }
+
+    /** This team's group in the given season, or 0 if it isn't enrolled there. */
+    private static function currentGroupId(int $teamId, int $seasonId): int
+    {
+        if ($seasonId === 0) {
+            return 0;
+        }
+        $enrollment = Team::enrollmentFor($teamId, $seasonId);
+        return $enrollment !== null ? (int) $enrollment['group_id'] : 0;
     }
 
     /** Removes a team from this season only; the team itself (and its history) is kept unless this was its only season. */
@@ -379,14 +402,16 @@ final class AdminController
             render('404');
             return;
         }
+        // Resolved before removal -- the enrollment row (and its group_id) is gone afterwards.
+        $groupId = self::currentGroupId($teamId, $seasonId);
         if (!csrf_check()) {
-            redirect('/admin/season/' . $seasonId);
+            self::redirectAfterTeamAction($seasonId, $groupId);
             return;
         }
 
         Team::removeFromSeason($teamId, $seasonId);
         flash_set('success', 'Team aus der Saison entfernt.');
-        redirect('/admin/season/' . $seasonId);
+        self::redirectAfterTeamAction($seasonId, $groupId);
     }
 
     public static function fixturesGenerate(array $params): void
@@ -399,30 +424,31 @@ final class AdminController
             render('404');
             return;
         }
+        $seasonId = (int) $group['season_id'];
         if (!csrf_check()) {
-            redirect('/admin/season/' . $group['season_id']);
+            self::redirectAfterTeamAction($seasonId, $groupId);
             return;
         }
 
         $existing = Game::forGroup($groupId);
         if (count($existing) > 0) {
             flash_set('error', 'Für diese Gruppe wurden die Spiele bereits erstellt.');
-            redirect('/admin/season/' . $group['season_id']);
+            self::redirectAfterTeamAction($seasonId, $groupId);
             return;
         }
 
         $teams = Team::byGroup($groupId);
         if (count($teams) < 2) {
             flash_set('error', 'Eine Gruppe braucht mindestens 2 Teams.');
-            redirect('/admin/season/' . $group['season_id']);
+            self::redirectAfterTeamAction($seasonId, $groupId);
             return;
         }
 
         $teamIds = array_map(fn ($t) => (int) $t['id'], $teams);
-        Game::createGroupFixtures((int) $group['season_id'], $groupId, $teamIds);
+        Game::createGroupFixtures($seasonId, $groupId, $teamIds);
 
         flash_set('success', count(RoundRobinScheduler::generate($teamIds)) . ' Spiele erstellt.');
-        redirect('/admin/season/' . $group['season_id']);
+        self::redirectAfterTeamAction($seasonId, $groupId);
     }
 
     public static function bracketAssign(array $params): void
