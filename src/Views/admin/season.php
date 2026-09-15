@@ -16,6 +16,20 @@ $isCurrent = (int) $season['is_current'] === 1;
     <?php if ($isCurrent): ?><span class="badge badge-current">Aktive Saison</span><?php else: ?><span class="badge badge-archive">Archiviert</span><?php endif; ?>
   </div>
   <div class="page-head-actions">
+    <details class="season-edit-entry">
+      <summary class="btn btn-secondary btn-sm">✎ Bezeichnung / Jahr bearbeiten</summary>
+      <form method="post" action="<?= h(url('/admin/season/' . $season['id'] . '/update')) ?>" class="stack-form">
+        <?= csrf_field() ?>
+        <label>Bezeichnung <input type="text" name="label" value="<?= h($season['label']) ?>" required></label>
+        <label>Jahr <input type="number" name="year" value="<?= (int) $season['year'] ?>" required></label>
+        <button class="btn btn-primary btn-sm" type="submit">Speichern</button>
+      </form>
+
+      <form method="post" action="<?= h(url('/admin/season/' . $season['id'] . '/delete')) ?>" class="inline-form" onsubmit="return confirm('Saison \'<?= h(addslashes($season['label'])) ?>\' wirklich unwiderruflich löschen? Alle Gruppen, Spiele und Resultate dieser Saison gehen dabei verloren.');">
+        <?= csrf_field() ?>
+        <button class="btn btn-ghost btn-sm btn-danger" type="submit">Saison löschen</button>
+      </form>
+    </details>
     <?php if ($isCurrent): ?>
       <form method="post" action="<?= h(url('/admin/season/' . $season['id'] . '/deactivate')) ?>" class="inline-form">
         <?= csrf_field() ?>
@@ -30,21 +44,6 @@ $isCurrent = (int) $season['is_current'] === 1;
     <a class="btn btn-secondary" href="<?= h(url('/admin/season/' . $season['id'] . '/audit')) ?>">Änderungsprotokoll</a>
   </div>
 </div>
-
-<details class="add-form">
-  <summary>Saison bearbeiten</summary>
-  <form method="post" action="<?= h(url('/admin/season/' . $season['id'] . '/update')) ?>" class="stack-form">
-    <?= csrf_field() ?>
-    <label>Bezeichnung <input type="text" name="label" value="<?= h($season['label']) ?>" required></label>
-    <label>Jahr <input type="number" name="year" value="<?= (int) $season['year'] ?>" required></label>
-    <button class="btn btn-primary btn-sm" type="submit">Speichern</button>
-  </form>
-
-  <form method="post" action="<?= h(url('/admin/season/' . $season['id'] . '/delete')) ?>" class="inline-form" onsubmit="return confirm('Saison \'<?= h(addslashes($season['label'])) ?>\' wirklich unwiderruflich löschen? Alle Gruppen, Spiele und Resultate dieser Saison gehen dabei verloren.');">
-    <?= csrf_field() ?>
-    <button class="btn btn-ghost btn-sm btn-danger" type="submit">Saison löschen</button>
-  </form>
-</details>
 
 <?php foreach ($groupData as $entry): ?>
   <?php $group = $entry['group']; ?>
