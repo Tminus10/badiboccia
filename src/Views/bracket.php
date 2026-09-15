@@ -2,6 +2,7 @@
 /** @var array $season
  * @var array[] $groupData
  * @var array $phases
+ * @var array{champion: array|null, runnerUp: array|null, third: array|null}|null $podium
  * @var array[] $teamsById
  * @var array|null $viewerTeam
  * @var array|null $admin
@@ -18,6 +19,33 @@ $phaseLabels = ['qf' => 'Viertelfinal', 'sf' => 'Halbfinal', 'final' => 'Final',
   </div>
   <a class="btn btn-secondary" href="<?= h(url($isCurrent ? '/' : '/season/' . $season['id'])) ?>">Übersicht ansehen →</a>
 </div>
+
+<?php if ($podium !== null): ?>
+  <section class="card podium-card">
+    <h2>Rangliste</h2>
+    <ul class="podium-list">
+      <li class="podium-row podium-1">
+        <span class="podium-medal" aria-hidden="true">🥇</span>
+        <span class="podium-place">1. Platz</span>
+        <?= render_partial('partials/team-dot', ['team' => $podium['champion'], 'seasonId' => (int) $season['id']]) ?>
+      </li>
+      <li class="podium-row podium-2">
+        <span class="podium-medal" aria-hidden="true">🥈</span>
+        <span class="podium-place">2. Platz</span>
+        <?= render_partial('partials/team-dot', ['team' => $podium['runnerUp'], 'seasonId' => (int) $season['id']]) ?>
+      </li>
+      <li class="podium-row podium-3">
+        <span class="podium-medal" aria-hidden="true">🥉</span>
+        <span class="podium-place">3. Platz</span>
+        <?php if ($podium['third'] !== null): ?>
+          <?= render_partial('partials/team-dot', ['team' => $podium['third'], 'seasonId' => (int) $season['id']]) ?>
+        <?php else: ?>
+          <span class="muted">Spiel um Platz 3 steht noch aus</span>
+        <?php endif; ?>
+      </li>
+    </ul>
+  </section>
+<?php endif; ?>
 
 <div class="bracket">
   <div class="bracket-col bracket-col-groups">

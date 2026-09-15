@@ -65,10 +65,18 @@ final class Game
 
     public static function winnerTeamId(array $game): ?int
     {
-        if (!self::isComplete($game)) {
+        if (!self::isComplete($game) || $game['sets_a'] === $game['sets_b']) {
             return null;
         }
         return (int) $game['sets_a'] > (int) $game['sets_b'] ? (int) $game['team_a_id'] : (int) $game['team_b_id'];
+    }
+
+    public static function loserTeamId(array $game): ?int
+    {
+        if (!self::isComplete($game) || $game['sets_a'] === $game['sets_b']) {
+            return null;
+        }
+        return (int) $game['sets_a'] > (int) $game['sets_b'] ? (int) $game['team_b_id'] : (int) $game['team_a_id'];
     }
 
     /** Creates the round-robin group-phase fixtures for a set of teams. */

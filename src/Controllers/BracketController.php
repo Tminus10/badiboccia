@@ -56,6 +56,7 @@ final class BracketController
             'season' => $season,
             'groupData' => $groupData,
             'phases' => BracketService::byPhase($bracketGames),
+            'podium' => BracketService::podium($bracketGames, $teamsById),
             'teamsById' => $teamsById,
             'viewerTeam' => TeamAuth::current(),
             'admin' => AdminAuth::current(),
