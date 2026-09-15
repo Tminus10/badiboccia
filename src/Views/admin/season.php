@@ -3,7 +3,7 @@
  * @var array $season
  * @var array[] $groupData
  * @var array[] $qfGames
- * @var array[] $allTeams
+ * @var array[] $qualifiedTeams
  * @var array[] $availableTeams
  */
 $pageTitle = 'Verwalten – ' . $season['label'];
@@ -166,14 +166,14 @@ $isCurrent = (int) $season['is_current'] === 1;
         <span class="qf-label">Viertelfinal <?= $slot ?></span>
         <select name="qf<?= $slot ?>_a">
           <option value="">– Team A wählen –</option>
-          <?php foreach ($allTeams as $t): ?>
+          <?php foreach ($qualifiedTeams as $t): ?>
             <option value="<?= (int) $t['id'] ?>" <?= (int) $game['team_a_id'] === (int) $t['id'] ? 'selected' : '' ?>><?= h($t['name']) ?></option>
           <?php endforeach; ?>
         </select>
         <span class="vs">–</span>
         <select name="qf<?= $slot ?>_b">
           <option value="">– Team B wählen –</option>
-          <?php foreach ($allTeams as $t): ?>
+          <?php foreach ($qualifiedTeams as $t): ?>
             <option value="<?= (int) $t['id'] ?>" <?= (int) $game['team_b_id'] === (int) $t['id'] ? 'selected' : '' ?>><?= h($t['name']) ?></option>
           <?php endforeach; ?>
         </select>

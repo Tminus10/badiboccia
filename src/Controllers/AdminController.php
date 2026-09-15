@@ -85,6 +85,7 @@ final class AdminController
 
         $groups = Season::groups((int) $season['id']);
         $groupData = [];
+        $qualifiedTeams = [];
         foreach ($groups as $group) {
             $teams = Team::byGroup((int) $group['id']);
             $games = Game::forGroup((int) $group['id']);
@@ -93,12 +94,15 @@ final class AdminController
                 'teams' => $teams,
                 'gamesCount' => count($games),
             ];
+            $standings = StandingsCalculator::compute($teams, $games);
+            foreach (array_slice($standings, 0, 2) as $row) {
+                $qualifiedTeams[] = $row['team'];
+            }
         }
 
         Game::ensureBracketSkeleton((int) $season['id']);
         $bracketGames = Game::bracketGames((int) $season['id']);
         $qfGames = array_values(array_filter($bracketGames, fn ($g) => $g['phase'] === 'qf'));
-        $allTeams = Team::bySeason((int) $season['id']);
         $availableTeams = Team::availableForSeason((int) $season['id']);
 
         render('admin/season', [
@@ -106,7 +110,7 @@ final class AdminController
             'season' => $season,
             'groupData' => $groupData,
             'qfGames' => $qfGames,
-            'allTeams' => $allTeams,
+            'qualifiedTeams' => $qualifiedTeams,
             'availableTeams' => $availableTeams,
         ]);
     }
