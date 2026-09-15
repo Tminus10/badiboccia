@@ -27,23 +27,23 @@ if ($teamA === null || $teamB === null) {
 } elseif ($viewerIsA) {
     $options = [
         ['2-0', 'Sieg 2:0'],
+        ['0-2', 'Niederlage 0:2'],
         ['2-1', 'Sieg 2:1'],
         ['1-2', 'Niederlage 1:2'],
-        ['0-2', 'Niederlage 0:2'],
     ];
 } elseif ($viewerIsB) {
     $options = [
         ['0-2', 'Sieg 2:0'],
+        ['2-0', 'Niederlage 0:2'],
         ['1-2', 'Sieg 2:1'],
         ['2-1', 'Niederlage 1:2'],
-        ['2-0', 'Niederlage 0:2'],
     ];
 } else {
     $options = [
         ['2-0', $teamA['name'] . ' gewinnt 2:0'],
+        ['0-2', $teamB['name'] . ' gewinnt 2:0'],
         ['2-1', $teamA['name'] . ' gewinnt 2:1'],
         ['1-2', $teamB['name'] . ' gewinnt 2:1'],
-        ['0-2', $teamB['name'] . ' gewinnt 2:0'],
     ];
 }
 ?>
