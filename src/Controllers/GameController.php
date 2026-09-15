@@ -49,10 +49,9 @@ final class GameController
             return;
         }
 
+        // Left blank when the exact date isn't known -- stored as no date rather than guessed.
         $date = (string) ($_POST['played_date'] ?? '');
-        if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $date)) {
-            $date = date('Y-m-d');
-        }
+        $date = preg_match('/^\d{4}-\d{2}-\d{2}$/', $date) ? $date : null;
 
         Game::recordResult($gameId, $setsA, $setsB, $date, $actorType, $actorId, $actorLabel);
 

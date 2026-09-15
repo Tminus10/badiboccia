@@ -7,7 +7,7 @@
  * @var bool $canEdit
  * @var int|null $targetTeamId whose page this is being shown on, for score orientation (null = absolute team A:B score)
  * @var bool|null $hideDate omit the date from the chip (caller renders it separately)
- * @var int|null $seasonYear the season's year, used to default the date picker to the right year for past seasons
+ * @var int|null $seasonYear the season's year, used to default the "Termin festlegen" date picker to the right year for past seasons
  */
 $targetTeamId = $targetTeamId ?? null;
 $hideDate = $hideDate ?? false;
@@ -17,11 +17,10 @@ $complete = Game::isComplete($game);
 $orientTeamId = $targetTeamId ?? $viewerTeamId;
 $orientIsB = $orientTeamId !== null && $teamB !== null && (int) $game['team_b_id'] === $orientTeamId;
 $today = date('Y-m-d');
-$seasonDefaultDate = sprintf('%04d-07-15', $seasonYear ?? (int) date('Y'));
-if ($seasonDefaultDate > $today) {
-    $seasonDefaultDate = $today;
+$scheduleDefaultDate = sprintf('%04d-07-15', $seasonYear ?? (int) date('Y'));
+if ($scheduleDefaultDate > $today) {
+    $scheduleDefaultDate = $today;
 }
-$defaultDate = $game['played_date'] ?? $seasonDefaultDate;
 $currentValue = $complete ? $game['sets_a'] . '-' . $game['sets_b'] : null;
 
 if ($teamA === null || $teamB === null) {
@@ -66,7 +65,7 @@ if ($teamA === null || $teamB === null) {
       <p class="score-hint">Für die anderen Teams sichtbar, sobald gespeichert.</p>
       <label class="date-field">
         <span>Datum</span>
-        <input type="date" name="played_date" value="<?= h($game['played_date'] ?? $today) ?>" required>
+        <input type="date" name="played_date" value="<?= h($game['played_date'] ?? $scheduleDefaultDate) ?>" required>
       </label>
       <button class="btn btn-primary btn-sm" type="submit">Termin speichern</button>
     </form>
@@ -80,8 +79,8 @@ if ($teamA === null || $teamB === null) {
       <?= csrf_field() ?>
       <input type="hidden" name="return_to" value="<?= h($returnTo) ?>">
       <label class="date-field">
-        <span>Datum</span>
-        <input type="date" name="played_date" value="<?= h($defaultDate) ?>" max="<?= h($today) ?>" required>
+        <span>Datum <span class="muted">(optional, falls bekannt)</span></span>
+        <input type="date" name="played_date" value="<?= h($game['played_date'] ?? '') ?>" max="<?= h($today) ?>">
       </label>
       <p class="score-hint">Zum Speichern das Ergebnis antippen:</p>
       <div class="score-buttons">
