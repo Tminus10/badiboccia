@@ -72,7 +72,7 @@ $phaseLabels = ['qf' => 'Viertelfinal', 'sf' => 'Halbfinal', 'final' => 'Final',
       </div>
     <?php endforeach; ?>
   </div>
-  <?php foreach (['qf', 'sf', 'final', 'third'] as $phase): ?>
+  <?php foreach (['qf', 'sf', 'third', 'final'] as $phase): ?>
     <div class="bracket-col bracket-col-<?= h($phase) ?>">
       <h2><?= h($phaseLabels[$phase]) ?></h2>
       <?php foreach ($phases[$phase] as $game): ?>

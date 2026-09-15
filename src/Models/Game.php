@@ -19,14 +19,14 @@ final class Game
         return $stmt->fetchAll();
     }
 
-    /** A team's full history, oldest season first; each season's games grouped together and ordered group -> qf -> sf -> final -> third within it. */
+    /** A team's full history, oldest season first; each season's games grouped together and ordered group -> qf -> sf -> third -> final within it. */
     public static function forTeam(int $teamId): array
     {
         $stmt = Db::pdo()->prepare(
             "SELECT games.* FROM games
              JOIN seasons ON seasons.id = games.season_id
              WHERE games.team_a_id = ? OR games.team_b_id = ?
-             ORDER BY seasons.year ASC, FIELD(games.phase, 'group','qf','sf','final','third'),
+             ORDER BY seasons.year ASC, FIELD(games.phase, 'group','qf','sf','third','final'),
                       (games.played_date IS NULL) ASC, games.played_date ASC, games.id ASC"
         );
         $stmt->execute([$teamId, $teamId]);
@@ -38,7 +38,7 @@ final class Game
     {
         $stmt = Db::pdo()->prepare(
             "SELECT * FROM games WHERE season_id = ? AND (team_a_id = ? OR team_b_id = ?)
-             ORDER BY FIELD(phase, 'group','qf','sf','final','third'), (played_date IS NULL) ASC, played_date ASC, id ASC"
+             ORDER BY FIELD(phase, 'group','qf','sf','third','final'), (played_date IS NULL) ASC, played_date ASC, id ASC"
         );
         $stmt->execute([$seasonId, $teamId, $teamId]);
         return $stmt->fetchAll();
@@ -47,7 +47,7 @@ final class Game
     public static function bracketGames(int $seasonId): array
     {
         $stmt = Db::pdo()->prepare(
-            "SELECT * FROM games WHERE season_id = ? AND phase != 'group' ORDER BY FIELD(phase, 'qf','sf','final','third'), slot_index ASC"
+            "SELECT * FROM games WHERE season_id = ? AND phase != 'group' ORDER BY FIELD(phase, 'qf','sf','third','final'), slot_index ASC"
         );
         $stmt->execute([$seasonId]);
         return $stmt->fetchAll();
