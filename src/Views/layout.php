@@ -10,7 +10,7 @@ $flashes = flash_take();
 <meta name="theme-color" content="#0a7d6c">
 <title><?= isset($pageTitle) ? h($pageTitle) . ' – Badi Boccia Buochs' : 'Badi Boccia Buochs' ?></title>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎯</text></svg>">
-<link rel="stylesheet" href="<?= h(url('/assets/css/style.css')) ?>">
+<link rel="stylesheet" href="<?= h(asset_url('/assets/css/style.css')) ?>">
 </head>
 <body>
 <header class="topbar">
