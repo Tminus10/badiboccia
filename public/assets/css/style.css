@@ -10,6 +10,7 @@
   --accent: #0a7d6c;
   --accent-dark: #06594d;
   --accent-tint: #e2f2ee;
+  --connector: #b7c9c3;
   --success-bg: #e7f5ea;
   --success-text: #1e7d32;
   --error-bg: #fdecea;
@@ -236,7 +237,11 @@ input:focus, select:focus, button:focus, a:focus {
 .standings-table .rank-col { width: 1.6em; color: var(--text-muted); font-weight: 700; }
 .standings-table .pts { font-weight: 800; }
 .standings-table tr.qualifies { background: var(--accent-tint); }
+.standings-table tr.qualifies td { font-weight: 800; }
 .standings-table tr.qualifies td:first-child { border-radius: var(--radius-sm) 0 0 var(--radius-sm); }
+.standings-table tr.qualifies:has(+ tr.qualifies) td { border-bottom: none; }
+.standings-table tr.qualifies:has(+ tr.qualifies) td:first-child { border-radius: var(--radius-sm) 0 0 0; }
+.standings-table tr.qualifies + tr.qualifies td:first-child { border-radius: 0 0 0 var(--radius-sm); }
 .standings-compact th, .standings-compact td { padding: 0.4rem 0.4rem; }
 .hint { font-size: 0.85rem; color: var(--text-muted); margin-top: 0.6rem; margin-bottom: 0; }
 
@@ -345,29 +350,79 @@ input:focus, select:focus, button:focus, a:focus {
 
 /* ---------- Bracket ---------- */
 
-.bracket { display: flex; gap: 1.2rem; overflow-x: auto; padding-bottom: 1rem; }
-.bracket-col { min-width: 260px; flex: 1; display: flex; flex-direction: column; gap: 1.4rem; }
-.bracket-col h2 { text-align: center; }
-.bracket-col-sf { justify-content: space-around; }
-.bracket-col-final { justify-content: center; }
-.bracket-col-third { justify-content: center; }
-.bracket-col-third h2 { color: var(--text-muted); font-size: 0.95rem; }
-.bracket-game {
-  background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-md);
-  padding: 0.7rem 0.9rem; display: flex; flex-direction: column; gap: 0.4rem;
+.bracket {
+  --bracket-gutter: 2.6rem;
+  display: flex; align-items: stretch; gap: var(--bracket-gutter); overflow-x: auto; padding-bottom: 1rem;
 }
-.bracket-team { padding: 0.3rem 0; border-bottom: 1px dashed var(--border); }
-.bracket-team:last-of-type { border-bottom: none; }
-.bracket-slot-empty { color: var(--text-muted); font-style: italic; }
-.bracket-game .fixture-result { margin-top: 0.4rem; }
+.bracket-col { min-width: 210px; flex: 1 1 0; display: flex; flex-direction: column; justify-content: center; gap: 1.4rem; }
+.bracket-col-groups { flex: 0 0 280px; min-width: 280px; gap: 0.9rem; justify-content: flex-start; }
+.bracket-col-title-mobile { display: none; text-align: left; }
 
-.bracket-col-groups { min-width: 280px; gap: 0.9rem; }
+/* Title strip: same two-part split as the columns below (fixed groups width + flexible
+   tree width) so "Gruppenphase" and "Viertelfinal / Halbfinal / Final" sit on one line
+   regardless of how much taller the group cards are than the bracket itself. */
+.bracket-titles { display: flex; gap: var(--bracket-gutter); margin-bottom: 0.9rem; }
+.bt-groups { flex: 0 0 280px; margin: 0; text-align: left; }
+.bt-tree { flex: 1 1 auto; min-width: 0; display: flex; gap: var(--bracket-gutter); }
+.bt-tree h2 { flex: 1 1 0; min-width: 210px; margin: 0; text-align: center; }
+.bt-final { color: var(--accent-dark); }
+
+/* Two QF matches (or two SF matches) sharing one next-round slot: a vertical spine spans
+   their combined height and a stub reaches on to the next match, both anchored at 50% of
+   their own box so this holds regardless of match-card height (e.g. an open result form). */
+.bracket-pair { position: relative; display: flex; flex-direction: column; gap: 1.4rem; }
+.bracket-pair::before {
+  content: ''; position: absolute; top: 0; bottom: 0; left: 100%;
+  margin-left: calc(var(--bracket-gutter) / 2 - 1px); width: 2px; background: var(--connector);
+}
+.bracket-pair::after {
+  content: ''; position: absolute; top: 50%; left: 100%;
+  margin-left: calc(var(--bracket-gutter) / 2 - 1px); width: calc(var(--bracket-gutter) / 2 + 1px); height: 2px; background: var(--connector);
+}
+.bracket-col-qf .bracket-game::after, .bracket-col-sf .bracket-game::after {
+  content: ''; position: absolute; top: 50%; left: 100%; width: calc(var(--bracket-gutter) / 2); height: 2px; background: var(--connector);
+}
+
+.bracket-game {
+  position: relative;
+  background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-md);
+  padding: 0.6rem 0.8rem; display: flex; flex-direction: column; gap: 0.3rem;
+}
+.bracket-game-final { border: 1.5px solid var(--accent); box-shadow: 0 2px 8px rgba(10, 125, 108, 0.12); }
+.bracket-team { display: flex; align-items: center; padding: 0.3rem 0.5rem; border-radius: var(--radius-sm); }
+.bracket-team.winner { background: var(--accent-tint); }
+.bracket-team.winner .team-name { font-weight: 800; color: var(--text); }
+.bracket-slot-empty { color: var(--text-muted); font-style: italic; }
+.bracket-game .fixture-result { margin-top: 0.3rem; }
+
 .bracket-group-card {
   background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-md);
   padding: 0.6rem 0.8rem;
 }
 .bracket-group-title { display: block; font-weight: 700; margin-bottom: 0.4rem; color: var(--text); }
 .bracket-group-title:hover { color: var(--accent-dark); }
+
+/* Spiel um Platz 3: fed by the SF losers, not the winner path, so it isn't wired into the
+   connected tree -- just tucked under the final with a dashed, visually secondary card. */
+.bracket-third-row { display: flex; justify-content: flex-end; margin-top: 1.4rem; }
+.bracket-third-col { width: 100%; max-width: 260px; }
+.bracket-third-col h2 { text-align: right; color: var(--text-muted); font-size: 0.95rem; margin: 0 0 0.2rem; }
+.bracket-third-hint { font-size: 0.75rem; color: var(--text-muted); text-align: center; margin: 0 0 0.4rem; }
+.bracket-game-third { border-style: dashed; background: var(--surface-alt); }
+
+@media (max-width: 900px) {
+  .bracket-titles { display: none; }
+  .bracket-col-title-mobile { display: block; }
+  .bracket { flex-direction: column; overflow-x: visible; }
+  .bracket-col { min-width: 0; }
+  .bracket-col-groups { flex: none; }
+  .bracket-pair { gap: 0.9rem; }
+  .bracket-pair::before, .bracket-pair::after,
+  .bracket-col-qf .bracket-game::after, .bracket-col-sf .bracket-game::after { display: none; }
+  .bracket-third-row { justify-content: flex-start; margin-top: 0; }
+  .bracket-third-col { max-width: none; }
+  .bracket-third-col h2 { text-align: left; }
+}
 
 /* ---------- Login / PIN ---------- */
 
