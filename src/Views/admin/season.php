@@ -4,6 +4,7 @@
  * @var array[] $groupData
  * @var array[] $qfGames
  * @var array[] $qualifiedTeams
+ * @var int $qualifiersPerGroup
  * @var array[] $availableTeams
  */
 $pageTitle = 'Verwalten – ' . $season['label'];
@@ -50,14 +51,22 @@ $isCurrent = (int) $season['is_current'] === 1;
   <section class="card" id="group-<?= (int) $group['id'] ?>">
     <header class="group-card-head">
       <h2>Gruppe <?= h($group['name']) ?></h2>
-      <?php if ($entry['gamesCount'] === 0): ?>
-        <form method="post" action="<?= h(url('/admin/group/' . $group['id'] . '/fixtures')) ?>" class="inline-form" onsubmit="return confirm('Spielplan für Gruppe <?= h($group['name']) ?> jetzt erstellen? Danach können keine weiteren Teams mehr sinnvoll ergänzt werden.');">
-          <?= csrf_field() ?>
-          <button class="btn btn-secondary btn-sm" type="submit" <?= count($entry['teams']) < 2 ? 'disabled' : '' ?>>Spielplan erstellen</button>
-        </form>
-      <?php else: ?>
-        <span class="muted"><?= (int) $entry['gamesCount'] ?> Spiele erstellt</span>
-      <?php endif; ?>
+      <div class="group-card-actions">
+        <?php if ($entry['gamesCount'] === 0): ?>
+          <form method="post" action="<?= h(url('/admin/group/' . $group['id'] . '/fixtures')) ?>" class="inline-form" onsubmit="return confirm('Spielplan für Gruppe <?= h($group['name']) ?> jetzt erstellen? Danach können keine weiteren Teams mehr sinnvoll ergänzt werden.');">
+            <?= csrf_field() ?>
+            <button class="btn btn-secondary btn-sm" type="submit" <?= count($entry['teams']) < 2 ? 'disabled' : '' ?>>Spielplan erstellen</button>
+          </form>
+        <?php else: ?>
+          <span class="muted"><?= (int) $entry['gamesCount'] ?> Spiele erstellt</span>
+        <?php endif; ?>
+        <?php if (empty($entry['teams']) && $entry['gamesCount'] === 0): ?>
+          <form method="post" action="<?= h(url('/admin/group/' . $group['id'] . '/delete')) ?>" class="inline-form" onsubmit="return confirm('Ungenutzte Gruppe <?= h($group['name']) ?> löschen?');">
+            <?= csrf_field() ?>
+            <button class="btn btn-ghost btn-sm btn-danger" type="submit">Gruppe löschen</button>
+          </form>
+        <?php endif; ?>
+      </div>
     </header>
 
     <?php if (empty($entry['teams'])): ?>
@@ -157,7 +166,11 @@ $isCurrent = (int) $season['is_current'] === 1;
 
 <section class="card">
   <h2>Viertelfinal-Paarungen</h2>
-  <p class="muted">Weise die acht qualifizierten Teams (Erste &amp; Zweite jeder Gruppe) den vier Viertelfinal-Spielen zu. Noch offene Paarungen sind bereits mit einem Vorschlag vorausgefüllt (Erste gegen Zweite einer anderen Gruppe, über Kreuz, damit zwei Teams derselben Gruppe erst im Final erneut aufeinandertreffen können) &ndash; einfach bei Bedarf über die Dropdowns anpassen.</p>
+  <?php if ($qualifiersPerGroup === 2): ?>
+    <p class="muted">Weise die acht qualifizierten Teams (Erste &amp; Zweite jeder Gruppe) den vier Viertelfinal-Spielen zu. Noch offene Paarungen sind bereits mit einem Vorschlag vorausgefüllt (Erste gegen Zweite einer anderen Gruppe, über Kreuz, damit zwei Teams derselben Gruppe erst im Final erneut aufeinandertreffen können) &ndash; einfach bei Bedarf über die Dropdowns anpassen.</p>
+  <?php else: ?>
+    <p class="muted">Weise acht der <?= count($qualifiedTeams) ?> qualifizierten Teams (die besten <?= $qualifiersPerGroup ?> jeder Gruppe) den vier Viertelfinal-Spielen zu.</p>
+  <?php endif; ?>
   <form method="post" action="<?= h(url('/admin/season/' . $season['id'] . '/bracket')) ?>" class="stack-form">
     <?= csrf_field() ?>
     <?php foreach ($qfGames as $game): ?>

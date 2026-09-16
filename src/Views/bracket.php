@@ -1,6 +1,7 @@
 <?php
 /** @var array $season
  * @var array[] $groupData
+ * @var int $qualifiers
  * @var array $phases
  * @var array{champion: array|null, runnerUp: array|null, third: array|null}|null $podium
  * @var array[] $teamsById
@@ -102,7 +103,7 @@ $thirdGame = $phases['third'][0] ?? null;
           <table class="standings-table standings-compact">
             <tbody>
               <?php foreach ($entry['standings'] as $row): ?>
-                <tr class="<?= ($row['rank'] <= 2 && $entry['anyPlayed']) ? 'qualifies' : '' ?>">
+                <tr class="<?= ($row['rank'] <= $qualifiers && $entry['anyPlayed']) ? 'qualifies' : '' ?>">
                   <td class="rank-col"><?= (int) $row['rank'] ?></td>
                   <td><?= render_partial('partials/team-dot', ['team' => $row['team'], 'seasonId' => (int) $season['id']]) ?></td>
                   <td class="pts"><?= (int) $row['points'] ?></td>

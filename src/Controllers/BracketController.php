@@ -41,8 +41,9 @@ final class BracketController
             }
         }
 
+        $groups = Season::groups($seasonId);
         $groupData = [];
-        foreach (Season::groups($seasonId) as $group) {
+        foreach ($groups as $group) {
             $teams = Team::byGroup((int) $group['id']);
             $games = Game::forGroup((int) $group['id']);
             $groupData[] = [
@@ -55,6 +56,7 @@ final class BracketController
         render('bracket', [
             'season' => $season,
             'groupData' => $groupData,
+            'qualifiers' => Season::qualifiersPerGroup(count($groups)),
             'phases' => BracketService::byPhase($bracketGames),
             'podium' => BracketService::podium($bracketGames, $teamsById),
             'teamsById' => $teamsById,

@@ -58,6 +58,7 @@ $router->post('/admin/team/{id}/photo', ['AdminController', 'teamPhoto']);
 $router->post('/admin/team/{id}/pin', ['AdminController', 'teamPinReset']);
 $router->post('/admin/team/{id}/delete', ['AdminController', 'teamDelete']);
 $router->post('/admin/group/{id}/fixtures', ['AdminController', 'fixturesGenerate']);
+$router->post('/admin/group/{id}/delete', ['AdminController', 'groupDelete']);
 $router->post('/admin/admins', ['AdminController', 'adminCreate']);
 $router->post('/admin/admins/{id}/delete', ['AdminController', 'adminDelete']);
 

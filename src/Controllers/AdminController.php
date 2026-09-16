@@ -84,6 +84,7 @@ final class AdminController
         }
 
         $groups = Season::groups((int) $season['id']);
+        $qualifiersPerGroup = Season::qualifiersPerGroup(count($groups));
         $groupData = [];
         $qualifiedTeams = [];
         $qualifiersByGroup = [];
@@ -96,11 +97,11 @@ final class AdminController
                 'gamesCount' => count($games),
             ];
             $standings = StandingsCalculator::compute($teams, $games);
-            $top2 = array_slice($standings, 0, 2);
-            foreach ($top2 as $row) {
+            $topN = array_slice($standings, 0, $qualifiersPerGroup);
+            foreach ($topN as $row) {
                 $qualifiedTeams[] = $row['team'];
             }
-            $qualifiersByGroup[$group['name']] = $top2;
+            $qualifiersByGroup[$group['name']] = $topN;
         }
 
         Game::ensureBracketSkeleton((int) $season['id']);
@@ -129,6 +130,7 @@ final class AdminController
             'groupData' => $groupData,
             'qfGames' => $qfGames,
             'qualifiedTeams' => $qualifiedTeams,
+            'qualifiersPerGroup' => $qualifiersPerGroup,
             'availableTeams' => $availableTeams,
         ]);
     }
@@ -142,12 +144,16 @@ final class AdminController
         }
         $label = trim((string) ($_POST['label'] ?? ''));
         $year = (int) ($_POST['year'] ?? date('Y'));
+        $groupCount = (int) ($_POST['group_count'] ?? 4);
+        if (!in_array($groupCount, [3, 4], true)) {
+            $groupCount = 4;
+        }
         if ($label === '') {
             flash_set('error', 'Bitte einen Namen für die Saison angeben.');
             redirect('/admin');
             return;
         }
-        $id = Season::create($label, $year);
+        $id = Season::create($label, $year, $groupCount);
         if (!empty($_POST['make_current'])) {
             Season::setCurrent($id);
         }
@@ -471,6 +477,38 @@ final class AdminController
 
         flash_set('success', count(RoundRobinScheduler::generate($teamIds)) . ' Spiele erstellt.');
         self::redirectAfterTeamAction($seasonId, $groupId);
+    }
+
+    /**
+     * Removes an unused group (e.g. a leftover 4th group on a season that's really only
+     * played with 3). Only allowed while the group has no teams enrolled, so this can never
+     * cascade-delete real fixtures or results.
+     */
+    public static function groupDelete(array $params): void
+    {
+        AdminAuth::requireLogin();
+        $groupId = (int) $params['id'];
+        $group = TeamGroup::find($groupId);
+        if ($group === null) {
+            http_response_code(404);
+            render('404');
+            return;
+        }
+        $seasonId = (int) $group['season_id'];
+        if (!csrf_check()) {
+            redirect('/admin/season/' . $seasonId);
+            return;
+        }
+
+        if (count(Team::byGroup($groupId)) > 0) {
+            flash_set('error', 'Gruppe ' . $group['name'] . ' enthält noch Teams und kann nicht gelöscht werden.');
+            redirect('/admin/season/' . $seasonId);
+            return;
+        }
+
+        TeamGroup::delete($groupId);
+        flash_set('success', 'Gruppe ' . $group['name'] . ' wurde gelöscht.');
+        redirect('/admin/season/' . $seasonId);
     }
 
     public static function bracketAssign(array $params): void

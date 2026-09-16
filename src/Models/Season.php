@@ -20,7 +20,8 @@ final class Season
         return $row ?: null;
     }
 
-    public static function create(string $label, int $year): int
+    /** $groupCount is how many groups (A, B, C, ...) the group phase starts with -- 3 or 4. */
+    public static function create(string $label, int $year, int $groupCount = 4): int
     {
         $pdo = Db::pdo();
         $stmt = $pdo->prepare('INSERT INTO seasons (label, year) VALUES (?, ?)');
@@ -28,7 +29,7 @@ final class Season
         $seasonId = (int) $pdo->lastInsertId();
 
         $groupStmt = $pdo->prepare('INSERT INTO team_groups (season_id, name) VALUES (?, ?)');
-        foreach (['A', 'B', 'C', 'D'] as $name) {
+        foreach (array_slice(['A', 'B', 'C', 'D'], 0, $groupCount) as $name) {
             $groupStmt->execute([$seasonId, $name]);
         }
 
@@ -67,5 +68,16 @@ final class Season
         $stmt = Db::pdo()->prepare('SELECT * FROM team_groups WHERE season_id = ? ORDER BY name ASC');
         $stmt->execute([$seasonId]);
         return $stmt->fetchAll();
+    }
+
+    /**
+     * How many teams per group advance to the quarter-finals, so the 4 QF games (8 slots)
+     * can always be filled: with 4 groups the top 2 fill the bracket exactly; with fewer
+     * groups, more teams per group are highlighted as candidates than there are slots to
+     * fill, so the admin can pick which of them go through.
+     */
+    public static function qualifiersPerGroup(int $groupCount): int
+    {
+        return $groupCount > 0 ? (int) ceil(8 / $groupCount) : 2;
     }
 }
