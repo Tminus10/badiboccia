@@ -35,7 +35,6 @@ $renderGame = function (array $game) use ($teamsById, $returnTo, $viewerTeam, $a
     <?php
 };
 
-$qfPairs = array_chunk($phases['qf'], 2);
 $sfPair = $phases['sf'];
 $finalGame = $phases['final'][0] ?? null;
 $thirdGame = $phases['third'][0] ?? null;
@@ -116,31 +115,32 @@ $thirdGame = $phases['third'][0] ?? null;
     <?php endforeach; ?>
   </div>
 
-  <div class="bracket-col bracket-col-qf">
-    <h2 class="bracket-col-title-mobile">Viertelfinal</h2>
-    <?php foreach ($qfPairs as $pair): ?>
-      <div class="bracket-pair">
-        <?php foreach ($pair as $game): ?>
-          <div class="bracket-game"><?php $renderGame($game); ?></div>
-        <?php endforeach; ?>
-      </div>
-    <?php endforeach; ?>
-  </div>
-
-  <div class="bracket-col bracket-col-sf">
-    <h2 class="bracket-col-title-mobile">Halbfinal</h2>
-    <div class="bracket-pair">
-      <?php foreach ($sfPair as $game): ?>
-        <div class="bracket-game"><?php $renderGame($game); ?></div>
+  <div class="bracket-tree">
+    <div class="bracket-col bracket-col-qf">
+      <h2 class="bracket-col-title-mobile">Viertelfinal</h2>
+      <?php foreach ($phases['qf'] as $i => $game): ?>
+        <div class="bracket-game bracket-qf-row-<?= $i + 1 ?>"><?php $renderGame($game); ?></div>
       <?php endforeach; ?>
     </div>
-  </div>
 
-  <div class="bracket-col bracket-col-final">
-    <h2 class="bracket-col-title-mobile">🏆 Final</h2>
-    <?php if ($finalGame !== null): ?>
-      <div class="bracket-game bracket-game-final"><?php $renderGame($finalGame); ?></div>
-    <?php endif; ?>
+    <div class="bracket-wire bracket-wire-a"></div>
+    <div class="bracket-wire bracket-wire-b"></div>
+
+    <div class="bracket-col bracket-col-sf">
+      <h2 class="bracket-col-title-mobile">Halbfinal</h2>
+      <?php foreach ($sfPair as $i => $game): ?>
+        <div class="bracket-game bracket-sf-row-<?= $i + 1 ?>"><?php $renderGame($game); ?></div>
+      <?php endforeach; ?>
+    </div>
+
+    <div class="bracket-wire bracket-wire-c"></div>
+
+    <div class="bracket-col bracket-col-final">
+      <h2 class="bracket-col-title-mobile">🏆 Final</h2>
+      <?php if ($finalGame !== null): ?>
+        <div class="bracket-game bracket-game-final"><?php $renderGame($finalGame); ?></div>
+      <?php endif; ?>
+    </div>
   </div>
 </div>
 
