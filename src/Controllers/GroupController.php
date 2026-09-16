@@ -26,6 +26,7 @@ final class GroupController
             'standings' => $standings,
             'games' => $games,
             'teamsById' => $teamsById,
+            'qualifiers' => Season::qualifiersPerGroup(count(Season::groups((int) $group['season_id']))),
             'viewerTeam' => TeamAuth::current(),
             'admin' => AdminAuth::current(),
         ]);

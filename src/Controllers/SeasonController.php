@@ -45,6 +45,7 @@ final class SeasonController
         render('season', [
             'season' => $season,
             'groupData' => $groupData,
+            'qualifiers' => Season::qualifiersPerGroup(count($groups)),
             'viewerTeam' => TeamAuth::current(),
             'admin' => AdminAuth::current(),
         ]);

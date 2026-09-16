@@ -1,6 +1,7 @@
 <?php
 /** @var array $season
  * @var array[] $groupData
+ * @var int $qualifiers
  * @var array|null $viewerTeam
  * @var array|null $admin
  */
@@ -36,7 +37,7 @@ $pageTitle = $season['label'];
           </thead>
           <tbody>
             <?php foreach ($standings as $row): ?>
-              <tr class="<?= ($row['rank'] <= 2 && $entry['gamesPlayed'] > 0) ? 'qualifies' : '' ?>">
+              <tr class="<?= ($row['rank'] <= $qualifiers && $entry['gamesPlayed'] > 0) ? 'qualifies' : '' ?>">
                 <td class="rank-col"><?= (int) $row['rank'] ?></td>
                 <td><?= render_partial('partials/team-dot', ['team' => $row['team'], 'seasonId' => (int) $season['id']]) ?></td>
                 <td><?= (int) $row['played'] ?></td>

@@ -4,9 +4,12 @@
  * @var array[] $standings
  * @var array[] $games
  * @var array[] $teamsById
+ * @var int $qualifiers
  * @var array|null $viewerTeam
  * @var array|null $admin
  */
+$qualifierWords = [2 => 'zwei', 3 => 'drei'];
+$qualifierWord = $qualifierWords[$qualifiers] ?? (string) $qualifiers;
 $isCurrent = (int) $season['is_current'] === 1;
 $pageTitle = 'Gruppe ' . $group['name'];
 $returnTo = '/group/' . $group['id'];
@@ -44,7 +47,7 @@ foreach ($games as $g) {
       </thead>
       <tbody>
         <?php foreach ($standings as $row): ?>
-          <tr class="<?= ($row['rank'] <= 2 && $anyPlayed) ? 'qualifies' : '' ?>">
+          <tr class="<?= ($row['rank'] <= $qualifiers && $anyPlayed) ? 'qualifies' : '' ?>">
             <td class="rank-col"><?= (int) $row['rank'] ?></td>
             <td><?= render_partial('partials/team-dot', ['team' => $row['team'], 'seasonId' => (int) $season['id']]) ?></td>
             <td><?= (int) $row['played'] ?></td>
@@ -57,7 +60,7 @@ foreach ($games as $g) {
         <?php endforeach; ?>
       </tbody>
     </table>
-    <p class="hint">Die ersten beiden Teams (hervorgehoben) erreichen das Viertelfinale.</p>
+    <p class="hint">Die ersten <?= h($qualifierWord) ?> Teams (hervorgehoben) kommen für das Viertelfinale in Frage.</p>
   </section>
 <?php endif; ?>
 

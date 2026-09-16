@@ -224,6 +224,7 @@ input:focus, select:focus, button:focus, a:focus {
 }
 
 .group-card-head { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 0.6rem; }
+.group-card-actions { display: flex; align-items: baseline; gap: 0.6rem; flex-wrap: wrap; }
 
 .standings-table { width: 100%; border-collapse: collapse; font-size: 0.95rem; }
 .standings-table th {

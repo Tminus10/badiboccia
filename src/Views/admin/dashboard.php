@@ -53,6 +53,12 @@ $pageTitle = 'Admin';
       <label>Jahr
         <input type="number" name="year" value="<?= date('Y') ?>" required>
       </label>
+      <label>Anzahl Gruppen
+        <select name="group_count">
+          <option value="4" selected>4 Gruppen</option>
+          <option value="3">3 Gruppen</option>
+        </select>
+      </label>
       <label class="checkbox-label">
         <input type="checkbox" name="make_current" value="1" checked>
         Direkt als aktive Saison setzen
