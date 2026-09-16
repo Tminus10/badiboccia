@@ -19,6 +19,18 @@ function url(string $path = ''): string
     return rtrim(base_path(), '/') . $path;
 }
 
+/**
+ * Like url(), but for a static file under public/ -- appends a ?v= cache-buster derived from
+ * the file's own mtime, so a deploy that changes e.g. style.css is picked up immediately
+ * instead of serving whatever a returning browser already cached under that same URL.
+ */
+function asset_url(string $path): string
+{
+    $absolute = __DIR__ . '/../public/' . ltrim($path, '/');
+    $version = is_file($absolute) ? (string) filemtime($absolute) : '0';
+    return url('/' . ltrim($path, '/')) . '?v=' . $version;
+}
+
 /** Escapes a value for safe HTML output. */
 function h(?string $value): string
 {

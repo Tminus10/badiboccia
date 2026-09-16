@@ -167,7 +167,7 @@ $isCurrent = (int) $season['is_current'] === 1;
 <section class="card">
   <h2>Viertelfinal-Paarungen</h2>
   <?php if ($qualifiersPerGroup === 2): ?>
-    <p class="muted">Weise die acht qualifizierten Teams (Erste &amp; Zweite jeder Gruppe) den vier Viertelfinal-Spielen zu.</p>
+    <p class="muted">Weise die acht qualifizierten Teams (Erste &amp; Zweite jeder Gruppe) den vier Viertelfinal-Spielen zu. Noch offene Paarungen sind bereits mit einem Vorschlag vorausgefüllt (Erste gegen Zweite einer anderen Gruppe, über Kreuz, damit zwei Teams derselben Gruppe erst im Final erneut aufeinandertreffen können) &ndash; einfach bei Bedarf über die Dropdowns anpassen.</p>
   <?php else: ?>
     <p class="muted">Weise acht der <?= count($qualifiedTeams) ?> qualifizierten Teams (die besten <?= $qualifiersPerGroup ?> jeder Gruppe) den vier Viertelfinal-Spielen zu.</p>
   <?php endif; ?>
@@ -177,6 +177,7 @@ $isCurrent = (int) $season['is_current'] === 1;
       <?php $slot = (int) $game['slot_index']; ?>
       <div class="qf-pair">
         <span class="qf-label">Viertelfinal <?= $slot ?></span>
+        <?php if (!empty($game['prefilled'])): ?><span class="badge badge-suggestion">Vorschlag</span><?php endif; ?>
         <select name="qf<?= $slot ?>_a">
           <option value="">– Team A wählen –</option>
           <?php foreach ($qualifiedTeams as $t): ?>

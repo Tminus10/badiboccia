@@ -60,4 +60,40 @@ final class BracketService
         }
         return $out;
     }
+
+    /**
+     * Recommended QF pairings for four groups' top two teams, using the standard
+     * "crossed" knockout seeding: a group's 1st plays another group's 2nd, and the
+     * two teams that crossed swap sides for the other pairing. That keeps every
+     * same-group pair (1st vs 2nd, or two group winners) apart until a possible
+     * final -- they can never meet in the QF or SF.
+     *
+     * @param array[] $qualifiersByGroup group name => that group's top-2 standings rows (each with a 'team')
+     * @return array<int, array{0:int,1:int}>|null [slot => [teamAId, teamBId]] for QF slots 1-4,
+     *   or null if there aren't exactly four groups with two qualifiers each.
+     */
+    public static function recommendedQfPairings(array $qualifiersByGroup): ?array
+    {
+        if (count($qualifiersByGroup) !== 4) {
+            return null;
+        }
+        $groups = array_values($qualifiersByGroup);
+        foreach ($groups as $top2) {
+            if (count($top2) !== 2) {
+                return null;
+            }
+        }
+        [$g1, $g2, $g3, $g4] = $groups;
+        $id = fn (array $row): int => (int) $row['team']['id'];
+
+        // QF1+QF2 feed SF1, QF3+QF4 feed SF2 (see Game::ensureBracketSkeleton) --
+        // crossing 1st/2nd across groups within each half keeps same-group teams
+        // out of the same semifinal too.
+        return [
+            1 => [$id($g1[0]), $id($g2[1])],
+            2 => [$id($g3[0]), $id($g4[1])],
+            3 => [$id($g2[0]), $id($g1[1])],
+            4 => [$id($g4[0]), $id($g3[1])],
+        ];
+    }
 }
