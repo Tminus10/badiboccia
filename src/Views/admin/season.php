@@ -157,13 +157,14 @@ $isCurrent = (int) $season['is_current'] === 1;
 
 <section class="card">
   <h2>Viertelfinal-Paarungen</h2>
-  <p class="muted">Weise die acht qualifizierten Teams (Erste &amp; Zweite jeder Gruppe) den vier Viertelfinal-Spielen zu.</p>
+  <p class="muted">Weise die acht qualifizierten Teams (Erste &amp; Zweite jeder Gruppe) den vier Viertelfinal-Spielen zu. Noch offene Paarungen sind bereits mit einem Vorschlag vorausgefüllt (Erste gegen Zweite einer anderen Gruppe, über Kreuz, damit zwei Teams derselben Gruppe erst im Final erneut aufeinandertreffen können) &ndash; einfach bei Bedarf über die Dropdowns anpassen.</p>
   <form method="post" action="<?= h(url('/admin/season/' . $season['id'] . '/bracket')) ?>" class="stack-form">
     <?= csrf_field() ?>
     <?php foreach ($qfGames as $game): ?>
       <?php $slot = (int) $game['slot_index']; ?>
       <div class="qf-pair">
         <span class="qf-label">Viertelfinal <?= $slot ?></span>
+        <?php if (!empty($game['prefilled'])): ?><span class="badge badge-suggestion">Vorschlag</span><?php endif; ?>
         <select name="qf<?= $slot ?>_a">
           <option value="">– Team A wählen –</option>
           <?php foreach ($qualifiedTeams as $t): ?>
