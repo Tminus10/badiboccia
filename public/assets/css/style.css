@@ -339,14 +339,18 @@ input:focus, select:focus, button:focus, a:focus {
 
 /* ---------- Podium ---------- */
 
-.podium-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.5rem; }
+.podium-list { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 0.7rem; }
 .podium-row {
-  display: flex; align-items: center; gap: 0.7rem;
-  padding: 0.6rem 0.8rem; border-radius: var(--radius-sm); background: var(--surface-alt);
+  flex: 1 1 200px; display: flex; align-items: center; gap: 0.65rem;
+  padding: 0.65rem 0.85rem; border-radius: var(--radius-md); background: var(--surface-alt);
+  border-top: 3px solid transparent;
 }
-.podium-medal { font-size: 1.4rem; line-height: 1; }
-.podium-place { font-weight: 700; min-width: 4.5rem; color: var(--text-muted); }
-.podium-1 { background: var(--accent-tint); }
+.podium-1 { border-top-color: #b8892b; background: var(--accent-tint); }
+.podium-2 { border-top-color: #7c8a86; }
+.podium-3 { border-top-color: #a15f34; }
+.podium-medal { font-size: 1.35rem; line-height: 1; }
+.podium-meta { display: flex; flex-direction: column; gap: 0.1rem; min-width: 0; }
+.podium-place { font-size: 0.72rem; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; color: var(--text-muted); }
 
 /* ---------- Bracket ---------- */
 
@@ -409,6 +413,10 @@ input:focus, select:focus, button:focus, a:focus {
 .bracket-third-col h2 { text-align: right; color: var(--text-muted); font-size: 0.95rem; margin: 0 0 0.2rem; }
 .bracket-third-hint { font-size: 0.75rem; color: var(--text-muted); text-align: center; margin: 0 0 0.4rem; }
 .bracket-game-third { border-style: dashed; background: var(--surface-alt); }
+
+@media (max-width: 420px) {
+  .podium-row { flex: 1 1 100%; }
+}
 
 @media (max-width: 900px) {
   .bracket-titles { display: none; }

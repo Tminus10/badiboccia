@@ -53,22 +53,28 @@ $thirdGame = $phases['third'][0] ?? null;
     <ul class="podium-list">
       <li class="podium-row podium-1">
         <span class="podium-medal" aria-hidden="true">🥇</span>
-        <span class="podium-place">1. Platz</span>
-        <?= render_partial('partials/team-dot', ['team' => $podium['champion'], 'seasonId' => (int) $season['id']]) ?>
+        <span class="podium-meta">
+          <span class="podium-place">1. Platz</span>
+          <?= render_partial('partials/team-dot', ['team' => $podium['champion'], 'seasonId' => (int) $season['id']]) ?>
+        </span>
       </li>
       <li class="podium-row podium-2">
         <span class="podium-medal" aria-hidden="true">🥈</span>
-        <span class="podium-place">2. Platz</span>
-        <?= render_partial('partials/team-dot', ['team' => $podium['runnerUp'], 'seasonId' => (int) $season['id']]) ?>
+        <span class="podium-meta">
+          <span class="podium-place">2. Platz</span>
+          <?= render_partial('partials/team-dot', ['team' => $podium['runnerUp'], 'seasonId' => (int) $season['id']]) ?>
+        </span>
       </li>
       <li class="podium-row podium-3">
         <span class="podium-medal" aria-hidden="true">🥉</span>
-        <span class="podium-place">3. Platz</span>
-        <?php if ($podium['third'] !== null): ?>
-          <?= render_partial('partials/team-dot', ['team' => $podium['third'], 'seasonId' => (int) $season['id']]) ?>
-        <?php else: ?>
-          <span class="muted">Spiel um Platz 3 steht noch aus</span>
-        <?php endif; ?>
+        <span class="podium-meta">
+          <span class="podium-place">3. Platz</span>
+          <?php if ($podium['third'] !== null): ?>
+            <?= render_partial('partials/team-dot', ['team' => $podium['third'], 'seasonId' => (int) $season['id']]) ?>
+          <?php else: ?>
+            <span class="muted">Spiel um Platz 3 steht noch aus</span>
+          <?php endif; ?>
+        </span>
       </li>
     </ul>
   </section>
