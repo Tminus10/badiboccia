@@ -356,6 +356,7 @@ input:focus, select:focus, button:focus, a:focus {
 
 .bracket {
   --bracket-gutter: 2.6rem;
+  --match-connector-h: 118px;
   display: flex; align-items: stretch; gap: var(--bracket-gutter); overflow-x: auto; padding-bottom: 1rem;
 }
 .bracket-col { min-width: 210px; flex: 1 1 0; display: flex; flex-direction: column; justify-content: center; gap: 1.4rem; }
@@ -371,20 +372,22 @@ input:focus, select:focus, button:focus, a:focus {
 .bt-tree h2 { flex: 1 1 0; min-width: 210px; margin: 0; text-align: center; }
 .bt-final { color: var(--accent-dark); }
 
-/* Two QF matches (or two SF matches) sharing one next-round slot: a vertical spine spans
-   their combined height and a stub reaches on to the next match, both anchored at 50% of
-   their own box so this holds regardless of match-card height (e.g. an open result form). */
+/* Two QF matches (or two SF matches) sharing one next-round slot: a single rounded elbow
+   -- two arms reaching back to each match's center, joined by a spine at the gutter's
+   midpoint -- then a straight stub carries on to the next match. Sized off a typical
+   match-card height; an open result-entry form can grow a card past that without the
+   geometry breaking, since the shape is only decorative once a card no longer sits at
+   the guessed height. */
 .bracket-pair { position: relative; display: flex; flex-direction: column; gap: 1.4rem; }
 .bracket-pair::before {
-  content: ''; position: absolute; top: 0; bottom: 0; left: 100%;
-  margin-left: calc(var(--bracket-gutter) / 2 - 1px); width: 2px; background: var(--connector);
+  content: ''; position: absolute; left: 100%; width: calc(var(--bracket-gutter) / 2);
+  top: calc(var(--match-connector-h) / 2); bottom: calc(var(--match-connector-h) / 2);
+  border-top: 2px solid var(--connector); border-bottom: 2px solid var(--connector); border-right: 2px solid var(--connector);
+  border-top-right-radius: 8px; border-bottom-right-radius: 8px;
 }
 .bracket-pair::after {
-  content: ''; position: absolute; top: 50%; left: 100%;
-  margin-left: calc(var(--bracket-gutter) / 2 - 1px); width: calc(var(--bracket-gutter) / 2 + 1px); height: 2px; background: var(--connector);
-}
-.bracket-col-qf .bracket-game::after, .bracket-col-sf .bracket-game::after {
-  content: ''; position: absolute; top: 50%; left: 100%; width: calc(var(--bracket-gutter) / 2); height: 2px; background: var(--connector);
+  content: ''; position: absolute; top: 50%; left: calc(100% + var(--bracket-gutter) / 2);
+  width: calc(var(--bracket-gutter) / 2); height: 2px; background: var(--connector);
 }
 
 .bracket-game {
@@ -425,8 +428,7 @@ input:focus, select:focus, button:focus, a:focus {
   .bracket-col { min-width: 0; }
   .bracket-col-groups { flex: none; }
   .bracket-pair { gap: 0.9rem; }
-  .bracket-pair::before, .bracket-pair::after,
-  .bracket-col-qf .bracket-game::after, .bracket-col-sf .bracket-game::after { display: none; }
+  .bracket-pair::before, .bracket-pair::after { display: none; }
   .bracket-third-row { justify-content: flex-start; margin-top: 0; }
   .bracket-third-col { max-width: none; }
   .bracket-third-col h2 { text-align: left; }
