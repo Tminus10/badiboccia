@@ -401,10 +401,9 @@ input:focus, select:focus, button:focus, a:focus {
 
 /* Connector wires: real grid items in the gutter columns, so their own height always
    exactly matches the row-range they span (rows are subgrid-shared, not guessed). The
-   rounded arms within a wire still target a guessed match-card center -- fine for the
+   rounded arms within wire-a/b still target a guessed match-card center -- fine for the
    common compact-card case; a taller card just makes that specific arm a bit approximate. */
 .bracket-wire-a, .bracket-wire-b { grid-column: 2; position: relative; }
-.bracket-wire-c { grid-column: 4; grid-row: 1 / 5; position: relative; }
 .bracket-wire-a { grid-row: 1 / 3; }
 .bracket-wire-b { grid-row: 3 / 5; }
 .bracket-wire-a::before, .bracket-wire-b::before {
@@ -413,15 +412,30 @@ input:focus, select:focus, button:focus, a:focus {
   border-top: 2px solid var(--connector); border-bottom: 2px solid var(--connector); border-right: 2px solid var(--connector);
   border-top-right-radius: 8px; border-bottom-right-radius: 8px;
 }
-/* Reaches SF1/SF2's centers, not QF's -- half a whole QF pair's height (two match cards
-   plus the row-gap between them), not half a single match's height like wire-a/b. */
-.bracket-wire-c::before {
-  content: ''; position: absolute; left: 0; width: calc(var(--bracket-gutter) / 2);
-  top: calc(var(--match-connector-h) + 0.7rem); bottom: calc(var(--match-connector-h) + 0.7rem);
-  border-top: 2px solid var(--connector); border-bottom: 2px solid var(--connector); border-right: 2px solid var(--connector);
-  border-top-right-radius: 8px; border-bottom-right-radius: 8px;
+.bracket-wire-a::after, .bracket-wire-b::after {
+  content: ''; position: absolute; top: 50%; left: calc(var(--bracket-gutter) / 2);
+  width: calc(var(--bracket-gutter) / 2); height: 2px; background: var(--connector);
 }
-.bracket-wire-a::after, .bracket-wire-b::after, .bracket-wire-c::after {
+
+/* SF-to-Final: no card-height guess needed here at all. wire-c1/c2 split at the same
+   row-line SF1/Sf2 themselves subgrid-align to, so "50%" of each half is exactly that
+   semifinal's real center -- the two halves' vertical edges meet exactly at that shared
+   row-line, forming one continuous spine between the two real centers. The stub spans the
+   full range, so its own 50% is the tree's true center, which -- always lying between
+   SF1's and SF2's real centers -- necessarily lands on that same spine. */
+.bracket-wire-c1, .bracket-wire-c2, .bracket-wire-c-stub { grid-column: 4; position: relative; }
+.bracket-wire-c1 { grid-row: 1 / 3; }
+.bracket-wire-c2 { grid-row: 3 / 5; }
+.bracket-wire-c-stub { grid-row: 1 / 5; }
+.bracket-wire-c1::before {
+  content: ''; position: absolute; left: 0; width: calc(var(--bracket-gutter) / 2); top: 50%; bottom: 0;
+  border-top: 2px solid var(--connector); border-right: 2px solid var(--connector); border-top-right-radius: 8px;
+}
+.bracket-wire-c2::before {
+  content: ''; position: absolute; left: 0; width: calc(var(--bracket-gutter) / 2); top: 0; bottom: 50%;
+  border-bottom: 2px solid var(--connector); border-right: 2px solid var(--connector); border-bottom-right-radius: 8px;
+}
+.bracket-wire-c-stub::before {
   content: ''; position: absolute; top: 50%; left: calc(var(--bracket-gutter) / 2);
   width: calc(var(--bracket-gutter) / 2); height: 2px; background: var(--connector);
 }
@@ -466,7 +480,7 @@ input:focus, select:focus, button:focus, a:focus {
   .bracket-tree { display: flex; flex-direction: column; gap: 1.5rem; overflow-x: visible; }
   .bracket-col-qf, .bracket-col-sf, .bracket-col-final { display: flex; flex-direction: column; gap: 0.9rem; }
   .bracket-sf-row-1, .bracket-sf-row-2, .bracket-game-final { align-self: stretch; }
-  .bracket-wire-a, .bracket-wire-b, .bracket-wire-c { display: none; }
+  .bracket-wire-a, .bracket-wire-b, .bracket-wire-c1, .bracket-wire-c2, .bracket-wire-c-stub { display: none; }
   .bracket-third-row { justify-content: flex-start; margin-top: 0; }
   .bracket-third-col { max-width: none; }
   .bracket-third-col h2 { text-align: left; }

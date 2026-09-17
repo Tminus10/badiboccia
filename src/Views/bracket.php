@@ -133,7 +133,9 @@ $thirdGame = $phases['third'][0] ?? null;
       <?php endforeach; ?>
     </div>
 
-    <div class="bracket-wire bracket-wire-c"></div>
+    <div class="bracket-wire bracket-wire-c1"></div>
+    <div class="bracket-wire bracket-wire-c2"></div>
+    <div class="bracket-wire bracket-wire-c-stub"></div>
 
     <div class="bracket-col bracket-col-final">
       <h2 class="bracket-col-title-mobile">🏆 Final</h2>
