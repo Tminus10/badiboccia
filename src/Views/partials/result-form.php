@@ -7,10 +7,12 @@
  * @var bool $canEdit
  * @var int|null $targetTeamId whose page this is being shown on, for score orientation (null = absolute team A:B score)
  * @var bool|null $hideDate omit the date from the chip (caller renders it separately)
+ * @var bool|null $hideScore omit the completed-score chip (caller renders per-team scores itself)
  * @var int|null $seasonYear the season's year, used to default the "Termin festlegen" date picker to the right year for past seasons
  */
 $targetTeamId = $targetTeamId ?? null;
 $hideDate = $hideDate ?? false;
+$hideScore = $hideScore ?? false;
 $complete = Game::isComplete($game);
 // Whose name goes on the left: the page we're on (a team's own page) takes priority over
 // who happens to be logged in, so admins/spectators see the same layout as the team itself.
@@ -44,11 +46,13 @@ if ($teamA === null || $teamB === null) {
     ];
 }
 ?>
-<?php if ($complete): ?>
+<?php if ($complete && !$hideScore): ?>
   <div class="result-chip">
     <span class="score"><?= h(format_result($game, $targetTeamId)) ?></span>
     <?php if (!$hideDate && !empty($game['played_date'])): ?><span class="played-date"><?= h(format_date_ch($game['played_date'])) ?></span><?php endif; ?>
   </div>
+<?php elseif ($complete): ?>
+  <?php if (!$hideDate && !empty($game['played_date'])): ?><span class="played-date"><?= h(format_date_ch($game['played_date'])) ?></span><?php endif; ?>
 <?php elseif ($teamA === null || $teamB === null): ?>
   <span class="result-pending">Gegner steht noch nicht fest</span>
 <?php elseif (!empty($game['played_date'])): ?>

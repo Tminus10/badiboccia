@@ -18,9 +18,16 @@ $renderGame = function (array $game) use ($teamsById, $returnTo, $viewerTeam, $a
     $viewerTeamId = $viewerTeam['id'] ?? null;
     $canEdit = $isCurrent && ($admin !== null || ($viewerTeamId !== null && Game::isParticipant($game, (int) $viewerTeamId)));
     $winnerId = Game::winnerTeamId($game);
+    $complete = Game::isComplete($game);
     ?>
-    <div class="bracket-team<?= $teamA !== null && $winnerId === (int) $teamA['id'] ? ' winner' : '' ?>"><?= render_bracket_slot($teamA, (int) $season['id']) ?></div>
-    <div class="bracket-team<?= $teamB !== null && $winnerId === (int) $teamB['id'] ? ' winner' : '' ?>"><?= render_bracket_slot($teamB, (int) $season['id']) ?></div>
+    <div class="bracket-team<?= $teamA !== null && $winnerId === (int) $teamA['id'] ? ' winner' : '' ?>">
+      <?= render_bracket_slot($teamA, (int) $season['id']) ?>
+      <?php if ($complete): ?><span class="bracket-score"><?= (int) $game['sets_a'] ?></span><?php endif; ?>
+    </div>
+    <div class="bracket-team<?= $teamB !== null && $winnerId === (int) $teamB['id'] ? ' winner' : '' ?>">
+      <?= render_bracket_slot($teamB, (int) $season['id']) ?>
+      <?php if ($complete): ?><span class="bracket-score"><?= (int) $game['sets_b'] ?></span><?php endif; ?>
+    </div>
     <div class="fixture-result">
       <?= render_partial('partials/result-form', [
           'game' => $game,
@@ -30,6 +37,7 @@ $renderGame = function (array $game) use ($teamsById, $returnTo, $viewerTeam, $a
           'viewerTeamId' => $viewerTeamId,
           'canEdit' => $canEdit,
           'seasonYear' => (int) $season['year'],
+          'hideScore' => true,
       ]) ?>
     </div>
     <?php
