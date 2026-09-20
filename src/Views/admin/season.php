@@ -9,6 +9,19 @@
  */
 $pageTitle = 'Verwalten – ' . $season['label'];
 $isCurrent = (int) $season['is_current'] === 1;
+
+// Plain-text team/PIN list for copy-pasting (e.g. into WhatsApp) -- built once here so the
+// on-screen textarea and the printable version below both show exactly the same data.
+$overviewGroups = array_values(array_filter($groupData, fn ($entry) => !empty($entry['teams'])));
+$overviewLines = ['Boccia ' . $season['label'] . ' – Teams & PINs', ''];
+foreach ($overviewGroups as $entry) {
+    $overviewLines[] = 'Gruppe ' . $entry['group']['name'];
+    foreach ($entry['teams'] as $team) {
+        $overviewLines[] = $team['name'] . ' – PIN ' . $team['pin'];
+    }
+    $overviewLines[] = '';
+}
+$overviewText = rtrim(implode("\n", $overviewLines));
 ?>
 <div class="page-head">
   <div>
@@ -45,6 +58,69 @@ $isCurrent = (int) $season['is_current'] === 1;
     <a class="btn btn-secondary" href="<?= h(url('/admin/season/' . $season['id'] . '/audit')) ?>">Änderungsprotokoll</a>
   </div>
 </div>
+
+<?php if (!empty($overviewGroups)): ?>
+<section class="card team-overview-card">
+  <h2>Team-Übersicht (Name &amp; PIN)</h2>
+  <p class="muted">Zum Kopieren in die WhatsApp-Gruppe oder zum Ausdrucken.</p>
+  <div class="team-overview-actions">
+    <button type="button" class="btn btn-secondary btn-sm" id="team-overview-copy">Kopieren</button>
+    <button type="button" class="btn btn-secondary btn-sm" id="team-overview-print">Drucken</button>
+    <span class="muted small" id="team-overview-copied" hidden>Kopiert!</span>
+  </div>
+  <textarea id="team-overview-text" class="team-overview-textarea" readonly rows="<?= max(6, substr_count($overviewText, "\n") + 2) ?>"><?= h($overviewText) ?></textarea>
+
+  <div class="team-overview-print-root">
+    <h1><?= h($season['label']) ?> &ndash; Teams &amp; PINs</h1>
+    <?php foreach ($overviewGroups as $entry): ?>
+      <section class="print-group">
+        <h2>Gruppe <?= h($entry['group']['name']) ?></h2>
+        <table class="print-team-table">
+          <?php foreach ($entry['teams'] as $team): ?>
+            <tr>
+              <td><?= h($team['name']) ?></td>
+              <td class="print-pin">PIN <?= h($team['pin']) ?></td>
+            </tr>
+          <?php endforeach; ?>
+        </table>
+      </section>
+    <?php endforeach; ?>
+  </div>
+</section>
+<script>
+(function () {
+  var copyBtn = document.getElementById('team-overview-copy');
+  var printBtn = document.getElementById('team-overview-print');
+  var textarea = document.getElementById('team-overview-text');
+  var copiedNote = document.getElementById('team-overview-copied');
+
+  copyBtn.addEventListener('click', function () {
+    var showCopied = function () {
+      copiedNote.hidden = false;
+      setTimeout(function () { copiedNote.hidden = true; }, 1800);
+    };
+    var fallback = function () {
+      textarea.select();
+      document.execCommand('copy');
+      showCopied();
+    };
+    if (navigator.clipboard && window.isSecureContext) {
+      navigator.clipboard.writeText(textarea.value).then(showCopied, fallback);
+    } else {
+      fallback();
+    }
+  });
+
+  printBtn.addEventListener('click', function () {
+    document.body.classList.add('printing-team-overview');
+    window.print();
+  });
+  window.addEventListener('afterprint', function () {
+    document.body.classList.remove('printing-team-overview');
+  });
+})();
+</script>
+<?php endif; ?>
 
 <?php foreach ($groupData as $entry): ?>
   <?php $group = $entry['group']; ?>

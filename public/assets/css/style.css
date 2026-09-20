@@ -537,6 +537,31 @@ input:focus, select:focus, button:focus, a:focus {
 .season-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.6rem; }
 .season-list-item a { display: flex; justify-content: space-between; color: var(--text); }
 
+.team-overview-actions { display: flex; align-items: center; gap: 0.6rem; margin-bottom: 0.6rem; flex-wrap: wrap; }
+.team-overview-textarea {
+  width: 100%; box-sizing: border-box; resize: vertical;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 0.85rem; line-height: 1.5;
+  padding: 0.6rem 0.7rem; border: 1px solid var(--border); border-radius: var(--radius-sm); background: var(--surface-alt); color: var(--text);
+}
+
+/* Printable version: hidden on screen, shown in its own pass when "Drucken" is clicked --
+   see the inline script in admin/season.php. Scoped to the .printing-team-overview body
+   class so it never affects printing any other page. */
+.team-overview-print-root { display: none; }
+.print-team-table { width: 100%; border-collapse: collapse; margin: 0 0 1.2rem; }
+.print-team-table td { padding: 0.3rem 0.4rem; border-bottom: 1px solid #ccc; font-size: 1rem; }
+.print-pin { text-align: right; font-weight: 700; white-space: nowrap; }
+.print-group h2 { margin: 1rem 0 0.3rem; font-size: 1.05rem; }
+
+@media print {
+  body.printing-team-overview * { visibility: hidden; }
+  body.printing-team-overview .team-overview-print-root,
+  body.printing-team-overview .team-overview-print-root * { visibility: visible; }
+  body.printing-team-overview .team-overview-print-root {
+    display: block; position: absolute; top: 0; left: 0; width: 100%; padding: 1.5rem;
+  }
+}
+
 /* ---------- Footer ---------- */
 
 .site-footer { text-align: center; color: var(--text-muted); font-size: 0.85rem; padding: 2rem 1rem 3rem; }
