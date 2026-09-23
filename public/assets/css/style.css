@@ -380,13 +380,21 @@ input:focus, select:focus, button:focus, a:focus {
 }
 .bracket-col { min-width: 210px; display: flex; flex-direction: column; gap: 1.4rem; }
 .bracket-col-groups { flex: 0 0 280px; min-width: 280px; gap: 0.9rem; }
-.bracket-col-title-mobile { display: none; text-align: left; }
+.bracket-col-title-mobile { display: none; }
+
+/* Round titles (Gruppenphase / Viertelfinal / Halbfinal / Final): a small uppercase
+   label rather than a full heading, so they read as section eyebrows -- same treatment
+   as the group titles below -- instead of competing with the "Turnierbaum" page title. */
+.bracket-titles h2, .bracket-col-title-mobile {
+  font-size: 0.8rem; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase;
+  color: var(--text-muted); text-align: left;
+}
 
 /* Title strip: same two-part split as the columns below (fixed groups width + flexible
    tree width) so "Gruppenphase" and "Viertelfinal / Halbfinal / Final" sit on one line
    regardless of how much taller the group cards are than the bracket itself. */
 .bracket-titles { display: flex; gap: var(--bracket-gutter); margin-bottom: 0.9rem; }
-.bt-groups { flex: 0 0 280px; margin: 0; text-align: left; }
+.bt-groups { flex: 0 0 280px; margin: 0; }
 .bt-tree { flex: 1 1 auto; min-width: 0; display: flex; gap: var(--bracket-gutter); }
 .bt-tree h2 { flex: 1 1 0; min-width: 210px; margin: 0; text-align: center; }
 .bt-final { color: var(--accent-dark); }
@@ -483,7 +491,10 @@ input:focus, select:focus, button:focus, a:focus {
   background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-md);
   padding: 0.6rem 0.8rem;
 }
-.bracket-group-title { display: block; font-weight: 700; margin-bottom: 0.4rem; color: var(--text); }
+.bracket-group-title {
+  display: block; font-size: 0.8rem; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase;
+  margin-bottom: 0.5rem; color: var(--text-muted);
+}
 .bracket-group-title:hover { color: var(--accent-dark); }
 
 /* Spiel um Platz 3: fed by the SF losers, not the winner path, so it isn't wired into the
