@@ -32,6 +32,7 @@ foreach ($games as $g) {
   <p class="empty-state">Für diese Gruppe sind noch keine Teams angelegt.</p>
 <?php else: ?>
   <section class="card">
+    <div class="table-scroll">
     <table class="standings-table">
       <thead>
         <tr>
@@ -60,6 +61,7 @@ foreach ($games as $g) {
         <?php endforeach; ?>
       </tbody>
     </table>
+    </div>
     <p class="hint">Die ersten <?= h($qualifierWord) ?> Teams (hervorgehoben) kommen für das Viertelfinale in Frage.</p>
   </section>
 <?php endif; ?>

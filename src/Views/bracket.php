@@ -152,14 +152,14 @@ $thirdGame = $phases['third'][0] ?? null;
       <?php endif; ?>
     </div>
   </div>
-</div>
 
-<?php if ($thirdGame !== null): ?>
-  <div class="bracket-third-row">
-    <div class="bracket-third-col">
-      <h2>Spiel um Platz 3</h2>
-      <p class="bracket-third-hint">Verlierer der Halbfinals</p>
-      <div class="bracket-game bracket-game-third"><?php $renderGame($thirdGame); ?></div>
+  <?php if ($thirdGame !== null): ?>
+    <div class="bracket-third-row">
+      <div class="bracket-third-col">
+        <h2>Spiel um Platz 3</h2>
+        <p class="bracket-third-hint">Verlierer der Halbfinals</p>
+        <div class="bracket-game bracket-game-third"><?php $renderGame($thirdGame); ?></div>
+      </div>
     </div>
-  </div>
-<?php endif; ?>
+  <?php endif; ?>
+</div>
