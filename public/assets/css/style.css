@@ -267,8 +267,10 @@ input:focus, select:focus, button:focus, a:focus {
 
 /* ---------- Team dot / avatar ---------- */
 
-.team-link { display: inline-flex; align-items: center; gap: 0.5rem; color: var(--text); font-weight: 600; }
-.team-link:hover { text-decoration: none; color: var(--accent-dark); }
+.team-link { display: inline-flex; align-items: center; gap: 0.5rem; min-width: 0; }
+.team-link:hover { text-decoration: none; }
+.team-link:hover .team-name { color: var(--accent-dark); }
+.team-name { font-weight: 700; color: var(--text); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .dot {
   width: 11px; height: 11px; border-radius: 50%;
   background: var(--dot, var(--accent));
@@ -480,9 +482,10 @@ input:focus, select:focus, button:focus, a:focus {
 }
 .bracket-game-final { border: 1.5px solid var(--accent); box-shadow: 0 2px 8px rgba(10, 125, 108, 0.12); }
 .bracket-team { display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; padding: 0.3rem 0.5rem; border-radius: var(--radius-sm); }
+.bracket-team .team-name { font-size: 0.86rem; font-weight: 500; color: var(--text-muted); }
 .bracket-team.winner { background: var(--accent-tint); }
 .bracket-team.winner .team-name { font-weight: 800; color: var(--text); }
-.bracket-score { font-weight: 700; font-variant-numeric: tabular-nums; color: var(--text-muted); }
+.bracket-score { font-size: 0.86rem; font-weight: 600; font-variant-numeric: tabular-nums; color: var(--text-muted); }
 .bracket-team.winner .bracket-score { color: var(--accent-dark); font-weight: 800; }
 .bracket-slot-empty { color: var(--text-muted); font-style: italic; }
 .bracket-game .fixture-result { margin-top: 0.3rem; }
@@ -491,6 +494,7 @@ input:focus, select:focus, button:focus, a:focus {
   background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-md);
   padding: 0.6rem 0.8rem;
 }
+.bracket-group-card .team-name { font-size: 0.86rem; font-weight: 600; }
 .bracket-group-title {
   display: block; font-size: 0.8rem; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase;
   margin-bottom: 0.5rem; color: var(--text-muted);
