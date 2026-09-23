@@ -45,6 +45,23 @@ a:hover { text-decoration: underline; }
 .eyebrow { color: var(--text-muted); font-size: 0.9rem; margin: 0 0 0.2em; }
 .eyebrow a { color: var(--text-muted); }
 
+/* ---------- Dev banner ---------- */
+
+/* Only rendered when config/config.php has app.env = 'dev' (see is_dev_env() in
+   helpers.php) -- production config never sets this, so the banner can't appear there
+   by accident. Deliberately not sticky/position:fixed: it must never cover content or
+   shift the sticky topbar's offset, just be the unmistakable first thing on page load. */
+.dev-banner {
+  background: repeating-linear-gradient(135deg, #fff3b0, #fff3b0 14px, #ffe066 14px, #ffe066 28px);
+  color: #4a3b00;
+  text-align: center;
+  font-weight: 800;
+  font-size: 0.85rem;
+  letter-spacing: 0.02em;
+  padding: 0.45rem 1rem;
+  border-bottom: 1px solid #e0b800;
+}
+
 /* ---------- Top bar ---------- */
 
 .topbar {
@@ -136,8 +153,8 @@ a:hover { text-decoration: underline; }
 .btn:hover { text-decoration: none; }
 .btn-primary { background: var(--accent); color: #fff; }
 .btn-primary:hover { background: var(--accent-dark); }
-.btn-secondary { background: var(--accent-tint); color: var(--accent-dark); }
-.btn-secondary:hover { background: #d4ece6; }
+.btn-secondary { background: var(--surface); color: var(--text); border: 1px solid var(--border); }
+.btn-secondary:hover { background: var(--surface-alt); border-color: var(--accent); }
 .btn-ghost { background: transparent; color: var(--text-muted); }
 .btn-ghost:hover { background: var(--surface-alt); }
 .btn-danger { color: var(--error-text); }
@@ -180,8 +197,8 @@ input:focus, select:focus, button:focus, a:focus {
 
 .page { max-width: 1100px; margin: 0 auto; padding: 1.2rem 1rem 4rem; }
 .page-head {
-  display: flex; justify-content: space-between; align-items: flex-start;
-  gap: 1rem; flex-wrap: wrap; margin-bottom: 1.2rem;
+  display: flex; justify-content: space-between; align-items: flex-end;
+  gap: 1rem; flex-wrap: wrap; margin-bottom: 1.3rem;
 }
 .page-head-actions { display: flex; align-items: center; gap: 0.6rem; flex-wrap: wrap; }
 .season-edit-entry summary { list-style: none; }
@@ -198,7 +215,7 @@ input:focus, select:focus, button:focus, a:focus {
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow);
-  padding: 1.1rem;
+  padding: 1.1rem 1.3rem;
   margin-bottom: 1.2rem;
 }
 
