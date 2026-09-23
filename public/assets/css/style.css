@@ -324,7 +324,7 @@ input:focus, select:focus, button:focus, a:focus {
 }
 
 .result-chip { display: flex; align-items: center; gap: 0.5rem; }
-.result-chip .score { font-weight: 800; font-size: 1.05rem; background: var(--surface-alt); padding: 0.2rem 0.6rem; border-radius: var(--radius-sm); }
+.result-chip .score { font-weight: 600; font-size: 0.95rem; font-variant-numeric: tabular-nums; background: var(--surface-alt); padding: 0.2rem 0.6rem; border-radius: var(--radius-sm); }
 .result-chip .played-date { color: var(--text-muted); font-size: 0.85rem; }
 .result-pending { color: var(--text-muted); font-style: italic; font-size: 0.9rem; }
 .result-chip-scheduled .scheduled-label {
