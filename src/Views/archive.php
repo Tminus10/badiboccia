@@ -14,6 +14,7 @@ $pageTitle = 'Archiv';
           <strong><?= h($season['label']) ?></strong>
           <span class="muted"><?= (int) $season['year'] ?></span>
         </a>
+        <a class="card-link" href="<?= h(url('/calendar/' . $season['id'])) ?>">Kalender →</a>
       </li>
     <?php endforeach; ?>
   </ul>

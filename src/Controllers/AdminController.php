@@ -594,6 +594,118 @@ final class AdminController
         redirect('/admin');
     }
 
+    /** Adds a custom calendar entry with no game behind it (group draw, victory party, etc.). */
+    public static function calendarEventCreate(array $params): void
+    {
+        AdminAuth::requireLogin();
+        $seasonId = (int) $params['id'];
+        $season = Season::find($seasonId);
+        if ($season === null) {
+            http_response_code(404);
+            render('404');
+            return;
+        }
+        if (!csrf_check()) {
+            redirect(self::calendarUrl($season));
+            return;
+        }
+        if (!self::isSeasonCurrent($seasonId)) {
+            flash_set('error', 'Diese Saison ist archiviert. Termine können nur in der aktiven Saison hinzugefügt werden.');
+            redirect(self::calendarUrl($season));
+            return;
+        }
+
+        $title = trim((string) ($_POST['title'] ?? ''));
+        $location = trim((string) ($_POST['location'] ?? ''));
+        $date = (string) ($_POST['event_date'] ?? '');
+        $time = parse_time_input((string) ($_POST['event_time'] ?? ''));
+        $reminder = !empty($_POST['reminder']);
+
+        if ($title === '' || !preg_match('/^\d{4}-\d{2}-\d{2}$/', $date)) {
+            flash_set('error', 'Bitte Titel und Datum angeben.');
+            redirect(self::calendarUrl($season));
+            return;
+        }
+
+        $admin = AdminAuth::current();
+        CalendarEvent::create($seasonId, $title, $location !== '' ? $location : null, $date, $time, $reminder, (int) $admin['id']);
+
+        flash_set('success', 'Termin "' . $title . '" gespeichert.');
+        redirect(self::calendarUrl($season));
+    }
+
+    public static function calendarEventUpdate(array $params): void
+    {
+        AdminAuth::requireLogin();
+        $event = CalendarEvent::find((int) $params['id']);
+        if ($event === null) {
+            http_response_code(404);
+            render('404');
+            return;
+        }
+        $season = Season::find((int) $event['season_id']);
+        if (!csrf_check()) {
+            redirect(self::calendarUrl($season));
+            return;
+        }
+        if (!self::isSeasonCurrent((int) $event['season_id'])) {
+            flash_set('error', 'Diese Saison ist archiviert. Termine können nicht mehr bearbeitet werden.');
+            redirect(self::calendarUrl($season));
+            return;
+        }
+
+        $title = trim((string) ($_POST['title'] ?? ''));
+        $location = trim((string) ($_POST['location'] ?? ''));
+        $date = (string) ($_POST['event_date'] ?? '');
+        $time = parse_time_input((string) ($_POST['event_time'] ?? ''));
+        $reminder = !empty($_POST['reminder']);
+
+        if ($title === '' || !preg_match('/^\d{4}-\d{2}-\d{2}$/', $date)) {
+            flash_set('error', 'Bitte Titel und Datum angeben.');
+            redirect(self::calendarUrl($season));
+            return;
+        }
+
+        CalendarEvent::update((int) $event['id'], $title, $location !== '' ? $location : null, $date, $time, $reminder);
+
+        flash_set('success', 'Termin "' . $title . '" aktualisiert.');
+        redirect(self::calendarUrl($season));
+    }
+
+    public static function calendarEventDelete(array $params): void
+    {
+        AdminAuth::requireLogin();
+        $event = CalendarEvent::find((int) $params['id']);
+        if ($event === null) {
+            http_response_code(404);
+            render('404');
+            return;
+        }
+        $season = Season::find((int) $event['season_id']);
+        if (!csrf_check()) {
+            redirect(self::calendarUrl($season));
+            return;
+        }
+        if (!self::isSeasonCurrent((int) $event['season_id'])) {
+            flash_set('error', 'Diese Saison ist archiviert. Termine können nicht mehr gelöscht werden.');
+            redirect(self::calendarUrl($season));
+            return;
+        }
+
+        CalendarEvent::delete((int) $event['id']);
+        flash_set('success', 'Termin "' . $event['title'] . '" gelöscht.');
+        redirect(self::calendarUrl($season));
+    }
+
+    /** The calendar page to return to after adding/removing a custom event. */
+    private static function calendarUrl(?array $season): string
+    {
+        if ($season === null) {
+            return '/calendar';
+        }
+        return (int) $season['is_current'] === 1 ? '/calendar' : '/calendar/' . $season['id'];
+    }
+
     public static function auditLog(array $params): void
     {
         $admin = AdminAuth::requireLogin();
