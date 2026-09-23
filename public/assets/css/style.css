@@ -358,6 +358,7 @@ input:focus, select:focus, button:focus, a:focus {
 .bracket {
   --bracket-gutter: 2.6rem;
   --match-connector-h: 118px;
+  --bracket-row-gap: 1.4rem;
   display: flex; align-items: center; gap: var(--bracket-gutter); overflow-x: auto; padding-bottom: 1rem;
 }
 .bracket-col { min-width: 210px; display: flex; flex-direction: column; gap: 1.4rem; }
@@ -383,10 +384,10 @@ input:focus, select:focus, button:focus, a:focus {
   display: grid;
   grid-template-columns: minmax(190px, 1fr) var(--bracket-gutter) minmax(190px, 1fr) var(--bracket-gutter) minmax(214px, 1fr);
   grid-template-rows: repeat(4, auto);
-  row-gap: 1.4rem;
+  row-gap: var(--bracket-row-gap);
 }
 .bracket-col-qf, .bracket-col-sf, .bracket-col-final {
-  display: grid; grid-template-rows: subgrid; grid-row: 1 / 5; row-gap: 1.4rem;
+  display: grid; grid-template-rows: subgrid; grid-row: 1 / 5; row-gap: var(--bracket-row-gap);
 }
 .bracket-col-qf { grid-column: 1; }
 .bracket-col-sf { grid-column: 3; }
@@ -417,26 +418,33 @@ input:focus, select:focus, button:focus, a:focus {
   width: calc(var(--bracket-gutter) / 2); height: 2px; background: var(--connector);
 }
 
-/* SF-to-Final: no card-height guess needed here at all. wire-c1/c2 split at the same
-   row-line SF1/Sf2 themselves subgrid-align to, so "50%" of each half is exactly that
-   semifinal's real center -- the two halves' vertical edges meet exactly at that shared
-   row-line, forming one continuous spine between the two real centers. The stub spans the
-   full range, so its own 50% is the tree's true center, which -- always lying between
-   SF1's and SF2's real centers -- necessarily lands on that same spine. */
+/* SF-to-Final: wire-c1/c2 split at the row-line SF1/SF2 themselves subgrid-align to, so
+   "50%" of each half is exactly that semifinal's real center. But a grid item spanning
+   rows only covers its OWN tracks plus the gap *between* them -- the row-gap that follows
+   (between SF1's and SF2's row-ranges) belongs to neither box, so stopping each arm at
+   `bottom: 0` / `top: 0` left a --bracket-row-gap-wide dead zone with no visible line at
+   all. Extending each arm by half that row-gap closes it: since both boxes sit exactly
+   one row-gap apart regardless of how tall any QF card renders, "own edge + half the
+   row-gap" always meets at the identical point from both sides, no guessing involved.
+   The stub reuses wire-c1's own box (same grid-row) so its exit line anchors to that same
+   exact point instead of the tree's overall midpoint, which would drift off it whenever
+   the SF1-side and SF2-side QF pairs don't render the same total height. */
 .bracket-wire-c1, .bracket-wire-c2, .bracket-wire-c-stub { grid-column: 4; position: relative; }
 .bracket-wire-c1 { grid-row: 1 / 3; }
 .bracket-wire-c2 { grid-row: 3 / 5; }
-.bracket-wire-c-stub { grid-row: 1 / 5; }
+.bracket-wire-c-stub { grid-row: 1 / 3; }
 .bracket-wire-c1::before {
-  content: ''; position: absolute; left: 0; width: calc(var(--bracket-gutter) / 2); top: 50%; bottom: 0;
+  content: ''; position: absolute; left: 0; width: calc(var(--bracket-gutter) / 2);
+  top: 50%; bottom: calc(-1 * var(--bracket-row-gap) / 2);
   border-top: 2px solid var(--connector); border-right: 2px solid var(--connector); border-top-right-radius: 8px;
 }
 .bracket-wire-c2::before {
-  content: ''; position: absolute; left: 0; width: calc(var(--bracket-gutter) / 2); top: 0; bottom: 50%;
+  content: ''; position: absolute; left: 0; width: calc(var(--bracket-gutter) / 2);
+  top: calc(-1 * var(--bracket-row-gap) / 2); bottom: 50%;
   border-bottom: 2px solid var(--connector); border-right: 2px solid var(--connector); border-bottom-right-radius: 8px;
 }
 .bracket-wire-c-stub::before {
-  content: ''; position: absolute; top: 50%; left: calc(var(--bracket-gutter) / 2);
+  content: ''; position: absolute; top: calc(100% + var(--bracket-row-gap) / 2); left: calc(var(--bracket-gutter) / 2);
   width: calc(var(--bracket-gutter) / 2); height: 2px; background: var(--connector);
 }
 
