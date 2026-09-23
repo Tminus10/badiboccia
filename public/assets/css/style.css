@@ -358,7 +358,7 @@ input:focus, select:focus, button:focus, a:focus {
 .bracket {
   --bracket-gutter: 2.6rem;
   --match-connector-h: 118px;
-  display: flex; align-items: stretch; gap: var(--bracket-gutter); overflow-x: auto; padding-bottom: 1rem;
+  display: flex; align-items: center; gap: var(--bracket-gutter); overflow-x: auto; padding-bottom: 1rem;
 }
 .bracket-col { min-width: 210px; display: flex; flex-direction: column; gap: 1.4rem; }
 .bracket-col-groups { flex: 0 0 280px; min-width: 280px; gap: 0.9rem; }
@@ -476,7 +476,7 @@ input:focus, select:focus, button:focus, a:focus {
 @media (max-width: 900px) {
   .bracket-titles { display: none; }
   .bracket-col-title-mobile { display: block; }
-  .bracket { flex-direction: column; overflow-x: visible; }
+  .bracket { flex-direction: column; align-items: stretch; overflow-x: visible; }
   .bracket-col { min-width: 0; }
   .bracket-col-groups { flex: none; }
   .bracket-tree { display: flex; flex-direction: column; gap: 1.5rem; overflow-x: visible; }
