@@ -74,13 +74,13 @@ fresh environment):
 Every deploy after that:
 
 ```
-export HOSTPOINT_SSH=reutener@reutener.ssh.cloud.hostpoint.ch
-export HOSTPOINT_PATH=/home/reutener/www/boccia.reutener.swiss
-./scripts/deploy.sh
+./scripts/deploy.sh prod
 ```
 
-(Locally, `~/.ssh/config` has a `hostpoint-badiboccia` alias set up for this,
-so `ssh hostpoint-badiboccia` also works directly.)
+(Locally, `~/.ssh/config` has a `hostpoint-badiboccia` alias set up for this;
+`scripts/deploy.sh` defaults `HOSTPOINT_SSH`/`HOSTPOINT_PATH` for both `prod`
+and `dev`, so no env vars are needed unless your setup differs — see the
+comments at the top of the script.)
 
 This rsyncs the project over SSH, skipping `config/config.php` (server-only secrets)
 and `public/uploads/` (live team photos) so neither gets clobbered.
@@ -88,6 +88,25 @@ and `public/uploads/` (live team photos) so neither gets clobbered.
 If SSH isn't available on your plan, upload the same files with any SFTP client
 instead (e.g. Cyberduck, FileZilla) — just skip `config/config.php` if it already
 exists on the server, and skip `public/uploads/`.
+
+### DEV instance
+
+There's also an online DEV instance at **https://dev.boccia.reutener.swiss**,
+used to develop and test against before anything reaches PROD. It's a second
+subdomain under the same hostpoint account, pointed at its own `public/`
+document root the same way PROD is, with its own MySQL database and its own
+`config/config.php` (same steps as "One-time server setup" above, using
+`dev.boccia.reutener.swiss` as the path and setting `app.env` to `'dev'` —
+that's what makes the `[DEV]` banner show on every page, so the two
+environments can never be mistaken for each other). Because it's a separate
+document root and database, PROD's data and deploys are completely
+unaffected by whatever happens on DEV.
+
+Deploy to it with:
+
+```
+./scripts/deploy.sh dev
+```
 
 ## Notes on the domain rules
 
