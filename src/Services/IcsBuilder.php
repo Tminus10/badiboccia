@@ -3,7 +3,7 @@
 /** Builds a minimal RFC 5545 .ics feed spanning every season's scheduled games and custom calendar entries. */
 final class IcsBuilder
 {
-    private const GAME_DURATION_MINUTES = 150; // a game slot is assumed to take 2.5 hours
+    private const GAME_DURATION_MINUTES = 120; // a game slot is assumed to take 2 hours
     private const CUSTOM_EVENT_DURATION_MINUTES = 60; // draws, celebrations, etc. -- no fixed duration is known
     private const TZ = 'Europe/Zurich';
 
