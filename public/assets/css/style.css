@@ -262,7 +262,7 @@ input:focus, select:focus, button:focus, a:focus {
 .standings-table tr.qualifies:has(+ tr.qualifies) td { border-bottom: none; }
 .standings-table tr.qualifies:has(+ tr.qualifies) td:first-child { border-radius: var(--radius-sm) 0 0 0; }
 .standings-table tr.qualifies + tr.qualifies td:first-child { border-radius: 0 0 0 var(--radius-sm); }
-.standings-compact th, .standings-compact td { padding: 0.4rem 0.4rem; }
+.standings-compact th, .standings-compact td { padding: 4px 0.4rem; }
 .hint { font-size: 0.85rem; color: var(--text-muted); margin-top: 0.6rem; margin-bottom: 0; }
 
 .card-link { display: inline-block; margin-top: 0.8rem; font-weight: 700; font-size: 0.9rem; }
@@ -376,15 +376,15 @@ input:focus, select:focus, button:focus, a:focus {
 
 /* ---------- Bracket ---------- */
 
-/* Groups spans both grid rows on the left; the tree sits in row 1 on the right, vertically
-   centered against that full span as before; "Spiel um Platz 3" now lives in row 2, pinned
-   to the bottom of that same column -- so its card bottom lands exactly on the groups
-   column's bottom whenever groups (the usual case) is the taller side. */
+/* Groups spans both grid rows on the left; row 1 is 1fr so it absorbs whatever space isn't
+   claimed by "Spiel um Platz 3" in row 2 (auto, sized to its own content) -- the tree then
+   centers within that flexible row 1, same as it always did against the full groups height,
+   while row 2's fixed size still keeps the third-place card pinned exactly to the bottom. */
 .bracket {
   --bracket-gutter: 2.6rem;
   --match-connector-h: 118px;
   --bracket-row-gap: 1.4rem;
-  display: grid; grid-template-columns: 280px 1fr; grid-template-rows: auto 1fr;
+  display: grid; grid-template-columns: 280px 1fr; grid-template-rows: 1fr auto;
   column-gap: var(--bracket-gutter); overflow-x: auto; padding-bottom: 1rem;
 }
 .bracket-col { min-width: 210px; display: flex; flex-direction: column; gap: 1.4rem; }
