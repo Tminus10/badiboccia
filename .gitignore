@@ -6,3 +6,4 @@ dev/mysqld.log
 dev/mysqld.pid
 dev/mysql.sock
 .DS_Store
+.claude/
