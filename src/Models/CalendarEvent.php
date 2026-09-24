@@ -10,12 +10,12 @@ final class CalendarEvent
         return $stmt->fetch() ?: null;
     }
 
-    /** A season's custom calendar entries, earliest first. */
+    /** A season's custom calendar entries, newest first (for the admin management list). */
     public static function forSeason(int $seasonId): array
     {
         $stmt = Db::pdo()->prepare(
             'SELECT * FROM calendar_events WHERE season_id = ?
-             ORDER BY event_date ASC, (event_time IS NULL) ASC, event_time ASC, id ASC'
+             ORDER BY event_date DESC, (event_time IS NULL) ASC, event_time ASC, id ASC'
         );
         $stmt->execute([$seasonId]);
         return $stmt->fetchAll();
