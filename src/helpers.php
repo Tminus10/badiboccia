@@ -19,6 +19,18 @@ function url(string $path = ''): string
     return rtrim(base_path(), '/') . $path;
 }
 
+/** Like url(), but absolute (scheme + host) -- needed for links meant to be used outside this
+ * page, e.g. pasted into a calendar app to subscribe to the .ics feed. */
+function absolute_url(string $path = ''): string
+{
+    $proto = $_SERVER['HTTP_X_FORWARDED_PROTO'] ?? null;
+    $isHttps = $proto !== null ? strtolower((string) $proto) === 'https'
+        : (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off');
+    $scheme = $isHttps ? 'https' : 'http';
+    $host = (string) ($_SERVER['HTTP_HOST'] ?? 'localhost');
+    return $scheme . '://' . $host . url($path);
+}
+
 /**
  * Like url(), but for a static file under public/ -- appends a ?v= cache-buster derived from
  * the file's own mtime, so a deploy that changes e.g. style.css is picked up immediately
@@ -178,4 +190,58 @@ function format_date_ch(?string $date): string
     }
     $ts = strtotime($date);
     return $ts ? date('d.m.Y', $ts) : '';
+}
+
+/** "HH:MM" from a DB TIME value ("HH:MM:SS"), or '' if unset. */
+function format_time_ch(?string $time): string
+{
+    if (empty($time)) {
+        return '';
+    }
+    return substr($time, 0, 5);
+}
+
+/** Parses an HTML <input type="time"> value ("HH:MM" or "HH:MM:SS") into a DB TIME string, or null if empty/invalid. */
+function parse_time_input(string $value): ?string
+{
+    if ($value === '') {
+        return null;
+    }
+    if (!preg_match('/^(\d{2}):(\d{2})(?::\d{2})?$/', $value, $m)) {
+        return null;
+    }
+    return $m[1] . ':' . $m[2] . ':00';
+}
+
+/** "23.09.2026" or, when a time is set, "23.09.2026 · 18:30". */
+function format_datetime_ch(?string $date, ?string $time): string
+{
+    $d = format_date_ch($date);
+    if ($d === '') {
+        return '';
+    }
+    $t = format_time_ch($time);
+    return $t === '' ? $d : $d . ' · ' . $t;
+}
+
+/** German label for a game's phase, as used on the bracket, team pages, and calendar. */
+function phase_label(string $phase): string
+{
+    static $labels = [
+        'group' => 'Gruppenphase',
+        'qf' => 'Viertelfinal',
+        'sf' => 'Halbfinal',
+        'final' => 'Final',
+        'third' => 'Spiel um Platz 3',
+    ];
+    return $labels[$phase] ?? $phase;
+}
+
+/** "Gruppe A" for a group-phase game (looked up via $groupsById), or the phase label otherwise. */
+function game_phase_label(array $game, array $groupsById): string
+{
+    if ($game['phase'] === 'group' && $game['group_id'] !== null && isset($groupsById[$game['group_id']])) {
+        return 'Gruppe ' . $groupsById[$game['group_id']]['name'];
+    }
+    return phase_label($game['phase']);
 }

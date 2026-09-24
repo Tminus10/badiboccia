@@ -64,8 +64,11 @@ final class GameController
         } else {
             $date = preg_match('/^\d{4}-\d{2}-\d{2}$/', $submittedDate) ? $submittedDate : null;
         }
+        // Unlike the date, the time field has no pre-filled guess to disambiguate against
+        // (it starts empty), so whatever was submitted is always a deliberate choice.
+        $time = parse_time_input((string) ($_POST['game_time'] ?? ''));
 
-        Game::recordResult($gameId, $setsA, $setsB, $date, $actorType, $actorId, $actorLabel);
+        Game::recordResult($gameId, $setsA, $setsB, $date, $time, $actorType, $actorId, $actorLabel);
 
         flash_set('success', 'Resultat gespeichert: ' . $setsA . ':' . $setsB);
         redirect($returnTo);
@@ -107,10 +110,11 @@ final class GameController
             redirect($returnTo);
             return;
         }
+        $time = parse_time_input((string) ($_POST['game_time'] ?? ''));
 
-        Game::scheduleDate($gameId, $date, $actorType, $actorId, $actorLabel);
+        Game::scheduleDate($gameId, $date, $time, $actorType, $actorId, $actorLabel);
 
-        flash_set('success', 'Termin gespeichert: ' . format_date_ch($date));
+        flash_set('success', 'Termin gespeichert: ' . format_datetime_ch($date, $time));
         redirect($returnTo);
     }
 

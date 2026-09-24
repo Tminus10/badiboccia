@@ -137,7 +137,7 @@ final class Game
         $stmt->execute([$teamId, $gameId]);
     }
 
-    public static function recordResult(int $gameId, int $setsA, int $setsB, ?string $playedDate, string $actorType, int $actorId, string $actorLabel): void
+    public static function recordResult(int $gameId, int $setsA, int $setsB, ?string $playedDate, ?string $gameTime, string $actorType, int $actorId, string $actorLabel): void
     {
         $pdo = Db::pdo();
         $game = self::find($gameId);
@@ -146,9 +146,9 @@ final class Game
         }
 
         $stmt = $pdo->prepare(
-            'UPDATE games SET sets_a = ?, sets_b = ?, played_date = ?, updated_by_type = ?, updated_by_id = ? WHERE id = ?'
+            'UPDATE games SET sets_a = ?, sets_b = ?, played_date = ?, game_time = ?, updated_by_type = ?, updated_by_id = ? WHERE id = ?'
         );
-        $stmt->execute([$setsA, $setsB, $playedDate, $actorType, $actorId, $gameId]);
+        $stmt->execute([$setsA, $setsB, $playedDate, $gameTime, $actorType, $actorId, $gameId]);
 
         $audit = $pdo->prepare(
             'INSERT INTO audit_log (game_id, actor_type, actor_id, actor_label, old_sets_a, old_sets_b, old_played_date, new_sets_a, new_sets_b, new_played_date)
@@ -175,8 +175,8 @@ final class Game
         }
     }
 
-    /** Sets a scheduled/played date without recording a result (sets_a/sets_b stay untouched). */
-    public static function scheduleDate(int $gameId, string $date, string $actorType, int $actorId, string $actorLabel): void
+    /** Sets a scheduled/played date (and optional time) without recording a result (sets_a/sets_b stay untouched). */
+    public static function scheduleDate(int $gameId, string $date, ?string $time, string $actorType, int $actorId, string $actorLabel): void
     {
         $pdo = Db::pdo();
         $game = self::find($gameId);
@@ -184,8 +184,8 @@ final class Game
             throw new RuntimeException('Game not found');
         }
 
-        $stmt = $pdo->prepare('UPDATE games SET played_date = ?, updated_by_type = ?, updated_by_id = ? WHERE id = ?');
-        $stmt->execute([$date, $actorType, $actorId, $gameId]);
+        $stmt = $pdo->prepare('UPDATE games SET played_date = ?, game_time = ?, updated_by_type = ?, updated_by_id = ? WHERE id = ?');
+        $stmt->execute([$date, $time, $actorType, $actorId, $gameId]);
 
         $audit = $pdo->prepare(
             'INSERT INTO audit_log (game_id, actor_type, actor_id, actor_label, old_sets_a, old_sets_b, old_played_date, new_sets_a, new_sets_b, new_played_date)
@@ -196,6 +196,39 @@ final class Game
             $game['sets_a'], $game['sets_b'], $game['played_date'],
             $game['sets_a'], $game['sets_b'], $date,
         ]);
+    }
+
+    /** Every game in a season that has a scheduled/played date and a known opponent, earliest first, for the calendar. */
+    public static function scheduledForSeason(int $seasonId): array
+    {
+        $stmt = Db::pdo()->prepare(
+            "SELECT * FROM games
+             WHERE season_id = ? AND played_date IS NOT NULL AND team_a_id IS NOT NULL AND team_b_id IS NOT NULL
+             ORDER BY played_date ASC, (game_time IS NULL) ASC, game_time ASC, id ASC"
+        );
+        $stmt->execute([$seasonId]);
+        return $stmt->fetchAll();
+    }
+
+    /** Every scheduled/played game across every season, earliest first -- backs the all-seasons .ics subscription feed. */
+    public static function scheduledAll(): array
+    {
+        $stmt = Db::pdo()->query(
+            'SELECT * FROM games
+             WHERE played_date IS NOT NULL AND team_a_id IS NOT NULL AND team_b_id IS NOT NULL
+             ORDER BY played_date ASC, (game_time IS NULL) ASC, game_time ASC, id ASC'
+        );
+        return $stmt->fetchAll();
+    }
+
+    /** Count of games in a season whose opponents are known but that still have no scheduled date. */
+    public static function countUnscheduled(int $seasonId): int
+    {
+        $stmt = Db::pdo()->prepare(
+            'SELECT COUNT(*) FROM games WHERE season_id = ? AND played_date IS NULL AND team_a_id IS NOT NULL AND team_b_id IS NOT NULL'
+        );
+        $stmt->execute([$seasonId]);
+        return (int) $stmt->fetchColumn();
     }
 
     public static function recentAuditLog(int $seasonId, int $limit = 50): array

@@ -13,7 +13,6 @@
 $pageTitle = $targetTeam['name'];
 $teamId = (int) $targetTeam['id'];
 $returnTo = $showAllSeasons ? url('/team/' . $teamId) . '?season=all' : url('/team/' . $teamId);
-$phaseLabels = ['group' => 'Gruppenphase', 'qf' => 'Viertelfinal', 'sf' => 'Halbfinal', 'final' => 'Final', 'third' => 'Spiel um Platz 3'];
 ?>
 <div class="team-header card">
   <?= render_partial('partials/team-avatar', ['team' => $targetTeam, 'size' => 'lg', 'linked' => false]) ?>
@@ -50,7 +49,7 @@ $phaseLabels = ['group' => 'Gruppenphase', 'qf' => 'Viertelfinal', 'sf' => 'Halb
         <?php if ($groupKey !== $lastGroupKey): ?>
           <?php $lastGroupKey = $groupKey; ?>
           <li class="fixture-phase-label">
-            <?= h($phaseLabels[$game['phase']] ?? $game['phase']) ?><?php if ($gameSeason !== null): ?> &middot; <?= h($gameSeason['label']) ?><?php if ($gameGroup !== null): ?> (Gruppe <?= h($gameGroup['name']) ?>)<?php endif; ?><?php endif; ?>
+            <?= h(phase_label($game['phase'])) ?><?php if ($gameSeason !== null): ?> &middot; <?= h($gameSeason['label']) ?><?php if ($gameGroup !== null): ?> (Gruppe <?= h($gameGroup['name']) ?>)<?php endif; ?><?php endif; ?>
           </li>
         <?php endif; ?>
         <?php
@@ -63,7 +62,7 @@ $phaseLabels = ['group' => 'Gruppenphase', 'qf' => 'Viertelfinal', 'sf' => 'Halb
           $gameIsCurrent = $gameSeason !== null && (int) $gameSeason['is_current'] === 1;
           $canEdit = $gameIsCurrent && ($admin !== null || ($viewerTeamId !== null && Game::isParticipant($game, (int) $viewerTeamId)));
         ?>
-        <?php $dateLabel = !empty($game['played_date']) ? format_date_ch($game['played_date']) : ''; ?>
+        <?php $dateLabel = format_datetime_ch($game['played_date'] ?? null, $game['game_time'] ?? null); ?>
         <li class="fixture-card team-fixture-card">
           <div class="fixture-teams">
             <?= render_partial('partials/team-dot', ['team' => $targetTeam, 'seasonId' => (int) $game['season_id']]) ?>

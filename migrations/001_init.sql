@@ -62,6 +62,7 @@ CREATE TABLE games (
   sets_a TINYINT NULL,
   sets_b TINYINT NULL,
   played_date DATE NULL,
+  game_time TIME NULL, -- optional kickoff time for played_date; NULL means "all day" in the calendar
   next_game_id INT NULL,
   next_game_slot CHAR(1) NULL, -- a | b
   updated_by_type VARCHAR(10) NULL, -- team | admin
@@ -89,6 +90,22 @@ CREATE TABLE audit_log (
   new_played_date DATE NULL,
   changed_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY (game_id) REFERENCES games(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- Admin-created calendar entries with no game behind them (group draw, victory party, etc.).
+-- Shown alongside games in the calendar views and the .ics feed.
+CREATE TABLE calendar_events (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  season_id INT NOT NULL,
+  title VARCHAR(150) NOT NULL,
+  location VARCHAR(255) NULL,
+  event_date DATE NOT NULL,
+  event_time TIME NULL, -- NULL means "all day" in the calendar, same as games.game_time
+  reminder TINYINT(1) NOT NULL DEFAULT 1, -- 1h-before VALARM in the .ics feed; only applies when event_time is set
+  created_by_admin_id INT NULL,
+  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (season_id) REFERENCES seasons(id) ON DELETE CASCADE,
+  FOREIGN KEY (created_by_admin_id) REFERENCES admins(id) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE team_login_attempts (
