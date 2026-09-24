@@ -31,24 +31,24 @@ final class CalendarEvent
         return $stmt->fetchAll();
     }
 
-    public static function create(int $seasonId, string $title, ?string $location, string $date, ?string $time, bool $reminder, int $adminId): int
+    public static function create(int $seasonId, string $title, ?string $location, string $date, ?string $time, ?int $durationMinutes, bool $reminder, int $adminId): int
     {
         $pdo = Db::pdo();
         $stmt = $pdo->prepare(
-            'INSERT INTO calendar_events (season_id, title, location, event_date, event_time, reminder, created_by_admin_id)
-             VALUES (?, ?, ?, ?, ?, ?, ?)'
+            'INSERT INTO calendar_events (season_id, title, location, event_date, event_time, duration_minutes, reminder, created_by_admin_id)
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?)'
         );
-        $stmt->execute([$seasonId, $title, $location, $date, $time, $reminder ? 1 : 0, $adminId]);
+        $stmt->execute([$seasonId, $title, $location, $date, $time, $durationMinutes, $reminder ? 1 : 0, $adminId]);
 
         return (int) $pdo->lastInsertId();
     }
 
-    public static function update(int $id, string $title, ?string $location, string $date, ?string $time, bool $reminder): void
+    public static function update(int $id, string $title, ?string $location, string $date, ?string $time, ?int $durationMinutes, bool $reminder): void
     {
         $stmt = Db::pdo()->prepare(
-            'UPDATE calendar_events SET title = ?, location = ?, event_date = ?, event_time = ?, reminder = ? WHERE id = ?'
+            'UPDATE calendar_events SET title = ?, location = ?, event_date = ?, event_time = ?, duration_minutes = ?, reminder = ? WHERE id = ?'
         );
-        $stmt->execute([$title, $location, $date, $time, $reminder ? 1 : 0, $id]);
+        $stmt->execute([$title, $location, $date, $time, $durationMinutes, $reminder ? 1 : 0, $id]);
     }
 
     public static function delete(int $id): void

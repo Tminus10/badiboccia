@@ -101,6 +101,7 @@ CREATE TABLE calendar_events (
   location VARCHAR(255) NULL,
   event_date DATE NOT NULL,
   event_time TIME NULL, -- NULL means "all day" in the calendar, same as games.game_time
+  duration_minutes SMALLINT NULL, -- NULL falls back to the default custom-event duration in the .ics feed
   reminder TINYINT(1) NOT NULL DEFAULT 1, -- 1h-before VALARM in the .ics feed; only applies when event_time is set
   created_by_admin_id INT NULL,
   created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,

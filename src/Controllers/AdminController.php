@@ -619,6 +619,7 @@ final class AdminController
         $location = trim((string) ($_POST['location'] ?? ''));
         $date = (string) ($_POST['event_date'] ?? '');
         $time = parse_time_input((string) ($_POST['event_time'] ?? ''));
+        $duration = parse_duration_input((string) ($_POST['duration_minutes'] ?? ''));
         $reminder = !empty($_POST['reminder']);
 
         if ($title === '' || !preg_match('/^\d{4}-\d{2}-\d{2}$/', $date)) {
@@ -628,7 +629,7 @@ final class AdminController
         }
 
         $admin = AdminAuth::current();
-        CalendarEvent::create($seasonId, $title, $location !== '' ? $location : null, $date, $time, $reminder, (int) $admin['id']);
+        CalendarEvent::create($seasonId, $title, $location !== '' ? $location : null, $date, $time, $duration, $reminder, (int) $admin['id']);
 
         flash_set('success', 'Termin "' . $title . '" gespeichert.');
         redirect(self::calendarUrl($season));
@@ -658,6 +659,7 @@ final class AdminController
         $location = trim((string) ($_POST['location'] ?? ''));
         $date = (string) ($_POST['event_date'] ?? '');
         $time = parse_time_input((string) ($_POST['event_time'] ?? ''));
+        $duration = parse_duration_input((string) ($_POST['duration_minutes'] ?? ''));
         $reminder = !empty($_POST['reminder']);
 
         if ($title === '' || !preg_match('/^\d{4}-\d{2}-\d{2}$/', $date)) {
@@ -666,7 +668,7 @@ final class AdminController
             return;
         }
 
-        CalendarEvent::update((int) $event['id'], $title, $location !== '' ? $location : null, $date, $time, $reminder);
+        CalendarEvent::update((int) $event['id'], $title, $location !== '' ? $location : null, $date, $time, $duration, $reminder);
 
         flash_set('success', 'Termin "' . $title . '" aktualisiert.');
         redirect(self::calendarUrl($season));

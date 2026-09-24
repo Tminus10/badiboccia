@@ -81,7 +81,8 @@ final class IcsBuilder
         $lines = ['BEGIN:VEVENT'];
         $lines[] = 'UID:event-' . $event['id'] . '@' . $uidDomain;
         $lines[] = 'DTSTAMP:' . gmdate('Ymd\THis\Z');
-        $lines = array_merge($lines, self::dateLines($event['event_date'], $event['event_time'], self::CUSTOM_EVENT_DURATION_MINUTES));
+        $duration = !empty($event['duration_minutes']) ? (int) $event['duration_minutes'] : self::CUSTOM_EVENT_DURATION_MINUTES;
+        $lines = array_merge($lines, self::dateLines($event['event_date'], $event['event_time'], $duration));
         $lines[] = 'SUMMARY:' . self::escape($event['title']);
         if ($seasonLabel !== null) {
             $lines[] = 'DESCRIPTION:' . self::escape($seasonLabel);

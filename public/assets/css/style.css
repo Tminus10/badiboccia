@@ -168,7 +168,7 @@ label {
   margin-bottom: 0.7rem;
 }
 .checkbox-label { flex-direction: row; align-items: center; font-weight: 500; }
-input[type="text"], input[type="password"], input[type="date"], input[type="number"], input[type="tel"], select {
+input[type="text"], input[type="password"], input[type="date"], input[type="time"], input[type="number"], input[type="tel"], select {
   font-size: 1rem;
   padding: 0.6rem 0.7rem;
   border: 1.5px solid var(--border);
@@ -542,7 +542,11 @@ input:focus, select:focus, button:focus, a:focus {
 
 /* ---------- Calendar ---------- */
 
-.calendar-view-toggle { gap: 0.5rem; }
+/* Offsets the sticky topbar so the Monat/Liste + Vorheriger/Nächster Monat links, which
+   reload the page, land back on the calendar section instead of hiding it underneath. */
+#calendar { scroll-margin-top: 110px; }
+
+.calendar-view-toggle { gap: 0.5rem; margin-bottom: 0.9rem; }
 
 .calendar-subscribe { display: flex; flex-direction: column; gap: 0.3rem; }
 .calendar-subscribe-row { display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap; }
@@ -553,8 +557,20 @@ input:focus, select:focus, button:focus, a:focus {
   background: var(--surface-alt); color: var(--text);
 }
 
-.calendar-nav { display: flex; align-items: center; justify-content: space-between; gap: 0.6rem; margin: 1.2rem 0 0.8rem; flex-wrap: wrap; }
-.calendar-nav h2 { margin: 0; text-align: center; flex: 1; }
+.calendar-nav { display: flex; align-items: center; justify-content: center; gap: 0.8rem; margin: 1.2rem 0 0.8rem; }
+.calendar-nav h2 { margin: 0; text-align: center; }
+.calendar-nav-arrow {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 40px; height: 40px; flex-shrink: 0;
+  border: 1px solid var(--border); border-radius: 50%;
+  background: var(--surface); color: var(--text);
+  font-size: 1.4rem; line-height: 1;
+}
+.calendar-nav-arrow:hover { background: var(--surface-alt); border-color: var(--accent); text-decoration: none; }
+
+/* Datum/Zeit/Dauer side by side, same width, instead of three full-width rows. */
+.field-row { display: flex; gap: 0.6rem; flex-wrap: wrap; }
+.field-row > label { flex: 1 1 110px; min-width: 100px; }
 
 .calendar-grid {
   display: grid; grid-template-columns: repeat(7, 1fr);

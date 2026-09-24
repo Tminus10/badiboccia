@@ -219,6 +219,29 @@ function parse_time_input(string $value): ?string
     return $m[1] . ':' . $m[2] . ':00';
 }
 
+/** Selectable durations (minutes => German label) for a custom calendar event's duration field. */
+function calendar_duration_options(): array
+{
+    return [
+        30 => '30 Minuten',
+        60 => '1 Stunde',
+        90 => '1½ Stunden',
+        120 => '2 Stunden',
+        150 => '2½ Stunden',
+        180 => '3 Stunden',
+    ];
+}
+
+/** Parses a duration <select> value (whole minutes) into an int, or null if empty/invalid. */
+function parse_duration_input(string $value): ?int
+{
+    if ($value === '' || !ctype_digit($value)) {
+        return null;
+    }
+    $minutes = (int) $value;
+    return $minutes > 0 ? $minutes : null;
+}
+
 /** "23.09.2026" or, when a time is set, "23.09.2026 · 18:30". */
 function format_datetime_ch(?string $date, ?string $time): string
 {
