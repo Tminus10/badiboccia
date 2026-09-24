@@ -88,6 +88,7 @@ final class AdminController
         $groupData = [];
         $qualifiedTeams = [];
         $qualifiersByGroup = [];
+        $groupResultsCount = 0;
         foreach ($groups as $group) {
             $teams = Team::byGroup((int) $group['id']);
             $games = Game::forGroup((int) $group['id']);
@@ -96,6 +97,7 @@ final class AdminController
                 'teams' => $teams,
                 'gamesCount' => count($games),
             ];
+            $groupResultsCount += count(array_filter($games, fn ($g) => Game::isComplete($g)));
             $standings = StandingsCalculator::compute($teams, $games);
             $topN = array_slice($standings, 0, $qualifiersPerGroup);
             foreach ($topN as $row) {
@@ -108,18 +110,27 @@ final class AdminController
         $bracketGames = Game::bracketGames((int) $season['id']);
         $qfGames = array_values(array_filter($bracketGames, fn ($g) => $g['phase'] === 'qf'));
 
-        // Suggest the standard crossed pairing for any QF slot the admin hasn't assigned
-        // yet -- purely a display default, only saved if the admin submits the form.
-        $recommended = BracketService::recommendedQfPairings($qualifiersByGroup);
-        if ($recommended !== null) {
-            foreach ($qfGames as &$game) {
-                $slot = (int) $game['slot_index'];
-                if ($game['team_a_id'] === null && $game['team_b_id'] === null && isset($recommended[$slot])) {
-                    [$game['team_a_id'], $game['team_b_id']] = $recommended[$slot];
-                    $game['prefilled'] = true;
+        // Before any group-phase game has a result, standings are all tied and "top 2"
+        // is really just alphabetical -- prefilling real (but meaningless) team names
+        // would look like an actual assignment. Show the crossed-seeding template as
+        // plain group labels instead, and leave the dropdowns themselves unselected.
+        $qfLabelSuggestions = [];
+        if ($groupResultsCount === 0) {
+            $qfLabelSuggestions = BracketService::recommendedQfPairingLabels(array_keys($qualifiersByGroup)) ?? [];
+        } else {
+            // Suggest the standard crossed pairing for any QF slot the admin hasn't
+            // assigned yet -- purely a display default, only saved if the admin submits.
+            $recommended = BracketService::recommendedQfPairings($qualifiersByGroup);
+            if ($recommended !== null) {
+                foreach ($qfGames as &$game) {
+                    $slot = (int) $game['slot_index'];
+                    if ($game['team_a_id'] === null && $game['team_b_id'] === null && isset($recommended[$slot])) {
+                        [$game['team_a_id'], $game['team_b_id']] = $recommended[$slot];
+                        $game['prefilled'] = true;
+                    }
                 }
+                unset($game);
             }
-            unset($game);
         }
 
         $availableTeams = Team::availableForSeason((int) $season['id']);
@@ -129,6 +140,7 @@ final class AdminController
             'season' => $season,
             'groupData' => $groupData,
             'qfGames' => $qfGames,
+            'qfLabelSuggestions' => $qfLabelSuggestions,
             'qualifiedTeams' => $qualifiedTeams,
             'qualifiersPerGroup' => $qualifiersPerGroup,
             'availableTeams' => $availableTeams,

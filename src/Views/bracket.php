@@ -5,6 +5,7 @@
  * @var array $phases
  * @var array{champion: array|null, runnerUp: array|null, third: array|null}|null $podium
  * @var array[] $teamsById
+ * @var array<int, array{0:string,1:string}> $qfLabelSuggestions
  * @var array|null $viewerTeam
  * @var array|null $admin
  */
@@ -12,20 +13,22 @@ $isCurrent = (int) $season['is_current'] === 1;
 $pageTitle = 'Turnierbaum – ' . $season['label'];
 $returnTo = $isCurrent ? '/bracket' : '/bracket/' . $season['id'];
 
-$renderGame = function (array $game) use ($teamsById, $returnTo, $viewerTeam, $admin, $isCurrent, $season): void {
+$renderGame = function (array $game) use ($teamsById, $returnTo, $viewerTeam, $admin, $isCurrent, $season, $qfLabelSuggestions): void {
     $teamA = $game['team_a_id'] !== null ? ($teamsById[$game['team_a_id']] ?? null) : null;
     $teamB = $game['team_b_id'] !== null ? ($teamsById[$game['team_b_id']] ?? null) : null;
     $viewerTeamId = $viewerTeam['id'] ?? null;
     $canEdit = $isCurrent && ($admin !== null || ($viewerTeamId !== null && Game::isParticipant($game, (int) $viewerTeamId)));
     $winnerId = Game::winnerTeamId($game);
     $complete = Game::isComplete($game);
+    // Unassigned QF slots explain what will fill them (crossed seeding) instead of a bare "?".
+    $slotLabels = $game['phase'] === 'qf' ? ($qfLabelSuggestions[(int) $game['slot_index']] ?? null) : null;
     ?>
     <div class="bracket-team<?= $teamA !== null && $winnerId === (int) $teamA['id'] ? ' winner' : '' ?>">
-      <?= render_bracket_slot($teamA, (int) $season['id']) ?>
+      <?= render_bracket_slot($teamA, (int) $season['id'], $slotLabels[0] ?? '?') ?>
       <?php if ($complete): ?><span class="bracket-score"><?= (int) $game['sets_a'] ?></span><?php endif; ?>
     </div>
     <div class="bracket-team<?= $teamB !== null && $winnerId === (int) $teamB['id'] ? ' winner' : '' ?>">
-      <?= render_bracket_slot($teamB, (int) $season['id']) ?>
+      <?= render_bracket_slot($teamB, (int) $season['id'], $slotLabels[1] ?? '?') ?>
       <?php if ($complete): ?><span class="bracket-score"><?= (int) $game['sets_b'] ?></span><?php endif; ?>
     </div>
     <div class="fixture-result">
@@ -38,6 +41,7 @@ $renderGame = function (array $game) use ($teamsById, $returnTo, $viewerTeam, $a
           'canEdit' => $canEdit,
           'seasonYear' => (int) $season['year'],
           'hideScore' => true,
+          'hidePendingNote' => $slotLabels !== null,
       ]) ?>
     </div>
     <?php

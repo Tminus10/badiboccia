@@ -3,6 +3,7 @@
  * @var array $season
  * @var array[] $groupData
  * @var array[] $qfGames
+ * @var array<int, array{0:string,1:string}> $qfLabelSuggestions
  * @var array[] $qualifiedTeams
  * @var int $qualifiersPerGroup
  * @var array[] $availableTeams
@@ -184,26 +185,31 @@ $overviewText = rtrim(implode("\n", $overviewLines));
   <?php else: ?>
     <p class="muted">Weise acht der <?= count($qualifiedTeams) ?> qualifizierten Teams (die besten <?= $qualifiersPerGroup ?> jeder Gruppe) den vier Viertelfinal-Spielen zu.</p>
   <?php endif; ?>
-  <form method="post" action="<?= h(url('/admin/season/' . $season['id'] . '/bracket')) ?>" class="stack-form">
+  <form method="post" action="<?= h(url('/admin/season/' . $season['id'] . '/bracket')) ?>" class="stack-form qf-form">
     <?= csrf_field() ?>
     <?php foreach ($qfGames as $game): ?>
       <?php $slot = (int) $game['slot_index']; ?>
+      <?php $labelSuggestion = $qfLabelSuggestions[$slot] ?? null; ?>
       <div class="qf-pair">
-        <span class="qf-label">Viertelfinal <?= $slot ?></span>
-        <?php if (!empty($game['prefilled'])): ?><span class="badge badge-suggestion">Vorschlag</span><?php endif; ?>
-        <select name="qf<?= $slot ?>_a">
-          <option value="">– Team A wählen –</option>
-          <?php foreach ($qualifiedTeams as $t): ?>
-            <option value="<?= (int) $t['id'] ?>" <?= (int) $game['team_a_id'] === (int) $t['id'] ? 'selected' : '' ?>><?= h($t['name']) ?></option>
-          <?php endforeach; ?>
-        </select>
-        <span class="vs">–</span>
-        <select name="qf<?= $slot ?>_b">
-          <option value="">– Team B wählen –</option>
-          <?php foreach ($qualifiedTeams as $t): ?>
-            <option value="<?= (int) $t['id'] ?>" <?= (int) $game['team_b_id'] === (int) $t['id'] ? 'selected' : '' ?>><?= h($t['name']) ?></option>
-          <?php endforeach; ?>
-        </select>
+        <div class="qf-pair-title">
+          Viertelfinal <?= $slot ?>
+          <?php if (!empty($game['prefilled']) || $labelSuggestion !== null): ?><span class="badge badge-suggestion">Vorschlag</span><?php endif; ?>
+        </div>
+        <div class="qf-pair-row">
+          <select name="qf<?= $slot ?>_a">
+            <option value=""><?= $labelSuggestion !== null ? h($labelSuggestion[0]) : '– Team A wählen –' ?></option>
+            <?php foreach ($qualifiedTeams as $t): ?>
+              <option value="<?= (int) $t['id'] ?>" <?= (int) $game['team_a_id'] === (int) $t['id'] ? 'selected' : '' ?>><?= h($t['name']) ?></option>
+            <?php endforeach; ?>
+          </select>
+          <span class="vs">vs.</span>
+          <select name="qf<?= $slot ?>_b">
+            <option value=""><?= $labelSuggestion !== null ? h($labelSuggestion[1]) : '– Team B wählen –' ?></option>
+            <?php foreach ($qualifiedTeams as $t): ?>
+              <option value="<?= (int) $t['id'] ?>" <?= (int) $game['team_b_id'] === (int) $t['id'] ? 'selected' : '' ?>><?= h($t['name']) ?></option>
+            <?php endforeach; ?>
+          </select>
+        </div>
       </div>
     <?php endforeach; ?>
     <button class="btn btn-primary" type="submit">Paarungen speichern</button>

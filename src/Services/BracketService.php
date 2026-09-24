@@ -96,4 +96,30 @@ final class BracketService
             4 => [$id($g4[0]), $id($g3[1])],
         ];
     }
+
+    /**
+     * Same crossed-seeding template as recommendedQfPairings(), but as plain
+     * "1./2. Gruppe X" labels rather than actual teams. Used before any group-phase
+     * game has a result, when standings are still all-tied and "top 2" would just be
+     * alphabetical -- showing real (but meaningless) team names as the suggestion
+     * would look like a real assignment. Needs only the four group names, not standings.
+     *
+     * @param string[] $groupNames the season's group names, in their display order
+     * @return array<int, array{0:string,1:string}>|null [slot => [labelA, labelB]] for QF slots 1-4,
+     *   or null if there aren't exactly four groups.
+     */
+    public static function recommendedQfPairingLabels(array $groupNames): ?array
+    {
+        if (count($groupNames) !== 4) {
+            return null;
+        }
+        [$n1, $n2, $n3, $n4] = array_values($groupNames);
+
+        return [
+            1 => ["1. Gruppe $n1", "2. Gruppe $n2"],
+            2 => ["1. Gruppe $n3", "2. Gruppe $n4"],
+            3 => ["1. Gruppe $n2", "2. Gruppe $n1"],
+            4 => ["1. Gruppe $n4", "2. Gruppe $n3"],
+        ];
+    }
 }

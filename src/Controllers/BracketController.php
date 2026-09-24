@@ -53,6 +53,12 @@ final class BracketController
             ];
         }
 
+        // For QF slots nobody has assigned yet, explain what will fill them (the
+        // standard crossed seeding) instead of a bare "?" -- see BracketService.
+        $qfLabelSuggestions = BracketService::recommendedQfPairingLabels(
+            array_map(fn ($group) => $group['name'], $groups)
+        ) ?? [];
+
         render('bracket', [
             'season' => $season,
             'groupData' => $groupData,
@@ -60,6 +66,7 @@ final class BracketController
             'phases' => BracketService::byPhase($bracketGames),
             'podium' => BracketService::podium($bracketGames, $teamsById),
             'teamsById' => $teamsById,
+            'qfLabelSuggestions' => $qfLabelSuggestions,
             'viewerTeam' => TeamAuth::current(),
             'admin' => AdminAuth::current(),
         ]);

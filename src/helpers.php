@@ -158,10 +158,10 @@ function format_result(array $game, ?int $perspectiveTeamId = null): string
     return $game['sets_a'] . ':' . $game['sets_b'];
 }
 
-function render_bracket_slot(?array $team, ?int $seasonId = null): string
+function render_bracket_slot(?array $team, ?int $seasonId = null, string $placeholder = '?'): string
 {
     if ($team === null) {
-        return '<span class="bracket-slot bracket-slot-empty">?</span>';
+        return '<span class="bracket-slot bracket-slot-empty">' . h($placeholder) . '</span>';
     }
     return render_partial('partials/team-dot', ['team' => $team, 'seasonId' => $seasonId]);
 }
