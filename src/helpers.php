@@ -229,6 +229,12 @@ function calendar_duration_options(): array
         120 => '2 Stunden',
         150 => '2½ Stunden',
         180 => '3 Stunden',
+        210 => '3½ Stunden',
+        240 => '4 Stunden',
+        270 => '4½ Stunden',
+        300 => '5 Stunden',
+        330 => '5½ Stunden',
+        360 => '6 Stunden',
     ];
 }
 
