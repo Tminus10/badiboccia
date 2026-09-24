@@ -65,7 +65,7 @@ final class IcsBuilder
         $lines = array_merge($lines, self::dateLines($game['played_date'], $game['game_time'], self::GAME_DURATION_MINUTES));
         $lines[] = 'SUMMARY:' . self::escape($summary);
         $lines[] = 'DESCRIPTION:' . self::escape($description);
-        $lines[] = 'LOCATION:' . self::escape("Strandbad Buochs-Ennetbürgen\nBeckenriederstrasse 9, 6374 Buochs, Switzerland");
+        $lines[] = 'LOCATION:' . self::escape("Strandbad Buochs\nSeefeld, Ennetbürgen, Schweiz");
         $lines[] = 'STATUS:CONFIRMED';
         // Every timed game gets a reminder; there's no per-game opt-out (unlike custom events).
         $lines = array_merge($lines, self::alarmLines(!empty($game['game_time'])));
