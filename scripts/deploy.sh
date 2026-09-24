@@ -11,6 +11,11 @@
 #   export HOSTPOINT_SSH=myuser@myuser.hostpoint.ch
 #   export HOSTPOINT_PATH=/home/myuser/boccia.reutener.swiss
 #   ./scripts/deploy.sh prod
+#
+# Defaults to the `hostpoint-badiboccia` alias from ~/.ssh/config (key-based
+# auth). Using the raw hostname instead skips that config block and falls
+# back to password auth, since ssh only applies a Host block when you pass
+# its alias verbatim -- not when you pass the hostname it resolves to.
 set -euo pipefail
 
 ENV_NAME="${1:-}"
@@ -19,7 +24,7 @@ if [[ "$ENV_NAME" != "prod" && "$ENV_NAME" != "dev" ]]; then
   exit 1
 fi
 
-HOSTPOINT_SSH="${HOSTPOINT_SSH:-reutener@reutener.ssh.cloud.hostpoint.ch}"
+HOSTPOINT_SSH="${HOSTPOINT_SSH:-hostpoint-badiboccia}"
 if [[ "$ENV_NAME" == "prod" ]]; then
   HOSTPOINT_PATH="${HOSTPOINT_PATH:-/home/reutener/www/boccia.reutener.swiss}"
 else
