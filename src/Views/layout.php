@@ -8,11 +8,12 @@ $flashes = flash_take();
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5">
 <meta name="theme-color" content="#0a7d6c">
-<title><?= isset($pageTitle) ? h($pageTitle) . ' – Badi Boccia Buochs' : 'Badi Boccia Buochs' ?></title>
+<title><?= is_dev_env() ? '[DEV] ' : '' ?><?= isset($pageTitle) ? h($pageTitle) . ' – Badi Boccia Buochs' : 'Badi Boccia Buochs' ?></title>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎯</text></svg>">
 <link rel="stylesheet" href="<?= h(asset_url('/assets/css/style.css')) ?>">
 </head>
 <body>
+<?php if (is_dev_env()): ?><div class="dev-banner">🧪 DEV-Umgebung &ndash; nicht die Live-Website</div><?php endif; ?>
 <header class="topbar">
   <div class="topbar-inner">
     <div class="topbar-row">

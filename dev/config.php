@@ -14,5 +14,6 @@ return [
         'base_path' => '',
         'session_name' => 'badiboccia_session',
         'session_lifetime_days' => 90,
+        'env' => 'dev',
     ],
 ];

@@ -15,5 +15,8 @@ return [
         'base_path' => '',
         'session_name' => 'badiboccia_session',
         'session_lifetime_days' => 90,
+        // 'dev' shows a banner on every page so a dev copy of the site can never be mistaken
+        // for the live one. Leave as 'prod' (or omit entirely) on the real server.
+        'env' => 'prod',
     ],
 ];

@@ -14,6 +14,12 @@ function base_path(): string
     return app_config()['app']['base_path'] ?? '';
 }
 
+/** True only when config explicitly opts in with app.env = 'dev' -- defaults safely to false (prod) otherwise. */
+function is_dev_env(): bool
+{
+    return (app_config()['app']['env'] ?? 'prod') === 'dev';
+}
+
 function url(string $path = ''): string
 {
     return rtrim(base_path(), '/') . $path;
