@@ -65,14 +65,11 @@ $itemDisplay = function (array $item) use ($teamsById, $groupsById, $isCurrent, 
       <div class="field-row">
         <label>
           <span>Datum</span>
-          <span class="date-input-group">
-            <input type="text" inputmode="numeric" class="date-text-input" name="event_date" placeholder="TT.MM.JJJJ" maxlength="10" required>
-            <input type="date" class="date-native-picker" aria-label="Datum auswählen">
-          </span>
+          <input type="date" name="event_date" required>
         </label>
         <label>
           <span>Zeit <span class="muted">(optional)</span></span>
-          <input type="text" inputmode="numeric" class="time-text-input" name="event_time" placeholder="HH:MM" maxlength="5">
+          <input type="time" name="event_time">
         </label>
         <label>
           <span>Dauer <span class="muted">(nur bei Uhrzeit)</span></span>
@@ -117,14 +114,11 @@ $itemDisplay = function (array $item) use ($teamsById, $groupsById, $isCurrent, 
                 <div class="field-row">
                   <label>
                     <span>Datum</span>
-                    <span class="date-input-group">
-                      <input type="text" inputmode="numeric" class="date-text-input" name="event_date" placeholder="TT.MM.JJJJ" maxlength="10" value="<?= h(format_date_ch($e['event_date'])) ?>" required>
-                      <input type="date" class="date-native-picker" aria-label="Datum auswählen">
-                    </span>
+                    <input type="date" name="event_date" value="<?= h($e['event_date']) ?>" required>
                   </label>
                   <label>
                     <span>Zeit <span class="muted">(optional)</span></span>
-                    <input type="text" inputmode="numeric" class="time-text-input" name="event_time" placeholder="HH:MM" maxlength="5" value="<?= h(format_time_ch($e['event_time'])) ?>">
+                    <input type="time" name="event_time" value="<?= h(format_time_ch($e['event_time'])) ?>">
                   </label>
                   <label>
                     <span>Dauer <span class="muted">(nur bei Uhrzeit)</span></span>

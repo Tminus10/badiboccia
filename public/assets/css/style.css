@@ -347,29 +347,6 @@ input:focus, select:focus, button:focus, a:focus {
 }
 .date-field { flex-direction: row; align-items: center; gap: 0.6rem; font-weight: 600; color: var(--text); }
 .date-field input { flex: 1; }
-
-/* Swiss-formatted text field (always TT.MM.JJJJ, typed or auto-inserted -- see layout.php)
-   plus a real native <input type="date"> styled down to just its calendar-icon indicator, as
-   a picker convenience. Deliberately a REAL, visible, appropriately-sized native input rather
-   than a hidden one triggered via JS showPicker() -- that approach is unreliable on Safari
-   (opens only on a second click) and silently does nothing on iOS, since WebKit expects the
-   picker's anchor element to be genuinely interactive, not a synthetic click target. Letting
-   the browser handle opening it natively (just by being a real, clickable calendar input)
-   works everywhere; layout.php only syncs its value to/from the text field. No time
-   equivalent: Safari's <input type="time"> has no comparable pickable indicator to style. */
-.date-input-group { position: relative; flex: 1; display: flex; gap: 0.4rem; }
-.date-input-group .date-text-input { flex: 1; min-width: 0; }
-.date-native-picker {
-  -webkit-appearance: none; appearance: none; flex: 0 0 auto;
-  width: 44px; height: 44px; padding: 0; margin: 0;
-  border: 1.5px solid var(--border); border-radius: var(--radius-sm); background: #fff; color: transparent;
-  cursor: pointer;
-}
-.date-native-picker:hover { border-color: var(--accent); background: var(--accent-tint); }
-.date-native-picker::-webkit-datetime-edit,
-.date-native-picker::-webkit-inner-spin-button,
-.date-native-picker::-webkit-clear-button { display: none; }
-.date-native-picker::-webkit-calendar-picker-indicator { opacity: 1; padding: 0; margin: 0; }
 .score-hint { margin: 0; font-size: 0.85rem; font-weight: 600; color: var(--text-muted); }
 .score-buttons { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; }
 .score-btn {
@@ -612,9 +589,6 @@ input:focus, select:focus, button:focus, a:focus {
 /* Datum/Zeit/Dauer side by side, same width, instead of three full-width rows. */
 .field-row { display: flex; gap: 0.6rem; flex-wrap: wrap; }
 .field-row > label { flex: 1 1 110px; min-width: 100px; }
-/* The date label holds a text input plus a picker icon now, so it needs more room than a bare
-   input did -- otherwise "TT.MM.JJJJ" gets clipped in this 3-up row. */
-.field-row > label:has(.date-input-group) { flex-basis: 180px; min-width: 170px; }
 
 .calendar-grid {
   display: grid; grid-template-columns: repeat(7, 1fr);

@@ -70,48 +70,5 @@ $flashes = flash_take();
 <footer class="site-footer">
   <p>Badi Boccia Buochs &middot; <a href="<?= h(url('/archive')) ?>">Archiv</a> &middot; <?php if (!$currentAdmin): ?><a href="<?= h(url('/admin/login')) ?>">Admin-Login</a><?php endif; ?></p>
 </footer>
-<script>
-(function () {
-  // Auto-inserts the "." / ":" separators as the admin types into a result-form date or
-  // time field, so entry always reads in Swiss format regardless of the browser's own
-  // language -- a plain <input type="date"/"time"> displays in whatever format the browser's
-  // UI language uses, which isn't controllable from the page and isn't always Swiss.
-  document.addEventListener('input', function (e) {
-    var el = e.target;
-    if (el.matches && el.matches('.date-text-input')) {
-      var digits = el.value.replace(/\D/g, '').slice(0, 8);
-      el.value = [digits.slice(0, 2), digits.slice(2, 4), digits.slice(4, 8)].filter(Boolean).join('.');
-    } else if (el.matches && el.matches('.time-text-input')) {
-      var digits = el.value.replace(/\D/g, '').slice(0, 4);
-      el.value = [digits.slice(0, 2), digits.slice(2, 4)].filter(Boolean).join(':');
-    }
-  });
-
-  // Each date field also has a real native <input type="date"> next to it, styled down to
-  // just its calendar-icon indicator (see .date-native-picker in style.css) -- clicking that
-  // icon opens the browser/OS's own native calendar picker directly (no JS needed to trigger
-  // it, which is what makes this reliable on iOS/Safari, unlike a synthetic showPicker() call
-  // on a hidden field). Its value only exists to feed that picker and receive the pick; the
-  // Swiss-formatted text field stays the one actually submitted. There's no equivalent for
-  // time: Safari's <input type="time"> has no comparable pickable indicator, so time stays a
-  // plain typed field only.
-  document.addEventListener('focusin', function (e) {
-    var el = e.target;
-    if (el.matches && el.matches('.date-native-picker')) {
-      var text = el.closest('.date-input-group').querySelector('.date-text-input');
-      var m = text.value.match(/^(\d{2})\.(\d{2})\.(\d{4})$/);
-      el.value = m ? (m[3] + '-' + m[2] + '-' + m[1]) : '';
-    }
-  });
-
-  document.addEventListener('change', function (e) {
-    var el = e.target;
-    if (el.matches && el.matches('.date-native-picker') && el.value) {
-      var parts = el.value.split('-'); // native value is always "YYYY-MM-DD"
-      el.closest('.date-input-group').querySelector('.date-text-input').value = parts[2] + '.' + parts[1] + '.' + parts[0];
-    }
-  });
-})();
-</script>
 </body>
 </html>

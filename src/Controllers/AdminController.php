@@ -629,12 +629,12 @@ final class AdminController
 
         $title = trim((string) ($_POST['title'] ?? ''));
         $location = trim((string) ($_POST['location'] ?? ''));
-        $date = parse_date_input_ch((string) ($_POST['event_date'] ?? ''));
+        $date = (string) ($_POST['event_date'] ?? '');
         $time = parse_time_input((string) ($_POST['event_time'] ?? ''));
         $duration = parse_duration_input((string) ($_POST['duration_minutes'] ?? ''));
         $reminder = !empty($_POST['reminder']);
 
-        if ($title === '' || $date === null) {
+        if ($title === '' || !preg_match('/^\d{4}-\d{2}-\d{2}$/', $date)) {
             flash_set('error', 'Bitte Titel und Datum angeben.');
             redirect(self::calendarUrl($season));
             return;
@@ -669,12 +669,12 @@ final class AdminController
 
         $title = trim((string) ($_POST['title'] ?? ''));
         $location = trim((string) ($_POST['location'] ?? ''));
-        $date = parse_date_input_ch((string) ($_POST['event_date'] ?? ''));
+        $date = (string) ($_POST['event_date'] ?? '');
         $time = parse_time_input((string) ($_POST['event_time'] ?? ''));
         $duration = parse_duration_input((string) ($_POST['duration_minutes'] ?? ''));
         $reminder = !empty($_POST['reminder']);
 
-        if ($title === '' || $date === null) {
+        if ($title === '' || !preg_match('/^\d{4}-\d{2}-\d{2}$/', $date)) {
             flash_set('error', 'Bitte Titel und Datum angeben.');
             redirect(self::calendarUrl($season));
             return;
