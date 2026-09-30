@@ -10,11 +10,14 @@
  * @var bool|null $hideScore omit the completed-score chip (caller renders per-team scores itself)
  * @var int|null $seasonYear the season's year, used to default the "Termin festlegen" date picker to the right year for past seasons
  * @var bool|null $hidePendingNote suppress the "Gegner steht noch nicht fest" note (e.g. when the bracket slots already show a group-based placeholder instead)
+ * @var bool|null $useDialog open the edit form in a modal <dialog> instead of expanding inline -- for
+ *   the bracket view, where an inline-expanding <details> shoves the whole connector layout around
  */
 $targetTeamId = $targetTeamId ?? null;
 $hideDate = $hideDate ?? false;
 $hideScore = $hideScore ?? false;
 $hidePendingNote = $hidePendingNote ?? false;
+$useDialog = $useDialog ?? false;
 $complete = Game::isComplete($game);
 // Whose name goes on the left: the page we're on (a team's own page) takes priority over
 // who happens to be logged in, so admins/spectators see the same layout as the team itself.
@@ -65,8 +68,8 @@ if ($teamA === null || $teamB === null) {
 <?php endif; ?>
 
 <?php if ($canEdit && $teamA !== null && $teamB !== null && !$complete): ?>
-  <details class="result-entry">
-    <summary><?= empty($game['played_date']) ? 'Termin festlegen' : 'Termin ändern' ?></summary>
+  <?php $scheduleLabel = empty($game['played_date']) ? 'Termin festlegen' : 'Termin ändern'; ?>
+  <?php $scheduleForm = function () use ($game, $returnTo, $scheduleDefaultDate, $useDialog) { ?>
     <form method="post" action="<?= h(url('/game/' . $game['id'] . '/schedule')) ?>" class="score-form">
       <?= csrf_field() ?>
       <input type="hidden" name="return_to" value="<?= h($returnTo) ?>">
@@ -79,14 +82,31 @@ if ($teamA === null || $teamB === null) {
         <span>Zeit <span class="muted">(optional)</span></span>
         <input type="time" name="game_time" value="<?= h(format_time_ch($game['game_time'] ?? null)) ?>">
       </label>
-      <button class="btn btn-primary btn-sm" type="submit">Termin speichern</button>
+      <?php if ($useDialog): ?>
+        <div class="dialog-actions">
+          <button type="button" class="btn btn-ghost btn-sm result-cancel">Abbrechen</button>
+          <button class="btn btn-primary btn-sm" type="submit">Termin speichern</button>
+        </div>
+      <?php else: ?>
+        <button class="btn btn-primary btn-sm" type="submit">Termin speichern</button>
+      <?php endif; ?>
     </form>
-  </details>
+  <?php }; ?>
+  <?php if ($useDialog): ?>
+    <?php $scheduleDialogId = 'result-dialog-schedule-' . $game['id']; ?>
+    <button type="button" class="result-trigger-btn" data-dialog="<?= h($scheduleDialogId) ?>"><?= h($scheduleLabel) ?></button>
+    <dialog class="result-dialog" id="<?= h($scheduleDialogId) ?>"><?php $scheduleForm(); ?></dialog>
+  <?php else: ?>
+    <details class="result-entry">
+      <summary><?= h($scheduleLabel) ?></summary>
+      <?php $scheduleForm(); ?>
+    </details>
+  <?php endif; ?>
 <?php endif; ?>
 
 <?php if ($canEdit && $options): ?>
-  <details class="result-entry">
-    <summary><?= $complete ? 'Resultat korrigieren' : 'Resultat eintragen' ?></summary>
+  <?php $resultLabel = $complete ? 'Resultat korrigieren' : 'Resultat eintragen'; ?>
+  <?php $resultForm = function () use ($game, $returnTo, $scheduleDefaultDate, $today, $options, $allowTie, $currentValue, $useDialog) { ?>
     <form method="post" action="<?= h(url('/game/' . $game['id'] . '/result')) ?>" class="score-form">
       <?= csrf_field() ?>
       <input type="hidden" name="return_to" value="<?= h($returnTo) ?>">
@@ -111,6 +131,21 @@ if ($teamA === null || $teamB === null) {
           <button type="submit" name="score" value="1-1" class="score-btn score-btn-tie<?= $isCurrentTie ? ' score-btn-current' : '' ?>">Unentschieden 1:1<?= $isCurrentTie ? ' (aktuell)' : '' ?></button>
         <?php endif; ?>
       </div>
+      <?php if ($useDialog): ?>
+        <div class="dialog-actions">
+          <button type="button" class="btn btn-ghost btn-sm result-cancel">Abbrechen</button>
+        </div>
+      <?php endif; ?>
     </form>
-  </details>
+  <?php }; ?>
+  <?php if ($useDialog): ?>
+    <?php $resultDialogId = 'result-dialog-score-' . $game['id']; ?>
+    <button type="button" class="result-trigger-btn" data-dialog="<?= h($resultDialogId) ?>"><?= h($resultLabel) ?></button>
+    <dialog class="result-dialog" id="<?= h($resultDialogId) ?>"><?php $resultForm(); ?></dialog>
+  <?php else: ?>
+    <details class="result-entry">
+      <summary><?= h($resultLabel) ?></summary>
+      <?php $resultForm(); ?>
+    </details>
+  <?php endif; ?>
 <?php endif; ?>

@@ -359,6 +359,24 @@ input:focus, select:focus, button:focus, a:focus {
 .score-btn-current { border-color: var(--accent); border-width: 2px; background: var(--accent-tint); color: var(--accent-dark); }
 .score-btn-tie { grid-column: 1 / -1; color: var(--text-muted); }
 
+/* Bracket view: opens the score-form in a modal <dialog> instead of an inline <details> --
+   in the bracket's tight connector-grid layout, an inline-expanding form shoves every card
+   after it around. Trigger button mirrors .result-entry summary's look (sized to match the
+   bracket's own team-name/score text, which runs smaller than the rest of the site). */
+.result-trigger-btn {
+  -webkit-appearance: none; appearance: none; border: none; font-family: inherit;
+  cursor: pointer; font-weight: 700; color: var(--accent-dark); font-size: 0.86rem;
+  padding: 0.4rem 0.7rem; border-radius: var(--radius-sm); background: var(--accent-tint);
+}
+.result-dialog {
+  border: none; border-radius: var(--radius-lg); padding: 0;
+  box-shadow: 0 8px 30px rgba(20, 30, 25, 0.25);
+  width: min(92vw, 420px); max-height: 85vh; overflow: auto;
+}
+.result-dialog::backdrop { background: rgba(10, 20, 15, 0.45); }
+.result-dialog .score-form { min-width: 0; }
+.dialog-actions { display: flex; justify-content: flex-end; gap: 0.6rem; }
+
 /* ---------- Podium ---------- */
 
 .podium-list { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 0.7rem; }

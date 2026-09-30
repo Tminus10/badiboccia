@@ -42,6 +42,7 @@ $renderGame = function (array $game) use ($teamsById, $returnTo, $viewerTeam, $a
           'seasonYear' => (int) $season['year'],
           'hideScore' => true,
           'hidePendingNote' => $slotLabels !== null,
+          'useDialog' => true,
       ]) ?>
     </div>
     <?php
@@ -167,3 +168,27 @@ $thirdGame = $phases['third'][0] ?? null;
     </div>
   <?php endif; ?>
 </div>
+
+<script>
+(function () {
+  document.addEventListener('click', function (e) {
+    var trigger = e.target.closest('[data-dialog]');
+    if (trigger) {
+      var dialog = document.getElementById(trigger.getAttribute('data-dialog'));
+      if (dialog) dialog.showModal();
+      return;
+    }
+    var cancel = e.target.closest('.result-cancel');
+    if (cancel) {
+      var openDialog = cancel.closest('dialog');
+      if (openDialog) openDialog.close();
+    }
+  });
+  // Click on the backdrop (i.e. directly on the <dialog>, outside its content) closes it too.
+  document.querySelectorAll('dialog.result-dialog').forEach(function (dialog) {
+    dialog.addEventListener('click', function (e) {
+      if (e.target === dialog) dialog.close();
+    });
+  });
+})();
+</script>
