@@ -67,17 +67,12 @@ $itemDisplay = function (array $item) use ($teamsById, $groupsById, $isCurrent, 
           <span>Datum</span>
           <span class="date-input-group">
             <input type="text" inputmode="numeric" class="date-text-input" name="event_date" placeholder="TT.MM.JJJJ" maxlength="10" required>
-            <button type="button" class="date-picker-btn" aria-label="Datum auswählen">📅</button>
-            <input type="date" class="date-native-picker" tabindex="-1" aria-hidden="true">
+            <input type="date" class="date-native-picker" aria-label="Datum auswählen">
           </span>
         </label>
         <label>
           <span>Zeit <span class="muted">(optional)</span></span>
-          <span class="time-input-group">
-            <input type="text" inputmode="numeric" class="time-text-input" name="event_time" placeholder="HH:MM" maxlength="5">
-            <button type="button" class="time-picker-btn" aria-label="Uhrzeit auswählen">🕐</button>
-            <input type="time" class="time-native-picker" tabindex="-1" aria-hidden="true">
-          </span>
+          <input type="text" inputmode="numeric" class="time-text-input" name="event_time" placeholder="HH:MM" maxlength="5">
         </label>
         <label>
           <span>Dauer <span class="muted">(nur bei Uhrzeit)</span></span>
@@ -124,17 +119,12 @@ $itemDisplay = function (array $item) use ($teamsById, $groupsById, $isCurrent, 
                     <span>Datum</span>
                     <span class="date-input-group">
                       <input type="text" inputmode="numeric" class="date-text-input" name="event_date" placeholder="TT.MM.JJJJ" maxlength="10" value="<?= h(format_date_ch($e['event_date'])) ?>" required>
-                      <button type="button" class="date-picker-btn" aria-label="Datum auswählen">📅</button>
-                      <input type="date" class="date-native-picker" tabindex="-1" aria-hidden="true">
+                      <input type="date" class="date-native-picker" aria-label="Datum auswählen">
                     </span>
                   </label>
                   <label>
                     <span>Zeit <span class="muted">(optional)</span></span>
-                    <span class="time-input-group">
-                      <input type="text" inputmode="numeric" class="time-text-input" name="event_time" placeholder="HH:MM" maxlength="5" value="<?= h(format_time_ch($e['event_time'])) ?>">
-                      <button type="button" class="time-picker-btn" aria-label="Uhrzeit auswählen">🕐</button>
-                      <input type="time" class="time-native-picker" tabindex="-1" aria-hidden="true">
-                    </span>
+                    <input type="text" inputmode="numeric" class="time-text-input" name="event_time" placeholder="HH:MM" maxlength="5" value="<?= h(format_time_ch($e['event_time'])) ?>">
                   </label>
                   <label>
                     <span>Dauer <span class="muted">(nur bei Uhrzeit)</span></span>

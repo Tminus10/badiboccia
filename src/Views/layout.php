@@ -87,28 +87,20 @@ $flashes = flash_take();
     }
   });
 
-  // Each date/time field also has a hidden native <input type="date"/"time"> plus a button --
-  // typing stays Swiss-formatted (above), but tapping the button opens the OS/browser's own
-  // calendar or clock picker, synced back into the visible text field on pick. Best of both:
-  // familiar picker UI (especially on mobile) without ever showing a non-Swiss date format.
-  document.addEventListener('click', function (e) {
-    var dateBtn = e.target.closest('.date-picker-btn');
-    if (dateBtn) {
-      var dateGroup = dateBtn.closest('.date-input-group');
-      var dateText = dateGroup.querySelector('.date-text-input');
-      var dateNative = dateGroup.querySelector('.date-native-picker');
-      var dm = dateText.value.match(/^(\d{2})\.(\d{2})\.(\d{4})$/);
-      dateNative.value = dm ? (dm[3] + '-' + dm[2] + '-' + dm[1]) : '';
-      if (dateNative.showPicker) { dateNative.showPicker(); } else { dateNative.focus(); }
-      return;
-    }
-    var timeBtn = e.target.closest('.time-picker-btn');
-    if (timeBtn) {
-      var timeGroup = timeBtn.closest('.time-input-group');
-      var timeText = timeGroup.querySelector('.time-text-input');
-      var timeNative = timeGroup.querySelector('.time-native-picker');
-      timeNative.value = /^\d{2}:\d{2}$/.test(timeText.value) ? timeText.value : '';
-      if (timeNative.showPicker) { timeNative.showPicker(); } else { timeNative.focus(); }
+  // Each date field also has a real native <input type="date"> next to it, styled down to
+  // just its calendar-icon indicator (see .date-native-picker in style.css) -- clicking that
+  // icon opens the browser/OS's own native calendar picker directly (no JS needed to trigger
+  // it, which is what makes this reliable on iOS/Safari, unlike a synthetic showPicker() call
+  // on a hidden field). Its value only exists to feed that picker and receive the pick; the
+  // Swiss-formatted text field stays the one actually submitted. There's no equivalent for
+  // time: Safari's <input type="time"> has no comparable pickable indicator, so time stays a
+  // plain typed field only.
+  document.addEventListener('focusin', function (e) {
+    var el = e.target;
+    if (el.matches && el.matches('.date-native-picker')) {
+      var text = el.closest('.date-input-group').querySelector('.date-text-input');
+      var m = text.value.match(/^(\d{2})\.(\d{2})\.(\d{4})$/);
+      el.value = m ? (m[3] + '-' + m[2] + '-' + m[1]) : '';
     }
   });
 
@@ -117,8 +109,6 @@ $flashes = flash_take();
     if (el.matches && el.matches('.date-native-picker') && el.value) {
       var parts = el.value.split('-'); // native value is always "YYYY-MM-DD"
       el.closest('.date-input-group').querySelector('.date-text-input').value = parts[2] + '.' + parts[1] + '.' + parts[0];
-    } else if (el.matches && el.matches('.time-native-picker') && el.value) {
-      el.closest('.time-input-group').querySelector('.time-text-input').value = el.value.slice(0, 5);
     }
   });
 })();

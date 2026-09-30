@@ -78,17 +78,12 @@ if ($teamA === null || $teamB === null) {
         <span>Datum</span>
         <span class="date-input-group">
           <input type="text" inputmode="numeric" class="date-text-input" name="played_date" placeholder="TT.MM.JJJJ" maxlength="10" value="<?= h(format_date_ch($game['played_date'] ?? $scheduleDefaultDate)) ?>" required>
-          <button type="button" class="date-picker-btn" aria-label="Datum auswählen">📅</button>
-          <input type="date" class="date-native-picker" tabindex="-1" aria-hidden="true">
+          <input type="date" class="date-native-picker" aria-label="Datum auswählen">
         </span>
       </label>
       <label class="date-field">
         <span>Zeit <span class="muted">(optional)</span></span>
-        <span class="time-input-group">
-          <input type="text" inputmode="numeric" class="time-text-input" name="game_time" placeholder="HH:MM" maxlength="5" value="<?= h(format_time_ch($game['game_time'] ?? null)) ?>">
-          <button type="button" class="time-picker-btn" aria-label="Uhrzeit auswählen">🕐</button>
-          <input type="time" class="time-native-picker" tabindex="-1" aria-hidden="true">
-        </span>
+        <input type="text" inputmode="numeric" class="time-text-input" name="game_time" placeholder="HH:MM" maxlength="5" value="<?= h(format_time_ch($game['game_time'] ?? null)) ?>">
       </label>
       <?php if ($useDialog): ?>
         <div class="dialog-actions">
@@ -124,17 +119,12 @@ if ($teamA === null || $teamB === null) {
         <span>Datum <span class="muted">(optional, falls bekannt)</span></span>
         <span class="date-input-group">
           <input type="text" inputmode="numeric" class="date-text-input" name="played_date" placeholder="TT.MM.JJJJ" maxlength="10" value="<?= h($resultDateDefault) ?>">
-          <button type="button" class="date-picker-btn" aria-label="Datum auswählen">📅</button>
-          <input type="date" class="date-native-picker" tabindex="-1" aria-hidden="true">
+          <input type="date" class="date-native-picker" aria-label="Datum auswählen">
         </span>
       </label>
       <label class="date-field">
         <span>Zeit <span class="muted">(optional)</span></span>
-        <span class="time-input-group">
-          <input type="text" inputmode="numeric" class="time-text-input" name="game_time" placeholder="HH:MM" maxlength="5" value="<?= h(format_time_ch($game['game_time'] ?? null)) ?>">
-          <button type="button" class="time-picker-btn" aria-label="Uhrzeit auswählen">🕐</button>
-          <input type="time" class="time-native-picker" tabindex="-1" aria-hidden="true">
-        </span>
+        <input type="text" inputmode="numeric" class="time-text-input" name="game_time" placeholder="HH:MM" maxlength="5" value="<?= h(format_time_ch($game['game_time'] ?? null)) ?>">
       </label>
       <p class="score-hint">Zum Speichern das Ergebnis antippen:</p>
       <div class="score-buttons">
