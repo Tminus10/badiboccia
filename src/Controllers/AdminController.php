@@ -583,6 +583,46 @@ final class AdminController
         redirect('/admin');
     }
 
+    public static function adminUpdate(array $params): void
+    {
+        AdminAuth::requireLogin();
+        $id = (int) $params['id'];
+        if (Admin::find($id) === null) {
+            http_response_code(404);
+            render('404');
+            return;
+        }
+        if (!csrf_check()) {
+            redirect('/admin');
+            return;
+        }
+
+        $username = trim((string) ($_POST['username'] ?? ''));
+        $displayName = trim((string) ($_POST['display_name'] ?? ''));
+        $password = (string) ($_POST['password'] ?? '');
+
+        if ($username === '' || $displayName === '') {
+            flash_set('error', 'Benutzername und Anzeigename sind nötig.');
+            redirect('/admin');
+            return;
+        }
+        if ($password !== '' && strlen($password) < 6) {
+            flash_set('error', 'Das neue Passwort muss mindestens 6 Zeichen haben.');
+            redirect('/admin');
+            return;
+        }
+        $existing = Admin::findByUsername($username);
+        if ($existing !== null && (int) $existing['id'] !== $id) {
+            flash_set('error', 'Dieser Benutzername existiert bereits.');
+            redirect('/admin');
+            return;
+        }
+
+        Admin::update($id, $username, $displayName, $password !== '' ? $password : null);
+        flash_set('success', 'Admin "' . $displayName . '" aktualisiert.');
+        redirect('/admin');
+    }
+
     public static function adminDelete(array $params): void
     {
         $current = AdminAuth::requireLogin();

@@ -29,6 +29,19 @@ final class Admin
         return (int) $pdo->lastInsertId();
     }
 
+    /** Updates username/display name, and the password only if a new one is given. */
+    public static function update(int $id, string $username, string $displayName, ?string $password): void
+    {
+        $pdo = Db::pdo();
+        if ($password !== null) {
+            $stmt = $pdo->prepare('UPDATE admins SET username = ?, display_name = ?, password_hash = ? WHERE id = ?');
+            $stmt->execute([$username, $displayName, password_hash($password, PASSWORD_DEFAULT), $id]);
+        } else {
+            $stmt = $pdo->prepare('UPDATE admins SET username = ?, display_name = ? WHERE id = ?');
+            $stmt->execute([$username, $displayName, $id]);
+        }
+    }
+
     public static function delete(int $id): void
     {
         $stmt = Db::pdo()->prepare('DELETE FROM admins WHERE id = ?');

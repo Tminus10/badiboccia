@@ -74,6 +74,22 @@ $pageTitle = 'Admin';
     <?php foreach ($admins as $a): ?>
       <li>
         <span><?= h($a['display_name']) ?> <span class="muted">(<?= h($a['username']) ?>)</span></span>
+        <details class="admin-team-edit">
+          <summary>Bearbeiten</summary>
+          <form method="post" action="<?= h(url('/admin/admins/' . $a['id'] . '/update')) ?>" class="stack-form">
+            <?= csrf_field() ?>
+            <label>Anzeigename
+              <input type="text" name="display_name" value="<?= h($a['display_name']) ?>" required>
+            </label>
+            <label>Benutzername
+              <input type="text" name="username" value="<?= h($a['username']) ?>" required autocomplete="off">
+            </label>
+            <label>Neues Passwort <span class="muted">(leer lassen, um es nicht zu ändern)</span>
+              <input type="password" name="password" minlength="6" autocomplete="new-password">
+            </label>
+            <button class="btn btn-primary btn-sm" type="submit">Speichern</button>
+          </form>
+        </details>
         <?php if ((int) $a['id'] !== (int) $admin['id']): ?>
           <form method="post" action="<?= h(url('/admin/admins/' . $a['id'] . '/delete')) ?>" class="inline-form" onsubmit="return confirm('Admin \'<?= h(addslashes($a['display_name'])) ?>\' wirklich löschen?');">
             <?= csrf_field() ?>
@@ -89,10 +105,10 @@ $pageTitle = 'Admin';
     <form method="post" action="<?= h(url('/admin/admins')) ?>" class="stack-form">
       <?= csrf_field() ?>
       <label>Anzeigename
-        <input type="text" name="display_name" required>
+        <input type="text" name="display_name" placeholder="z.B. Roli" required>
       </label>
-      <label>Benutzername
-        <input type="text" name="username" required autocomplete="off">
+      <label>Benutzername <span class="muted">(zum Anmelden, nicht der Anzeigename)</span>
+        <input type="text" name="username" placeholder="z.B. roli" required autocomplete="off">
       </label>
       <label>Passwort
         <input type="password" name="password" minlength="6" required autocomplete="new-password">

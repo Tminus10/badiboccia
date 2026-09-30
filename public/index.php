@@ -66,6 +66,7 @@ $router->post('/admin/team/{id}/delete', ['AdminController', 'teamDelete']);
 $router->post('/admin/group/{id}/fixtures', ['AdminController', 'fixturesGenerate']);
 $router->post('/admin/group/{id}/delete', ['AdminController', 'groupDelete']);
 $router->post('/admin/admins', ['AdminController', 'adminCreate']);
+$router->post('/admin/admins/{id}/update', ['AdminController', 'adminUpdate']);
 $router->post('/admin/admins/{id}/delete', ['AdminController', 'adminDelete']);
 
 $router->dispatch($_SERVER['REQUEST_METHOD'], $_SERVER['REQUEST_URI']);
