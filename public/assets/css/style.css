@@ -347,6 +347,23 @@ input:focus, select:focus, button:focus, a:focus {
 }
 .date-field { flex-direction: row; align-items: center; gap: 0.6rem; font-weight: 600; color: var(--text); }
 .date-field input { flex: 1; }
+
+/* Swiss-formatted text field (always TT.MM.JJJJ / HH:MM, typed or auto-inserted -- see
+   layout.php) plus a button that opens the browser's native calendar/clock picker as a
+   convenience; the native inputs themselves stay invisible (position:absolute, 0 size) and
+   only exist so showPicker() has something to open, syncing their pick back into the text
+   field. Used both inside .date-field (bracket/game forms) and the calendar event form. */
+.date-input-group, .time-input-group { position: relative; flex: 1; display: flex; gap: 0.4rem; }
+.date-input-group .date-text-input, .time-input-group .time-text-input { flex: 1; min-width: 0; }
+.date-picker-btn, .time-picker-btn {
+  -webkit-appearance: none; appearance: none; flex: 0 0 auto;
+  border: 1.5px solid var(--border); background: #fff; border-radius: var(--radius-sm);
+  min-width: 44px; min-height: 44px; font-size: 1.1rem; line-height: 1; cursor: pointer;
+}
+.date-picker-btn:hover, .time-picker-btn:hover { border-color: var(--accent); background: var(--accent-tint); }
+.date-native-picker, .time-native-picker {
+  position: absolute; width: 1px; height: 1px; opacity: 0; pointer-events: none; border: 0; padding: 0; margin: 0;
+}
 .score-hint { margin: 0; font-size: 0.85rem; font-weight: 600; color: var(--text-muted); }
 .score-buttons { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; }
 .score-btn {
@@ -589,6 +606,10 @@ input:focus, select:focus, button:focus, a:focus {
 /* Datum/Zeit/Dauer side by side, same width, instead of three full-width rows. */
 .field-row { display: flex; gap: 0.6rem; flex-wrap: wrap; }
 .field-row > label { flex: 1 1 110px; min-width: 100px; }
+/* Date/time labels hold a text input plus a picker button now, so they need more room than a
+   bare input did -- otherwise "TT.MM.JJJJ" gets clipped in this 3-up row. */
+.field-row > label:has(.date-input-group),
+.field-row > label:has(.time-input-group) { flex-basis: 180px; min-width: 170px; }
 
 .calendar-grid {
   display: grid; grid-template-columns: repeat(7, 1fr);

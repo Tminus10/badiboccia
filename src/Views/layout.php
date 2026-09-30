@@ -86,6 +86,41 @@ $flashes = flash_take();
       el.value = [digits.slice(0, 2), digits.slice(2, 4)].filter(Boolean).join(':');
     }
   });
+
+  // Each date/time field also has a hidden native <input type="date"/"time"> plus a button --
+  // typing stays Swiss-formatted (above), but tapping the button opens the OS/browser's own
+  // calendar or clock picker, synced back into the visible text field on pick. Best of both:
+  // familiar picker UI (especially on mobile) without ever showing a non-Swiss date format.
+  document.addEventListener('click', function (e) {
+    var dateBtn = e.target.closest('.date-picker-btn');
+    if (dateBtn) {
+      var dateGroup = dateBtn.closest('.date-input-group');
+      var dateText = dateGroup.querySelector('.date-text-input');
+      var dateNative = dateGroup.querySelector('.date-native-picker');
+      var dm = dateText.value.match(/^(\d{2})\.(\d{2})\.(\d{4})$/);
+      dateNative.value = dm ? (dm[3] + '-' + dm[2] + '-' + dm[1]) : '';
+      if (dateNative.showPicker) { dateNative.showPicker(); } else { dateNative.focus(); }
+      return;
+    }
+    var timeBtn = e.target.closest('.time-picker-btn');
+    if (timeBtn) {
+      var timeGroup = timeBtn.closest('.time-input-group');
+      var timeText = timeGroup.querySelector('.time-text-input');
+      var timeNative = timeGroup.querySelector('.time-native-picker');
+      timeNative.value = /^\d{2}:\d{2}$/.test(timeText.value) ? timeText.value : '';
+      if (timeNative.showPicker) { timeNative.showPicker(); } else { timeNative.focus(); }
+    }
+  });
+
+  document.addEventListener('change', function (e) {
+    var el = e.target;
+    if (el.matches && el.matches('.date-native-picker') && el.value) {
+      var parts = el.value.split('-'); // native value is always "YYYY-MM-DD"
+      el.closest('.date-input-group').querySelector('.date-text-input').value = parts[2] + '.' + parts[1] + '.' + parts[0];
+    } else if (el.matches && el.matches('.time-native-picker') && el.value) {
+      el.closest('.time-input-group').querySelector('.time-text-input').value = el.value.slice(0, 5);
+    }
+  });
 })();
 </script>
 </body>
