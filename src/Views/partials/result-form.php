@@ -76,15 +76,15 @@ if ($teamA === null || $teamB === null) {
       <p class="score-hint">Für die anderen Teams sichtbar, sobald gespeichert. Erscheint auch im Kalender.</p>
       <label class="date-field">
         <span>Datum</span>
-        <input type="date" name="played_date" value="<?= h($game['played_date'] ?? $scheduleDefaultDate) ?>" required>
+        <input type="text" inputmode="numeric" class="date-text-input" name="played_date" placeholder="TT.MM.JJJJ" maxlength="10" value="<?= h(format_date_ch($game['played_date'] ?? $scheduleDefaultDate)) ?>" required>
       </label>
       <label class="date-field">
         <span>Zeit <span class="muted">(optional)</span></span>
-        <input type="time" name="game_time" value="<?= h(format_time_ch($game['game_time'] ?? null)) ?>">
+        <input type="text" inputmode="numeric" class="time-text-input" name="game_time" placeholder="HH:MM" maxlength="5" value="<?= h(format_time_ch($game['game_time'] ?? null)) ?>">
       </label>
       <?php if ($useDialog): ?>
         <div class="dialog-actions">
-          <button type="button" class="btn btn-ghost btn-sm result-cancel">Abbrechen</button>
+          <button type="button" class="btn btn-secondary btn-sm result-cancel">Abbrechen</button>
           <button class="btn btn-primary btn-sm" type="submit">Termin speichern</button>
         </div>
       <?php else: ?>
@@ -106,19 +106,19 @@ if ($teamA === null || $teamB === null) {
 
 <?php if ($canEdit && $options): ?>
   <?php $resultLabel = $complete ? 'Resultat korrigieren' : 'Resultat eintragen'; ?>
-  <?php $resultForm = function () use ($game, $returnTo, $scheduleDefaultDate, $today, $options, $allowTie, $currentValue, $useDialog) { ?>
+  <?php $resultForm = function () use ($game, $returnTo, $scheduleDefaultDate, $options, $allowTie, $currentValue, $useDialog) { ?>
     <form method="post" action="<?= h(url('/game/' . $game['id'] . '/result')) ?>" class="score-form">
       <?= csrf_field() ?>
       <input type="hidden" name="return_to" value="<?= h($returnTo) ?>">
-      <?php $resultDateDefault = $game['played_date'] ?? $scheduleDefaultDate; ?>
+      <?php $resultDateDefault = format_date_ch($game['played_date'] ?? $scheduleDefaultDate); ?>
       <input type="hidden" name="played_date_default" value="<?= h($resultDateDefault) ?>">
       <label class="date-field">
         <span>Datum <span class="muted">(optional, falls bekannt)</span></span>
-        <input type="date" name="played_date" value="<?= h($resultDateDefault) ?>" max="<?= h($today) ?>">
+        <input type="text" inputmode="numeric" class="date-text-input" name="played_date" placeholder="TT.MM.JJJJ" maxlength="10" value="<?= h($resultDateDefault) ?>">
       </label>
       <label class="date-field">
         <span>Zeit <span class="muted">(optional)</span></span>
-        <input type="time" name="game_time" value="<?= h(format_time_ch($game['game_time'] ?? null)) ?>">
+        <input type="text" inputmode="numeric" class="time-text-input" name="game_time" placeholder="HH:MM" maxlength="5" value="<?= h(format_time_ch($game['game_time'] ?? null)) ?>">
       </label>
       <p class="score-hint">Zum Speichern das Ergebnis antippen:</p>
       <div class="score-buttons">
@@ -133,7 +133,7 @@ if ($teamA === null || $teamB === null) {
       </div>
       <?php if ($useDialog): ?>
         <div class="dialog-actions">
-          <button type="button" class="btn btn-ghost btn-sm result-cancel">Abbrechen</button>
+          <button type="button" class="btn btn-secondary btn-sm result-cancel">Abbrechen</button>
         </div>
       <?php endif; ?>
     </form>

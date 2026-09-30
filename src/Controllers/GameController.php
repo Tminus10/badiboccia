@@ -54,16 +54,13 @@ final class GameController
             return;
         }
 
-        // The date field is pre-filled with a guessed default so the picker opens on the right
-        // year; if the submitted value still matches that guess, nothing was deliberately
-        // entered, so keep whatever the game already had (often no date) rather than the guess.
+        // The date field is pre-filled with a guessed default so it shows a sensible year; if
+        // the submitted value still matches that guess, nothing was deliberately entered, so
+        // keep whatever the game already had (often no date) rather than the guess. Both sides
+        // of this comparison are in the same "TT.MM.JJJJ" display format the field shows.
         $submittedDate = (string) ($_POST['played_date'] ?? '');
         $defaultMarker = (string) ($_POST['played_date_default'] ?? '');
-        if ($submittedDate === $defaultMarker) {
-            $date = $game['played_date'];
-        } else {
-            $date = preg_match('/^\d{4}-\d{2}-\d{2}$/', $submittedDate) ? $submittedDate : null;
-        }
+        $date = $submittedDate === $defaultMarker ? $game['played_date'] : parse_date_input_ch($submittedDate);
         // Unlike the date, the time field has no pre-filled guess to disambiguate against
         // (it starts empty), so whatever was submitted is always a deliberate choice.
         $time = parse_time_input((string) ($_POST['game_time'] ?? ''));
@@ -104,8 +101,8 @@ final class GameController
             return;
         }
 
-        $date = (string) ($_POST['played_date'] ?? '');
-        if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $date)) {
+        $date = parse_date_input_ch((string) ($_POST['played_date'] ?? ''));
+        if ($date === null) {
             flash_set('error', 'Ungültiges Datum.');
             redirect($returnTo);
             return;

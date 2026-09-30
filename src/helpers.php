@@ -198,6 +198,27 @@ function format_date_ch(?string $date): string
     return $ts ? date('d.m.Y', $ts) : '';
 }
 
+/**
+ * Parses a Swiss-format "TT.MM.JJJJ" date (as typed into the date-field text inputs -- plain
+ * text rather than <input type="date">, since its displayed format follows the browser's own
+ * language setting, not the page's, and can't be forced to Swiss format for an English-language
+ * browser) into a DB DATE string ("YYYY-MM-DD"), or null if empty/invalid.
+ */
+function parse_date_input_ch(string $value): ?string
+{
+    if ($value === '') {
+        return null;
+    }
+    if (!preg_match('/^(\d{2})\.(\d{2})\.(\d{4})$/', $value, $m)) {
+        return null;
+    }
+    [, $day, $month, $year] = $m;
+    if (!checkdate((int) $month, (int) $day, (int) $year)) {
+        return null;
+    }
+    return sprintf('%s-%s-%s', $year, $month, $day);
+}
+
 /** "HH:MM" from a DB TIME value ("HH:MM:SS"), or '' if unset. */
 function format_time_ch(?string $time): string
 {

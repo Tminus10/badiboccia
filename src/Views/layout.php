@@ -70,5 +70,23 @@ $flashes = flash_take();
 <footer class="site-footer">
   <p>Badi Boccia Buochs &middot; <a href="<?= h(url('/archive')) ?>">Archiv</a> &middot; <?php if (!$currentAdmin): ?><a href="<?= h(url('/admin/login')) ?>">Admin-Login</a><?php endif; ?></p>
 </footer>
+<script>
+(function () {
+  // Auto-inserts the "." / ":" separators as the admin types into a result-form date or
+  // time field, so entry always reads in Swiss format regardless of the browser's own
+  // language -- a plain <input type="date"/"time"> displays in whatever format the browser's
+  // UI language uses, which isn't controllable from the page and isn't always Swiss.
+  document.addEventListener('input', function (e) {
+    var el = e.target;
+    if (el.matches && el.matches('.date-text-input')) {
+      var digits = el.value.replace(/\D/g, '').slice(0, 8);
+      el.value = [digits.slice(0, 2), digits.slice(2, 4), digits.slice(4, 8)].filter(Boolean).join('.');
+    } else if (el.matches && el.matches('.time-text-input')) {
+      var digits = el.value.replace(/\D/g, '').slice(0, 4);
+      el.value = [digits.slice(0, 2), digits.slice(2, 4)].filter(Boolean).join(':');
+    }
+  });
+})();
+</script>
 </body>
 </html>
