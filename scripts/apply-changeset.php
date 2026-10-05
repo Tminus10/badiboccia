@@ -338,11 +338,20 @@ foreach (['name', 'summary', 'actor_label', 'apply'] as $key) {
 }
 
 $pdo = Db::pdo();
-$applied = $pdo->prepare('SELECT applied_at FROM data_changesets WHERE name = ?');
-$applied->execute([$definition['name']]);
-if ($at = $applied->fetchColumn()) {
-    fwrite(STDERR, "Changeset '{$definition['name']}' was already applied on $at.\n");
+$hasTable = (bool) $pdo->query("SHOW TABLES LIKE 'data_changesets'")->fetchColumn();
+if (!$hasTable && !$dryRun) {
+    fwrite(STDERR, "Table data_changesets is missing -- run migrations/003_data_changesets.sql first.\n");
     exit(1);
+}
+if (!$hasTable) {
+    echo "Note: table data_changesets is missing (migration 003 not run yet); dry run continues.\n";
+} else {
+    $applied = $pdo->prepare('SELECT applied_at FROM data_changesets WHERE name = ?');
+    $applied->execute([$definition['name']]);
+    if ($at = $applied->fetchColumn()) {
+        fwrite(STDERR, "Changeset '{$definition['name']}' was already applied on $at.\n");
+        exit(1);
+    }
 }
 
 $changeset = new Changeset($pdo, $definition['actor_label']);
