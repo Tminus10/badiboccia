@@ -237,6 +237,28 @@ final class Changeset
         $this->report[] = "OK   merged #$from \"$duplicate\" into #$into \"$survivor\" -> \"$newName\" ($player1 / $player2); moved " . implode(', ', $moved) . "; deleted #$from  [$source]";
     }
 
+    /**
+     * Renames a team and sets its players. A database where the team already has exactly the
+     * target name and players (e.g. edited by hand in the admin area) counts as done, not as a conflict.
+     */
+    public function renameTeam(string $oldName, string $newName, string $player1, string $player2, string $source): void
+    {
+        $stmt = $this->pdo->prepare('SELECT id FROM teams WHERE name = ? AND player1 = ? AND player2 = ?');
+        $stmt->execute([$newName, $player1, $player2]);
+        if ($done = $stmt->fetchColumn()) {
+            $this->report[] = "OK   team #$done is already \"$newName\" ($player1 / $player2), nothing to do  [$source]";
+            return;
+        }
+        $id = $this->teamId($oldName);
+        if ($id === null || $this->teamId($newName) !== null) {
+            $this->skip("rename \"$oldName\" -> \"$newName\": old team not found or new name already taken");
+            return;
+        }
+        Team::update($id, $newName, $player1, $player2);
+        $this->changed++;
+        $this->report[] = "OK   team #$id \"$oldName\" -> \"$newName\" ($player1 / $player2)  [$source]";
+    }
+
     private function seasonId(int $year): ?int
     {
         $stmt = $this->pdo->prepare('SELECT id FROM seasons WHERE year = ?');
