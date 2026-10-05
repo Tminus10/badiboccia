@@ -116,3 +116,12 @@ CREATE TABLE team_login_attempts (
   attempted_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY (team_id) REFERENCES teams(id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- Applied data changesets (scripted bulk edits from data-changes/), see scripts/apply-changeset.php.
+CREATE TABLE data_changesets (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  name VARCHAR(100) NOT NULL,
+  summary TEXT NULL,
+  applied_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  UNIQUE KEY uniq_changeset_name (name)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
