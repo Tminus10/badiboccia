@@ -237,6 +237,7 @@ input:focus, select:focus, button:focus, a:focus {
 .conflict-list { list-style: none; padding: 0; margin: 0.8rem 0; display: flex; flex-direction: column; gap: 0.5rem; }
 .conflict-list li { background: var(--error-bg); border-radius: var(--radius-sm); padding: 0.6rem 0.8rem; }
 .conflict-actions { display: flex; flex-wrap: wrap; gap: 0.6rem; }
+.conflict-overlap { font-weight: 700; color: var(--error-text); }
 .conflict-subhead { font-size: 1.05rem; margin: 1.4rem 0 0.6rem; }
 
 /* ---------- Group grid / standings ---------- */

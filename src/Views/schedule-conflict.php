@@ -13,6 +13,19 @@ $sameDayOnly = $time === null;
 foreach ($conflicts as $other) {
     $sameDayOnly = $sameDayOnly || $other['game_time'] === null;
 }
+$toMinutes = static fn (string $t): int => (int) substr($t, 0, 2) * 60 + (int) substr($t, 3, 2);
+$clock = static fn (int $m): string => sprintf('%02d:%02d', intdiv($m, 60) % 24, $m % 60);
+/** "18:00 – 19:00 (1 Std.)" for two timed slots, or null when either game has no time. */
+$overlap = static function (?string $otherTime) use ($time, $toMinutes, $clock): ?string {
+    if ($time === null || $otherTime === null) {
+        return null;
+    }
+    $start = max($toMinutes($time), $toMinutes($otherTime));
+    $end = min($toMinutes($time), $toMinutes($otherTime)) + Game::SLOT_MINUTES;
+    $length = $end - $start;
+    $duration = trim((intdiv($length, 60) > 0 ? intdiv($length, 60) . ' Std. ' : '') . ($length % 60 > 0 ? $length % 60 . ' Min.' : ''));
+    return $clock($start) . ' – ' . $clock($end) . ' (' . $duration . ')';
+};
 ?>
 <div class="page-head">
   <div>
@@ -33,9 +46,12 @@ foreach ($conflicts as $other) {
         <strong><?= h($pairing($other)) ?></strong>
         <span class="muted">· <?= h(game_phase_label($other, $groupsById)) ?></span><br>
         <?= h(format_game_slot_ch($other['played_date'], $other['game_time'])) ?>
+        <?php $overlapText = $overlap($other['game_time']); ?>
+        <?php if ($overlapText !== null): ?><br><span class="conflict-overlap">Überschneidung: <?= h($overlapText) ?></span><?php endif; ?>
       </li>
     <?php endforeach; ?>
   </ul>
+  <p class="muted">Ein Spiel dauert erfahrungsgemäss rund <?= intdiv(Game::SLOT_MINUTES, 60) ?> Stunden – die Zeitfenster oben gehen davon aus. Ob es tatsächlich knapp wird, könnt ihr am besten selbst abschätzen.</p>
   <?php if ($sameDayOnly): ?>
     <p class="muted">Ohne genaue Uhrzeit lässt sich nicht sagen, ob sich die Spiele tatsächlich überschneiden.</p>
   <?php endif; ?>
