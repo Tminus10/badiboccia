@@ -24,7 +24,7 @@ foreach ($conflicts as $other) {
 <div class="card conflict-card">
   <p>
     Du möchtest <strong><?= h($pairing($game)) ?></strong> am
-    <strong><?= h(format_datetime_ch($date, $time)) ?></strong> ansetzen.
+    <strong><?= h(format_game_slot_ch($date, $time)) ?></strong> ansetzen.
     <?= count($conflicts) === 1 ? 'Zu diesem Zeitpunkt ist bereits ein Spiel geplant:' : 'Zu diesem Zeitpunkt sind bereits ' . count($conflicts) . ' Spiele geplant:' ?>
   </p>
   <ul class="conflict-list">
@@ -32,7 +32,7 @@ foreach ($conflicts as $other) {
       <li>
         <strong><?= h($pairing($other)) ?></strong>
         <span class="muted">· <?= h(game_phase_label($other, $groupsById)) ?></span><br>
-        <?= h(format_datetime_ch($other['played_date'], $other['game_time'])) ?>
+        <?= h(format_game_slot_ch($other['played_date'], $other['game_time'])) ?>
       </li>
     <?php endforeach; ?>
   </ul>

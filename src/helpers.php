@@ -259,6 +259,17 @@ function format_datetime_ch(?string $date, ?string $time): string
     return $t === '' ? $d : $d . ' · ' . $t;
 }
 
+/** Like format_datetime_ch(), but with the end of the assumed game slot: "06.05.2027 · 18:00 – 20:00". */
+function format_game_slot_ch(?string $date, ?string $time): string
+{
+    $start = format_datetime_ch($date, $time);
+    if ($start === '' || empty($time)) {
+        return $start;
+    }
+    $end = date('H:i', strtotime('2000-01-01 ' . $time) + Game::SLOT_MINUTES * 60);
+    return $start . ' – ' . $end;
+}
+
 /** German label for a game's phase, as used on the bracket, team pages, and calendar. */
 function phase_label(string $phase): string
 {
