@@ -15,13 +15,23 @@ foreach ($conflicts as $other) {
 }
 $toMinutes = static fn (string $t): int => (int) substr($t, 0, 2) * 60 + (int) substr($t, 3, 2);
 $clock = static fn (int $m): string => sprintf('%02d:%02d', intdiv($m, 60) % 24, $m % 60);
-/** "18:00 – 19:00 (1 Std.)" for two timed slots, or null when either game has no time. */
-$overlap = static function (?string $otherTime) use ($time, $toMinutes, $clock): ?string {
-    if ($time === null || $otherTime === null) {
+$newSlot = Game::slotMinutes($game['phase']);
+/** [start, end] minutes of the overlap between the new game and $other, or null when either has no time. */
+$overlapRange = static function (array $other) use ($time, $newSlot, $toMinutes): ?array {
+    if ($time === null || $other['game_time'] === null) {
         return null;
     }
-    $start = max($toMinutes($time), $toMinutes($otherTime));
-    $end = min($toMinutes($time), $toMinutes($otherTime)) + Game::SLOT_MINUTES;
+    $start = $toMinutes($time);
+    $otherStart = $toMinutes($other['game_time']);
+    return [max($start, $otherStart), min($start + $newSlot, $otherStart + Game::slotMinutes($other['phase']))];
+};
+/** "18:00 – 19:00 (1 Std.)" for two timed slots, or null when either game has no time. */
+$overlap = static function (array $other) use ($overlapRange, $clock): ?string {
+    $range = $overlapRange($other);
+    if ($range === null) {
+        return null;
+    }
+    [$start, $end] = $range;
     $length = $end - $start;
     $duration = trim((intdiv($length, 60) > 0 ? intdiv($length, 60) . ' Std. ' : '') . ($length % 60 > 0 ? $length % 60 . ' Min.' : ''));
     return $clock($start) . ' – ' . $clock($end) . ' (' . $duration . ')';
@@ -33,7 +43,8 @@ if ($timedConflicts !== []) {
     $newStart = $toMinutes($time);
     $starts = array_merge([$newStart], array_map(static fn (array $g): int => $toMinutes($g['game_time']), $timedConflicts));
     $windowStart = intdiv(min($starts), 60) * 60;
-    $windowEnd = (int) ceil((max($starts) + Game::SLOT_MINUTES) / 60) * 60;
+    $ends = array_merge([$newStart + $newSlot], array_map(static fn (array $g): int => $toMinutes($g['game_time']) + Game::slotMinutes($g['phase']), $timedConflicts));
+    $windowEnd = (int) ceil(max($ends) / 60) * 60;
     $windowHours = intdiv($windowEnd - $windowStart, 60);
     /** CSS left/width of a [$from, $to) minute range within the window. */
     $span = static fn (int $from, int $to): string => sprintf(
@@ -53,7 +64,7 @@ if ($timedConflicts !== []) {
 <div class="card conflict-card">
   <p>
     Du möchtest <strong><?= h($pairing($game)) ?></strong> am
-    <strong><?= h(format_game_slot_ch($date, $time)) ?></strong> ansetzen.
+    <strong><?= h(format_game_slot_ch($date, $time, $newSlot)) ?></strong> ansetzen.
     <?= count($conflicts) === 1 ? 'Zu diesem Zeitpunkt ist bereits ein Spiel geplant:' : 'Zu diesem Zeitpunkt sind bereits ' . count($conflicts) . ' Spiele geplant:' ?>
   </p>
   <ul class="conflict-list">
@@ -61,8 +72,8 @@ if ($timedConflicts !== []) {
       <li>
         <strong><?= h($pairing($other)) ?></strong>
         <span class="muted">· <?= h(game_phase_label($other, $groupsById)) ?></span><br>
-        <?= h(format_game_slot_ch($other['played_date'], $other['game_time'])) ?>
-        <?php $overlapText = $overlap($other['game_time']); ?>
+        <?= h(format_game_slot_ch($other['played_date'], $other['game_time'], Game::slotMinutes($other['phase']))) ?>
+        <?php $overlapText = $overlap($other); ?>
         <?php if ($overlapText !== null): ?><br><span class="conflict-overlap">Überschneidung: <?= h($overlapText) ?></span><?php endif; ?>
       </li>
     <?php endforeach; ?>
@@ -72,19 +83,19 @@ if ($timedConflicts !== []) {
       <div class="slot-row">
         <span class="slot-label">Neu: <?= h($pairing($game)) ?></span>
         <div class="slot-track">
-          <div class="slot-bar slot-bar-new" style="<?= $span($newStart, $newStart + Game::SLOT_MINUTES) ?>"><span><?= h($clock($newStart) . ' – ' . $clock($newStart + Game::SLOT_MINUTES)) ?></span></div>
+          <div class="slot-bar slot-bar-new" style="<?= $span($newStart, $newStart + $newSlot) ?>"><span><?= h($clock($newStart) . ' – ' . $clock($newStart + $newSlot)) ?></span></div>
         </div>
       </div>
       <?php foreach ($timedConflicts as $other): ?>
         <?php
           $otherStart = $toMinutes($other['game_time']);
-          $overlapStart = max($newStart, $otherStart);
-          $overlapEnd = min($newStart, $otherStart) + Game::SLOT_MINUTES;
+          $otherEnd = $otherStart + Game::slotMinutes($other['phase']);
+          [$overlapStart, $overlapEnd] = $overlapRange($other);
         ?>
         <div class="slot-row">
           <span class="slot-label"><?= h($pairing($other)) ?></span>
           <div class="slot-track">
-            <div class="slot-bar slot-bar-other" style="<?= $span($otherStart, $otherStart + Game::SLOT_MINUTES) ?>"><span><?= h($clock($otherStart) . ' – ' . $clock($otherStart + Game::SLOT_MINUTES)) ?></span></div>
+            <div class="slot-bar slot-bar-other" style="<?= $span($otherStart, $otherEnd) ?>"><span><?= h($clock($otherStart) . ' – ' . $clock($otherEnd)) ?></span></div>
             <div class="slot-overlap" style="<?= $span($overlapStart, $overlapEnd) ?>"></div>
           </div>
         </div>
@@ -96,7 +107,7 @@ if ($timedConflicts !== []) {
       </div>
     </div>
   <?php endif; ?>
-  <p class="muted">Ein Spiel dauert erfahrungsgemäss rund <?= intdiv(Game::SLOT_MINUTES, 60) ?> Stunden – die Zeitfenster oben gehen davon aus. Ob es tatsächlich knapp wird, könnt ihr am besten selbst abschätzen.</p>
+  <p class="muted">Erfahrungsgemäss dauert ein Gruppenspiel rund <?= h(format_hours_de(Game::GROUP_SLOT_MINUTES)) ?>, ein Spiel ab dem Viertelfinal rund <?= h(format_hours_de(Game::KNOCKOUT_SLOT_MINUTES)) ?> – die Zeitfenster oben gehen davon aus. Ob es tatsächlich knapp wird, könnt ihr am besten selbst abschätzen.</p>
   <?php if ($sameDayOnly): ?>
     <p class="muted">Ohne genaue Uhrzeit lässt sich nicht sagen, ob sich die Spiele tatsächlich überschneiden.</p>
   <?php endif; ?>

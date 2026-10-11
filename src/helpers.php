@@ -259,15 +259,23 @@ function format_datetime_ch(?string $date, ?string $time): string
     return $t === '' ? $d : $d . ' · ' . $t;
 }
 
-/** Like format_datetime_ch(), but with the end of the assumed game slot: "06.05.2027 · 18:00 – 20:00". */
-function format_game_slot_ch(?string $date, ?string $time): string
+/** Like format_datetime_ch(), but with the end of the assumed game slot: "06.05.2027 · 18:00 – 19:30". */
+function format_game_slot_ch(?string $date, ?string $time, int $slotMinutes): string
 {
     $start = format_datetime_ch($date, $time);
     if ($start === '' || empty($time)) {
         return $start;
     }
-    $end = date('H:i', strtotime('2000-01-01 ' . $time) + Game::SLOT_MINUTES * 60);
+    $end = date('H:i', strtotime('2000-01-01 ' . $time) + $slotMinutes * 60);
     return $start . ' – ' . $end;
+}
+
+/** "1½ Stunden", "2 Stunden", "2½ Stunden" -- for slot lengths in whole or half hours. */
+function format_hours_de(int $minutes): string
+{
+    $whole = intdiv($minutes, 60);
+    $half = $minutes % 60 >= 30 ? '½' : '';
+    return $whole . $half . ' ' . ($whole === 1 && $half === '' ? 'Stunde' : 'Stunden');
 }
 
 /** German label for a game's phase, as used on the bracket, team pages, and calendar. */

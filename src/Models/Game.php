@@ -2,8 +2,16 @@
 
 final class Game
 {
-    /** How long one game is assumed to occupy the court -- shared by the calendar export and the clash check. */
-    public const SLOT_MINUTES = 120;
+    /** How long a group-phase game is assumed to occupy the court. */
+    public const GROUP_SLOT_MINUTES = 90;
+    /** How long a knockout game (QF and up) is assumed to occupy the court -- they tend to be closer and longer. */
+    public const KNOCKOUT_SLOT_MINUTES = 150;
+
+    /** Assumed slot length for a game of this phase -- shared by the calendar export, the clash check and the conflict page. */
+    public static function slotMinutes(string $phase): int
+    {
+        return $phase === 'group' ? self::GROUP_SLOT_MINUTES : self::KNOCKOUT_SLOT_MINUTES;
+    }
 
     public static function find(int $id): ?array
     {
@@ -203,11 +211,11 @@ final class Game
 
     /**
      * Other planned (dated, no result yet) games in the same season that would clash with
-     * scheduling $gameId at $date/$time. Two timed games clash when their slots overlap
-     * (SLOT_MINUTES each, same as the calendar export assumes); if either side has no time,
-     * any planned game on the same day counts, since we can't tell whether they'd collide.
+     * scheduling $game at $date/$time. Two timed games clash when their slots overlap, each
+     * slot as long as its own phase's slotMinutes(); if either side has no time, any planned
+     * game on the same day counts, since we can't tell whether they'd collide.
      */
-    public static function scheduleConflicts(int $gameId, int $seasonId, string $date, ?string $time): array
+    public static function scheduleConflicts(array $game, string $date, ?string $time): array
     {
         $stmt = Db::pdo()->prepare(
             "SELECT * FROM games
@@ -215,14 +223,17 @@ final class Game
                AND sets_a IS NULL AND team_a_id IS NOT NULL AND team_b_id IS NOT NULL
              ORDER BY (game_time IS NULL) ASC, game_time ASC, id ASC"
         );
-        $stmt->execute([$seasonId, $date, $gameId]);
+        $stmt->execute([$game['season_id'], $date, $game['id']]);
 
         $toMinutes = static fn (string $t): int => (int) substr($t, 0, 2) * 60 + (int) substr($t, 3, 2);
-        return array_values(array_filter($stmt->fetchAll(), static function (array $other) use ($time, $toMinutes): bool {
+        return array_values(array_filter($stmt->fetchAll(), static function (array $other) use ($game, $time, $toMinutes): bool {
             if ($time === null || $other['game_time'] === null) {
                 return true;
             }
-            return abs($toMinutes($time) - $toMinutes($other['game_time'])) < self::SLOT_MINUTES;
+            $start = $toMinutes($time);
+            $otherStart = $toMinutes($other['game_time']);
+            return $start < $otherStart + self::slotMinutes($other['phase'])
+                && $otherStart < $start + self::slotMinutes($game['phase']);
         }));
     }
 

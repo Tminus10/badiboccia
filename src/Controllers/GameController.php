@@ -115,7 +115,7 @@ final class GameController
         // A clash isn't an error (there may be a second court, or the other game is stale), so
         // ask first and let the team save anyway via the confirmation page.
         if (($_POST['confirm_conflict'] ?? '') !== '1') {
-            $conflicts = Game::scheduleConflicts($gameId, (int) $game['season_id'], $date, $time);
+            $conflicts = Game::scheduleConflicts($game, $date, $time);
             if ($conflicts !== []) {
                 $teamIds = [(int) $game['team_a_id'], (int) $game['team_b_id']];
                 foreach ($conflicts as $other) {
