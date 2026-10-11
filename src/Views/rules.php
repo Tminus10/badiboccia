@@ -5,7 +5,7 @@
   <h2>Gruppenphase</h2>
   <p>
     In der Gruppenphase spielt jedes Team einmal gegen jedes andere Team seiner
-    Gruppe. Ein Spiel geht über zwei Gewinnsätze zu je 15 Punkten – wer zuerst
+    Gruppe. Ein Spiel geht über <strong>zwei Gewinnsätze</strong> zu je <strong>15 Punkten</strong> – wer zuerst
     zwei Sätze gewinnt, hat das Spiel gewonnen.
   </p>
 
@@ -20,7 +20,7 @@
   <p>
     Die ersten beiden Teams jeder Gruppe erreichen das Viertelfinale. Ab hier
     wird im K.-o.-System gespielt – Viertelfinale, Halbfinale, Finale – und die
-    Sätze gehen neu bis 21 Punkte. Die beiden Verlierer der Halbfinals spielen
+    Sätze gehen bis <strong>21 Punkte</strong>. Die beiden Verlierer der Halbfinals spielen
     zusätzlich im <strong>Spiel um Platz 3</strong> gegeneinander.
   </p>
 
