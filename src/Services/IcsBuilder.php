@@ -3,7 +3,6 @@
 /** Builds a minimal RFC 5545 .ics feed spanning every season's scheduled games and custom calendar entries. */
 final class IcsBuilder
 {
-    private const GAME_DURATION_MINUTES = 120; // a game slot is assumed to take 2 hours
     private const CUSTOM_EVENT_DURATION_MINUTES = 60; // draws, celebrations, etc. -- no fixed duration is known
     private const TZ = 'Europe/Zurich';
 
@@ -62,7 +61,7 @@ final class IcsBuilder
         $lines = ['BEGIN:VEVENT'];
         $lines[] = 'UID:game-' . $game['id'] . '@' . $uidDomain;
         $lines[] = 'DTSTAMP:' . gmdate('Ymd\THis\Z');
-        $lines = array_merge($lines, self::dateLines($game['played_date'], $game['game_time'], self::GAME_DURATION_MINUTES));
+        $lines = array_merge($lines, self::dateLines($game['played_date'], $game['game_time'], Game::SLOT_MINUTES));
         $lines[] = 'SUMMARY:' . self::escape($summary);
         $lines[] = 'DESCRIPTION:' . self::escape($description);
         $lines[] = 'LOCATION:' . self::escape('Strandbad Buochs-Ennetbürgen');

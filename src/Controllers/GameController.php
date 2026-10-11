@@ -112,6 +112,31 @@ final class GameController
         }
         $time = parse_time_input((string) ($_POST['game_time'] ?? ''));
 
+        // A clash isn't an error (there may be a second court, or the other game is stale), so
+        // ask first and let the team save anyway via the confirmation page.
+        if (($_POST['confirm_conflict'] ?? '') !== '1') {
+            $conflicts = Game::scheduleConflicts($gameId, (int) $game['season_id'], $date, $time);
+            if ($conflicts !== []) {
+                $teamIds = [(int) $game['team_a_id'], (int) $game['team_b_id']];
+                foreach ($conflicts as $other) {
+                    $teamIds[] = (int) $other['team_a_id'];
+                    $teamIds[] = (int) $other['team_b_id'];
+                }
+                $teamsById = [];
+                foreach (array_unique($teamIds) as $id) {
+                    $teamsById[$id] = Team::find($id);
+                }
+                $groupsById = [];
+                foreach (array_merge([$game], $conflicts) as $g) {
+                    if ($g['group_id'] !== null && !isset($groupsById[$g['group_id']])) {
+                        $groupsById[$g['group_id']] = TeamGroup::find((int) $g['group_id']);
+                    }
+                }
+                render('schedule-conflict', compact('game', 'conflicts', 'teamsById', 'groupsById', 'date', 'time', 'returnTo'));
+                return;
+            }
+        }
+
         Game::scheduleDate($gameId, $date, $time, $actorType, $actorId, $actorLabel);
 
         flash_set('success', 'Termin gespeichert: ' . format_datetime_ch($date, $time));
