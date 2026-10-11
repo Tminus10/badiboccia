@@ -238,6 +238,34 @@ input:focus, select:focus, button:focus, a:focus {
 .conflict-list li { background: var(--error-bg); border-radius: var(--radius-sm); padding: 0.6rem 0.8rem; }
 .conflict-actions { display: flex; flex-wrap: wrap; gap: 0.6rem; }
 .conflict-overlap { font-weight: 700; color: var(--error-text); }
+
+/* Day timeline: one track per game, hour gridlines drawn as a background sized to 1/--hours. */
+.slot-timeline { margin: 1rem 0; padding: 0.8rem 0.9rem 0.4rem; background: var(--surface-alt); border-radius: var(--radius-md); }
+.slot-row { margin-bottom: 0.6rem; }
+.slot-label { display: block; font-size: 0.8rem; font-weight: 600; color: var(--text-muted); margin-bottom: 0.2rem; }
+.slot-track, .slot-axis { position: relative; }
+.slot-track {
+  height: 28px; border-radius: 6px; background-color: var(--surface);
+  background-image: linear-gradient(to right, var(--border) 1px, transparent 1px);
+  background-size: calc(100% / var(--hours)) 100%;
+}
+.slot-bar {
+  position: absolute; top: 0; bottom: 0; border-radius: 6px; overflow: hidden; white-space: nowrap;
+  display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: 700;
+}
+.slot-bar-new { background: var(--accent); color: #fff; }
+.slot-bar-other { background: var(--connector); color: var(--text); }
+/* Above the overlap stripes (which come later in the DOM) so the times stay readable. */
+.slot-bar span { position: relative; z-index: 2; }
+.slot-bar-other span { background: rgba(255, 255, 255, 0.85); padding: 0 0.3rem; border-radius: 4px; }
+.slot-overlap {
+  position: absolute; top: 0; bottom: 0; z-index: 1; border: 2px solid var(--error-text); border-radius: 6px;
+  background: repeating-linear-gradient(45deg, rgba(179, 38, 30, 0.35) 0 4px, transparent 4px 8px);
+}
+.slot-axis { height: 1.2rem; margin-top: 0.1rem; }
+.slot-axis span { position: absolute; transform: translateX(-50%); font-size: 0.7rem; color: var(--text-muted); }
+.slot-axis span:first-child { transform: none; }
+.slot-axis span:last-child { transform: translateX(-100%); }
 .conflict-subhead { font-size: 1.05rem; margin: 1.4rem 0 0.6rem; }
 
 /* ---------- Group grid / standings ---------- */

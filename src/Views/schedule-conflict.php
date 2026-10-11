@@ -26,6 +26,22 @@ $overlap = static function (?string $otherTime) use ($time, $toMinutes, $clock):
     $duration = trim((intdiv($length, 60) > 0 ? intdiv($length, 60) . ' Std. ' : '') . ($length % 60 > 0 ? $length % 60 . ' Min.' : ''));
     return $clock($start) . ' – ' . $clock($end) . ' (' . $duration . ')';
 };
+
+// Day timeline: only the timed games can be drawn, on a window of whole hours around all slots.
+$timedConflicts = $time === null ? [] : array_values(array_filter($conflicts, static fn (array $g): bool => $g['game_time'] !== null));
+if ($timedConflicts !== []) {
+    $newStart = $toMinutes($time);
+    $starts = array_merge([$newStart], array_map(static fn (array $g): int => $toMinutes($g['game_time']), $timedConflicts));
+    $windowStart = intdiv(min($starts), 60) * 60;
+    $windowEnd = (int) ceil((max($starts) + Game::SLOT_MINUTES) / 60) * 60;
+    $windowHours = intdiv($windowEnd - $windowStart, 60);
+    /** CSS left/width of a [$from, $to) minute range within the window. */
+    $span = static fn (int $from, int $to): string => sprintf(
+        'left:%.3F%%;width:%.3F%%',
+        ($from - $windowStart) / ($windowEnd - $windowStart) * 100,
+        ($to - $from) / ($windowEnd - $windowStart) * 100
+    );
+}
 ?>
 <div class="page-head">
   <div>
@@ -51,6 +67,35 @@ $overlap = static function (?string $otherTime) use ($time, $toMinutes, $clock):
       </li>
     <?php endforeach; ?>
   </ul>
+  <?php if ($timedConflicts !== []): ?>
+    <div class="slot-timeline" style="--hours: <?= $windowHours ?>" aria-hidden="true">
+      <div class="slot-row">
+        <span class="slot-label">Neu: <?= h($pairing($game)) ?></span>
+        <div class="slot-track">
+          <div class="slot-bar slot-bar-new" style="<?= $span($newStart, $newStart + Game::SLOT_MINUTES) ?>"><span><?= h($clock($newStart) . ' – ' . $clock($newStart + Game::SLOT_MINUTES)) ?></span></div>
+        </div>
+      </div>
+      <?php foreach ($timedConflicts as $other): ?>
+        <?php
+          $otherStart = $toMinutes($other['game_time']);
+          $overlapStart = max($newStart, $otherStart);
+          $overlapEnd = min($newStart, $otherStart) + Game::SLOT_MINUTES;
+        ?>
+        <div class="slot-row">
+          <span class="slot-label"><?= h($pairing($other)) ?></span>
+          <div class="slot-track">
+            <div class="slot-bar slot-bar-other" style="<?= $span($otherStart, $otherStart + Game::SLOT_MINUTES) ?>"><span><?= h($clock($otherStart) . ' – ' . $clock($otherStart + Game::SLOT_MINUTES)) ?></span></div>
+            <div class="slot-overlap" style="<?= $span($overlapStart, $overlapEnd) ?>"></div>
+          </div>
+        </div>
+      <?php endforeach; ?>
+      <div class="slot-axis">
+        <?php for ($m = $windowStart; $m <= $windowEnd; $m += 60): ?>
+          <span style="left:<?= sprintf('%.3F', ($m - $windowStart) / ($windowEnd - $windowStart) * 100) ?>%"><?= h($clock($m)) ?></span>
+        <?php endfor; ?>
+      </div>
+    </div>
+  <?php endif; ?>
   <p class="muted">Ein Spiel dauert erfahrungsgemäss rund <?= intdiv(Game::SLOT_MINUTES, 60) ?> Stunden – die Zeitfenster oben gehen davon aus. Ob es tatsächlich knapp wird, könnt ihr am besten selbst abschätzen.</p>
   <?php if ($sameDayOnly): ?>
     <p class="muted">Ohne genaue Uhrzeit lässt sich nicht sagen, ob sich die Spiele tatsächlich überschneiden.</p>
@@ -62,7 +107,7 @@ $overlap = static function (?string $otherTime) use ($time, $toMinutes, $clock):
     <input type="hidden" name="played_date" value="<?= h($date) ?>">
     <input type="hidden" name="game_time" value="<?= h(format_time_ch($time)) ?>">
     <input type="hidden" name="confirm_conflict" value="1">
-    <button class="btn btn-secondary" type="submit">Trotzdem speichern</button>
+    <button class="btn btn-primary" type="submit">Trotzdem speichern</button>
   </form>
 
   <h2 class="conflict-subhead">Anderen Termin wählen</h2>
@@ -72,7 +117,7 @@ $overlap = static function (?string $otherTime) use ($time, $toMinutes, $clock):
     <input type="hidden" name="return_to" value="<?= h($returnTo) ?>">
     <label class="date-field">
       <span>Datum</span>
-      <input type="date" name="played_date" value="<?= h($date) ?>" required autofocus>
+      <input type="date" name="played_date" value="<?= h($date) ?>" required>
     </label>
     <label class="date-field">
       <span>Zeit <span class="muted">(optional)</span></span>
