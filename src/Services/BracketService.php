@@ -99,7 +99,7 @@ final class BracketService
 
     /**
      * Same crossed-seeding template as recommendedQfPairings(), but as plain
-     * "1./2. Gruppe X" labels rather than actual teams. Used before any group-phase
+     * "Sieger/Zweiter Gruppe X" labels rather than actual teams. Used before any group-phase
      * game has a result, when standings are still all-tied and "top 2" would just be
      * alphabetical -- showing real (but meaningless) team names as the suggestion
      * would look like a real assignment. Needs only the four group names, not standings.
@@ -116,10 +116,28 @@ final class BracketService
         [$n1, $n2, $n3, $n4] = array_values($groupNames);
 
         return [
-            1 => ["1. Gruppe $n1", "2. Gruppe $n2"],
-            2 => ["1. Gruppe $n3", "2. Gruppe $n4"],
-            3 => ["1. Gruppe $n2", "2. Gruppe $n1"],
-            4 => ["1. Gruppe $n4", "2. Gruppe $n3"],
+            1 => ["Sieger Gruppe $n1", "Zweiter Gruppe $n2"],
+            2 => ["Sieger Gruppe $n3", "Zweiter Gruppe $n4"],
+            3 => ["Sieger Gruppe $n2", "Zweiter Gruppe $n1"],
+            4 => ["Sieger Gruppe $n4", "Zweiter Gruppe $n3"],
         ];
+    }
+
+    /**
+     * Placeholder labels for a not-yet-filled SF/final/third-place game, naming the game each
+     * slot is fed from -- mirrors the next_game_id wiring of Game::ensureBracketSkeleton()
+     * (QF 1+2 -> SF 1, QF 3+4 -> SF 2, SF winners -> final, SF losers -> third place).
+     * Games are numbered top to bottom, as they're shown in the tournament tree.
+     *
+     * @return array{0:string,1:string}|null [labelA, labelB], or null for QF games (see recommendedQfPairingLabels()).
+     */
+    public static function feederLabels(string $phase, int $slotIndex): ?array
+    {
+        return match ($phase) {
+            'sf' => ['Sieger Viertelfinal ' . (2 * $slotIndex - 1), 'Sieger Viertelfinal ' . (2 * $slotIndex)],
+            'final' => ['Sieger Halbfinal 1', 'Sieger Halbfinal 2'],
+            'third' => ['Verlierer Halbfinal 1', 'Verlierer Halbfinal 2'],
+            default => null,
+        };
     }
 }

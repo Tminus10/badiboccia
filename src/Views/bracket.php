@@ -20,8 +20,11 @@ $renderGame = function (array $game) use ($teamsById, $returnTo, $viewerTeam, $a
     $canEdit = $isCurrent && ($admin !== null || ($viewerTeamId !== null && Game::isParticipant($game, (int) $viewerTeamId)));
     $winnerId = Game::winnerTeamId($game);
     $complete = Game::isComplete($game);
-    // Unassigned QF slots explain what will fill them (crossed seeding) instead of a bare "?".
-    $slotLabels = $game['phase'] === 'qf' ? ($qfLabelSuggestions[(int) $game['slot_index']] ?? null) : null;
+    // Unassigned slots explain what will fill them (crossed seeding for QF, the feeding game
+    // after that) instead of a bare "?".
+    $slotLabels = $game['phase'] === 'qf'
+        ? ($qfLabelSuggestions[(int) $game['slot_index']] ?? null)
+        : BracketService::feederLabels($game['phase'], (int) $game['slot_index']);
     ?>
     <div class="bracket-team<?= $teamA !== null && $winnerId === (int) $teamA['id'] ? ' winner' : '' ?>">
       <?= render_bracket_slot($teamA, (int) $season['id'], $slotLabels[0] ?? '?') ?>
