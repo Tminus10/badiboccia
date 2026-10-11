@@ -46,7 +46,25 @@ foreach ($conflicts as $other) {
     <input type="hidden" name="played_date" value="<?= h($date) ?>">
     <input type="hidden" name="game_time" value="<?= h(format_time_ch($time)) ?>">
     <input type="hidden" name="confirm_conflict" value="1">
-    <a class="btn btn-secondary" href="<?= h(url($returnTo)) ?>">Anderen Termin wählen</a>
-    <button class="btn btn-primary" type="submit">Trotzdem speichern</button>
+    <button class="btn btn-secondary" type="submit">Trotzdem speichern</button>
+  </form>
+
+  <h2 class="conflict-subhead">Anderen Termin wählen</h2>
+  <?php // Submitted without confirm_conflict, so the new slot is checked again before saving. ?>
+  <form method="post" action="<?= h(url('/game/' . $game['id'] . '/schedule')) ?>" class="score-form">
+    <?= csrf_field() ?>
+    <input type="hidden" name="return_to" value="<?= h($returnTo) ?>">
+    <label class="date-field">
+      <span>Datum</span>
+      <input type="date" name="played_date" value="<?= h($date) ?>" required autofocus>
+    </label>
+    <label class="date-field">
+      <span>Zeit <span class="muted">(optional)</span></span>
+      <input type="time" name="game_time" value="<?= h(format_time_ch($time)) ?>">
+    </label>
+    <div class="conflict-actions">
+      <a class="btn btn-secondary btn-sm" href="<?= h(url($returnTo)) ?>">Abbrechen</a>
+      <button class="btn btn-primary btn-sm" type="submit">Termin speichern</button>
+    </div>
   </form>
 </div>
