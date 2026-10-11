@@ -107,7 +107,7 @@ if ($timedConflicts !== []) {
     <input type="hidden" name="played_date" value="<?= h($date) ?>">
     <input type="hidden" name="game_time" value="<?= h(format_time_ch($time)) ?>">
     <input type="hidden" name="confirm_conflict" value="1">
-    <button class="btn btn-primary" type="submit">Trotzdem speichern</button>
+    <button class="btn btn-primary btn-sm" type="submit">Trotzdem speichern</button>
   </form>
 
   <h2 class="conflict-subhead">Anderen Termin wählen</h2>
