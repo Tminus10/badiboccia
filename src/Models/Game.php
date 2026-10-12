@@ -5,7 +5,7 @@ final class Game
     /** How long a group-phase game is assumed to occupy the court. */
     public const GROUP_SLOT_MINUTES = 90;
     /** How long a knockout game (QF and up) is assumed to occupy the court -- they tend to be closer and longer. */
-    public const KNOCKOUT_SLOT_MINUTES = 150;
+    public const KNOCKOUT_SLOT_MINUTES = 180;
 
     /** Assumed slot length for a game of this phase -- shared by the calendar export, the clash check and the conflict page. */
     public static function slotMinutes(string $phase): int
