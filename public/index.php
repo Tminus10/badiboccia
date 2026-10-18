@@ -55,6 +55,7 @@ $router->post('/api/v1/auth/logout', ['ApiController', 'logout']);
 $router->get('/api/v1/me', ['ApiController', 'me']);
 $router->post('/api/v1/games/{id}/result', ['ApiController', 'submitResult']);
 $router->post('/api/v1/games/{id}/schedule', ['ApiController', 'scheduleGame']);
+$router->post('/api/v1/teams/{id}/photo', ['ApiController', 'uploadPhoto']);
 
 // Admin area
 $router->get('/admin', ['AdminController', 'dashboard']);

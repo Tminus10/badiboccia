@@ -127,6 +127,7 @@ validation, audit log, schedule-clash check). Team PINs are never part of any re
 | GET  | `/api/v1/me` | the token's team (401 once revoked) |
 | POST | `/api/v1/games/{id}/result` | `{"sets_a", "sets_b", "played_date", "game_time"}` – omit date/time to keep them, `null` clears |
 | POST | `/api/v1/games/{id}/schedule` | `{"played_date", "game_time", "force"}` – 409 with the clashing games unless `force` |
+| POST | `/api/v1/teams/{id}/photo` | multipart field `photo` (JPG/PNG/WEBP, max. 8 MB) → `{"team"}`; own team only |
 
 Send the token as `Authorization: Bearer <token>` (or `X-Api-Token: <token>`, for hosts that drop
 the Authorization header). Errors are `{"error": "<code>", "message": "<German text>"}`.

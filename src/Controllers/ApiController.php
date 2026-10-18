@@ -3,7 +3,8 @@
 /**
  * JSON API for the iOS/iPadOS app (/api/v1). Read endpoints are public, like the website;
  * result entry and scheduling need a team bearer token (see ApiAuth) and follow the same rules
- * as GameController: only the two participating teams, only in the current season.
+ * as GameController: only the two participating teams, only in the current season. With the
+ * token a team can also replace its own photo.
  *
  * Errors are {"error": "<code>", "message": "<German text>"}; the app localizes by code.
  */
@@ -179,6 +180,26 @@ final class ApiController
 
         Game::scheduleDate((int) $game['id'], $date, $time, 'team', (int) $team['id'], $team['name']);
         self::respond(['game' => self::gameJson(Game::find((int) $game['id']))]);
+    }
+
+    /**
+     * Multipart upload, field "photo" (JPG, PNG or WEBP): replaces the team's photo. Like the
+     * website's TeamController::uploadPhoto, a team may only change its own photo, in any season.
+     */
+    public static function uploadPhoto(array $params): void
+    {
+        $team = self::requireTeam();
+        if ((int) $params['id'] !== (int) $team['id']) {
+            self::error(403, 'not_own_team', 'Du kannst nur das Foto deines eigenen Teams ändern.');
+        }
+
+        try {
+            $path = PhotoUploader::handle((int) $team['id'], $_FILES['photo'] ?? []);
+        } catch (RuntimeException $e) {
+            self::error(422, 'invalid_photo', $e->getMessage());
+        }
+        Team::setPhoto((int) $team['id'], $path);
+        self::respond(['team' => self::teamJson(Team::find((int) $team['id']))]);
     }
 
     public static function notFound(): void
