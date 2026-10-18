@@ -30,6 +30,17 @@ $returnTo = $showAllSeasons ? url('/team/' . $teamId) . '?season=all' : url('/te
     <?php else: ?>
       <a class="card-link" href="<?= h(url('/team/' . $teamId)) ?>?season=all">Alle Saisons anzeigen →</a>
     <?php endif; ?>
+    <?php if (TeamController::canEditPhoto($teamId)): ?>
+      <details class="team-photo-edit">
+        <summary><?= team_photo_url($targetTeam) !== null ? 'Foto ändern' : 'Foto hinzufügen' ?></summary>
+        <form method="post" action="<?= h(url('/team/' . $teamId . '/photo')) ?>" enctype="multipart/form-data" class="stack-form">
+          <?= csrf_field() ?>
+          <?php if (isset($_GET['season'])): ?><input type="hidden" name="season" value="<?= h((string) $_GET['season']) ?>"><?php endif; ?>
+          <label>Foto (wird quadratisch zugeschnitten) <input type="file" name="photo" accept="image/png,image/jpeg,image/webp" required></label>
+          <button class="btn btn-secondary btn-sm" type="submit">Foto hochladen</button>
+        </form>
+      </details>
+    <?php endif; ?>
   </div>
 </div>
 

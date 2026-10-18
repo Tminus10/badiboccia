@@ -9,7 +9,8 @@ build step — designed to run on ordinary shared hosting (hostpoint.ch Standard
 
 - **Anyone** can view standings, fixtures, and the bracket without logging in.
 - **Teams** log in with a 4-digit PIN (tap your team, enter the PIN) and can then
-  enter/correct the result of games *they* played.
+  enter/correct the result of games *they* played, and add/change their own team
+  photo on their team page.
 - **Admins** log in with a username/password and manage seasons, groups, teams
   (incl. photos and PIN resets), the knockout bracket pairings, other admin
   accounts, and can correct any result. Every result change is written to an

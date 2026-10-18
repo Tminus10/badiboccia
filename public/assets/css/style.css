@@ -334,6 +334,9 @@ input:focus, select:focus, button:focus, a:focus {
 
 .team-header { display: flex; align-items: center; gap: 1rem; }
 .team-header h1 { margin-bottom: 0.1em; }
+.team-photo-edit { margin-top: 0.8rem; }
+.team-photo-edit summary { cursor: pointer; font-weight: 700; font-size: 0.9rem; color: var(--accent); }
+.team-photo-edit .stack-form { margin-top: 0.6rem; }
 
 /* ---------- Fixtures ---------- */
 

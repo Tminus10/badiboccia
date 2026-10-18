@@ -41,6 +41,9 @@ $router->post('/logout', ['AuthController', 'logout']);
 $router->post('/game/{id}/result', ['GameController', 'submitResult']);
 $router->post('/game/{id}/schedule', ['GameController', 'scheduleDate']);
 
+// Team photo (the team itself or admin)
+$router->post('/team/{id}/photo', ['TeamController', 'uploadPhoto']);
+
 // JSON API for the iOS/iPadOS app, see ApiController
 $router->get('/api/v1', ['ApiController', 'info']);
 $router->get('/api/v1/seasons', ['ApiController', 'seasons']);

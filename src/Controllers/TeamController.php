@@ -76,4 +76,53 @@ final class TeamController
             'admin' => AdminAuth::current(),
         ]);
     }
+
+    /**
+     * Lets a logged-in team upload/replace its own photo (admins can do this for any team, here
+     * or in the admin area). The photo belongs to the team, not a season, so this also works
+     * while no season is current.
+     */
+    public static function uploadPhoto(array $params): void
+    {
+        $teamId = (int) $params['id'];
+        $seasonParam = (string) ($_POST['season'] ?? '');
+        $returnTo = '/team/' . $teamId
+            . ($seasonParam === 'all' || ctype_digit($seasonParam) ? '?season=' . $seasonParam : '');
+
+        if (!csrf_check()) {
+            flash_set('error', 'Ungültige Anfrage. Bitte erneut versuchen.');
+            redirect($returnTo);
+        }
+
+        $team = Team::find($teamId);
+        if ($team === null) {
+            http_response_code(404);
+            render('404');
+            return;
+        }
+
+        if (!self::canEditPhoto($teamId)) {
+            flash_set('error', 'Bitte melde dich als dieses Team an, um das Foto zu ändern.');
+            redirect($returnTo);
+        }
+
+        try {
+            $path = PhotoUploader::handle($teamId, $_FILES['photo'] ?? []);
+            Team::setPhoto($teamId, $path);
+            flash_set('success', 'Foto gespeichert.');
+        } catch (RuntimeException $e) {
+            flash_set('error', $e->getMessage());
+        }
+
+        redirect($returnTo);
+    }
+
+    public static function canEditPhoto(int $teamId): bool
+    {
+        if (AdminAuth::current() !== null) {
+            return true;
+        }
+        $viewer = TeamAuth::current();
+        return $viewer !== null && (int) $viewer['id'] === $teamId;
+    }
 }

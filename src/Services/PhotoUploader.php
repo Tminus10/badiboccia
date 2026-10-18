@@ -33,6 +33,9 @@ final class PhotoUploader
         if ($source === false) {
             throw new RuntimeException('Bildformat wird nicht unterstützt (nutze JPG, PNG oder WEBP).');
         }
+        if ($info['mime'] === 'image/jpeg') {
+            $source = self::applyExifOrientation($source, $file['tmp_name']);
+        }
 
         $width = imagesx($source);
         $height = imagesy($source);
@@ -54,5 +57,33 @@ final class PhotoUploader
         imagedestroy($target);
 
         return "uploads/teams/$filename";
+    }
+
+    /**
+     * Phone cameras store JPEGs unrotated plus an EXIF orientation flag; GD ignores that flag,
+     * so without this a portrait phone photo would end up sideways. No-op without ext-exif.
+     */
+    private static function applyExifOrientation(GdImage $image, string $path): GdImage
+    {
+        if (!function_exists('exif_read_data')) {
+            return $image;
+        }
+        $exif = @exif_read_data($path);
+        $orientation = is_array($exif) ? (int) ($exif['Orientation'] ?? 1) : 1;
+
+        if (in_array($orientation, [2, 4, 5, 7], true)) {
+            imageflip($image, IMG_FLIP_HORIZONTAL);
+        }
+        $angle = match ($orientation) {
+            3, 4 => 180,
+            6, 7 => 270,
+            5, 8 => 90,
+            default => 0,
+        };
+        if ($angle === 0) {
+            return $image;
+        }
+        $rotated = imagerotate($image, $angle, 0);
+        return $rotated !== false ? $rotated : $image;
     }
 }
