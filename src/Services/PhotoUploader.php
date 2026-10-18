@@ -53,9 +53,6 @@ final class PhotoUploader
         $filename = "team-$teamId.jpg";
         imagejpeg($target, "$dir/$filename", 85);
 
-        imagedestroy($source);
-        imagedestroy($target);
-
         return "uploads/teams/$filename";
     }
 
