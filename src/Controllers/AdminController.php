@@ -416,6 +416,7 @@ final class AdminController
 
         $pin = str_pad((string) random_int(0, 9999), 4, '0', STR_PAD_LEFT);
         Team::resetPin($teamId, $pin);
+        ApiAuth::revokeAllForTeam($teamId);
         flash_set('success', 'Neuer PIN für ' . $team['name'] . ': ' . $pin);
         self::redirectAfterTeamAction($seasonId, $groupId);
     }

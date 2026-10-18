@@ -2,7 +2,8 @@
 
 final class GameController
 {
-    private const VALID_SCORES = [[2, 0], [2, 1], [1, 2], [0, 2], [1, 1]];
+    /** Also enforced by the app's API (ApiController). */
+    public const VALID_SCORES = [[2, 0], [2, 1], [1, 2], [0, 2], [1, 1]];
 
     public static function submitResult(array $params): void
     {

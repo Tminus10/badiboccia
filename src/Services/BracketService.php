@@ -98,46 +98,86 @@ final class BracketService
     }
 
     /**
-     * Same crossed-seeding template as recommendedQfPairings(), but as plain
-     * "Sieger/Zweiter Gruppe X" labels rather than actual teams. Used before any group-phase
-     * game has a result, when standings are still all-tied and "top 2" would just be
-     * alphabetical -- showing real (but meaningless) team names as the suggestion
-     * would look like a real assignment. Needs only the four group names, not standings.
+     * Same crossed-seeding template as recommendedQfPairings(), but naming the slots
+     * ("winner of group X", "runner-up of group Y") rather than actual teams. Used before any
+     * group-phase game has a result, when standings are still all-tied and "top 2" would just
+     * be alphabetical -- showing real (but meaningless) team names as the suggestion would look
+     * like a real assignment. Needs only the four group names, not standings.
+     *
+     * Returned as structured slots (see slotLabel()) so the app API can localize them; the
+     * website uses recommendedQfPairingLabels() below.
      *
      * @param string[] $groupNames the season's group names, in their display order
-     * @return array<int, array{0:string,1:string}>|null [slot => [labelA, labelB]] for QF slots 1-4,
+     * @return array<int, array{0:array,1:array}>|null [slot => [slotA, slotB]] for QF slots 1-4,
      *   or null if there aren't exactly four groups.
      */
-    public static function recommendedQfPairingLabels(array $groupNames): ?array
+    public static function recommendedQfPairingSlots(array $groupNames): ?array
     {
         if (count($groupNames) !== 4) {
             return null;
         }
         [$n1, $n2, $n3, $n4] = array_values($groupNames);
+        $winner = fn (string $group): array => ['type' => 'group_winner', 'group' => $group];
+        $runnerUp = fn (string $group): array => ['type' => 'group_runner_up', 'group' => $group];
 
         return [
-            1 => ["Sieger Gruppe $n1", "Zweiter Gruppe $n2"],
-            2 => ["Sieger Gruppe $n3", "Zweiter Gruppe $n4"],
-            3 => ["Sieger Gruppe $n2", "Zweiter Gruppe $n1"],
-            4 => ["Sieger Gruppe $n4", "Zweiter Gruppe $n3"],
+            1 => [$winner($n1), $runnerUp($n2)],
+            2 => [$winner($n3), $runnerUp($n4)],
+            3 => [$winner($n2), $runnerUp($n1)],
+            4 => [$winner($n4), $runnerUp($n3)],
         ];
     }
 
     /**
-     * Placeholder labels for a not-yet-filled SF/final/third-place game, naming the game each
-     * slot is fed from -- mirrors the next_game_id wiring of Game::ensureBracketSkeleton()
-     * (QF 1+2 -> SF 1, QF 3+4 -> SF 2, SF winners -> final, SF losers -> third place).
-     * Games are numbered top to bottom, as they're shown in the tournament tree.
+     * recommendedQfPairingSlots() as plain "Sieger/Zweiter Gruppe X" labels.
+     *
+     * @return array<int, array{0:string,1:string}>|null
+     */
+    public static function recommendedQfPairingLabels(array $groupNames): ?array
+    {
+        $slots = self::recommendedQfPairingSlots($groupNames);
+        return $slots === null ? null : array_map(fn (array $pair): array => array_map([self::class, 'slotLabel'], $pair), $slots);
+    }
+
+    /**
+     * The games feeding a not-yet-filled SF/final/third-place game's two slots -- mirrors the
+     * next_game_id wiring of Game::ensureBracketSkeleton() (QF 1+2 -> SF 1, QF 3+4 -> SF 2,
+     * SF winners -> final, SF losers -> third place). Games are numbered top to bottom, as
+     * they're shown in the tournament tree.
+     *
+     * @return array{0:array,1:array}|null [slotA, slotB] (see slotLabel()), or null for QF
+     *   games (see recommendedQfPairingSlots()).
+     */
+    public static function feederSlots(string $phase, int $slotIndex): ?array
+    {
+        $feeder = fn (string $type, string $fromPhase, int $slot): array => ['type' => $type, 'phase' => $fromPhase, 'slot' => $slot];
+        return match ($phase) {
+            'sf' => [$feeder('winner', 'qf', 2 * $slotIndex - 1), $feeder('winner', 'qf', 2 * $slotIndex)],
+            'final' => [$feeder('winner', 'sf', 1), $feeder('winner', 'sf', 2)],
+            'third' => [$feeder('loser', 'sf', 1), $feeder('loser', 'sf', 2)],
+            default => null,
+        };
+    }
+
+    /**
+     * feederSlots() as plain labels for a not-yet-filled game's slots, e.g. "Sieger Viertelfinal 1".
      *
      * @return array{0:string,1:string}|null [labelA, labelB], or null for QF games (see recommendedQfPairingLabels()).
      */
     public static function feederLabels(string $phase, int $slotIndex): ?array
     {
-        return match ($phase) {
-            'sf' => ['Sieger Viertelfinal ' . (2 * $slotIndex - 1), 'Sieger Viertelfinal ' . (2 * $slotIndex)],
-            'final' => ['Sieger Halbfinal 1', 'Sieger Halbfinal 2'],
-            'third' => ['Verlierer Halbfinal 1', 'Verlierer Halbfinal 2'],
-            default => null,
+        $slots = self::feederSlots($phase, $slotIndex);
+        return $slots === null ? null : array_map([self::class, 'slotLabel'], $slots);
+    }
+
+    /** German label for one structured placeholder slot from recommendedQfPairingSlots()/feederSlots(). */
+    public static function slotLabel(array $slot): string
+    {
+        return match ($slot['type']) {
+            'group_winner' => 'Sieger Gruppe ' . $slot['group'],
+            'group_runner_up' => 'Zweiter Gruppe ' . $slot['group'],
+            'winner' => 'Sieger ' . phase_label($slot['phase']) . ' ' . $slot['slot'],
+            'loser' => 'Verlierer ' . phase_label($slot['phase']) . ' ' . $slot['slot'],
         };
     }
 }

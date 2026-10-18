@@ -1,5 +1,10 @@
 RewriteEngine On
 
+# Hand the Authorization header (the app's API bearer token) through to PHP; CGI/FastCGI
+# setups drop it otherwise. ApiAuth also accepts X-Api-Token as a fallback.
+RewriteCond %{HTTP:Authorization} .
+RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
+
 # Serve real files and directories (assets, uploads) as-is
 RewriteCond %{REQUEST_FILENAME} -f [OR]
 RewriteCond %{REQUEST_FILENAME} -d

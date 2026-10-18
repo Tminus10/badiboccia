@@ -25,6 +25,19 @@ final class TeamAuth
 
     public static function attempt(int $teamId, string $pin): bool
     {
+        $ok = self::checkPin($teamId, $pin);
+        if ($ok) {
+            $_SESSION['team_id'] = $teamId;
+        }
+        return $ok;
+    }
+
+    /**
+     * Verifies a PIN and records the attempt (so it counts towards the lockout), without
+     * logging anyone in -- shared by the web login above and the app's token login (ApiController).
+     */
+    public static function checkPin(int $teamId, string $pin): bool
+    {
         $team = Team::find($teamId);
         if ($team === null) {
             return false;
@@ -38,10 +51,6 @@ final class TeamAuth
 
         $stmt = Db::pdo()->prepare('INSERT INTO team_login_attempts (team_id, success) VALUES (?, ?)');
         $stmt->execute([$teamId, $ok ? 1 : 0]);
-
-        if ($ok) {
-            $_SESSION['team_id'] = $teamId;
-        }
 
         return $ok;
     }

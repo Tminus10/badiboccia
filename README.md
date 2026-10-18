@@ -108,6 +108,30 @@ Deploy to it with:
 ./scripts/deploy.sh dev
 ```
 
+## JSON API (for the iOS/iPadOS app)
+
+`/api/v1` serves the native app (separate repo: `../badiboccia-ios`). Reading
+is public, like the website; writing needs a team token from the PIN login and follows the same
+rules as the web forms (only the two teams playing, only in the current season, same score
+validation, audit log, schedule-clash check). Team PINs are never part of any response.
+
+| Method | Path | |
+|---|---|---|
+| GET  | `/api/v1` | API version, `env` (dev/prod), current season id |
+| GET  | `/api/v1/seasons` | all seasons |
+| GET  | `/api/v1/seasons/current`, `/api/v1/seasons/{id}` | one season: teams, groups with standings and games, bracket (empty slots carry structured placeholders), podium, calendar entries |
+| GET  | `/api/v1/teams/{id}` | team, its seasons, all its games, its opponents |
+| POST | `/api/v1/auth/login` | `{"team_id", "pin", "device"}` → `{"token", "team"}`; same lockout as the web login |
+| POST | `/api/v1/auth/logout` | revokes the token |
+| GET  | `/api/v1/me` | the token's team (401 once revoked) |
+| POST | `/api/v1/games/{id}/result` | `{"sets_a", "sets_b", "played_date", "game_time"}` – omit date/time to keep them, `null` clears |
+| POST | `/api/v1/games/{id}/schedule` | `{"played_date", "game_time", "force"}` – 409 with the clashing games unless `force` |
+
+Send the token as `Authorization: Bearer <token>` (or `X-Api-Token: <token>`, for hosts that drop
+the Authorization header). Errors are `{"error": "<code>", "message": "<German text>"}`.
+Tokens live in `api_tokens` (SHA-256 hashes only, see `migrations/004_api_tokens.sql`);
+resetting a team's PIN in the admin area logs that team out of the app everywhere.
+
 ## Notes on the domain rules
 
 - Group phase: single round-robin (every team plays every other team in its

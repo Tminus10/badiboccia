@@ -56,6 +56,9 @@ final class Router
             }
         }
 
+        if (str_starts_with($path, '/api/')) {
+            ApiController::notFound();
+        }
         http_response_code(404);
         render('404');
     }

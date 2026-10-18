@@ -41,6 +41,18 @@ $router->post('/logout', ['AuthController', 'logout']);
 $router->post('/game/{id}/result', ['GameController', 'submitResult']);
 $router->post('/game/{id}/schedule', ['GameController', 'scheduleDate']);
 
+// JSON API for the iOS/iPadOS app, see ApiController
+$router->get('/api/v1', ['ApiController', 'info']);
+$router->get('/api/v1/seasons', ['ApiController', 'seasons']);
+$router->get('/api/v1/seasons/current', ['ApiController', 'currentSeason']);
+$router->get('/api/v1/seasons/{id}', ['ApiController', 'season']);
+$router->get('/api/v1/teams/{id}', ['ApiController', 'team']);
+$router->post('/api/v1/auth/login', ['ApiController', 'login']);
+$router->post('/api/v1/auth/logout', ['ApiController', 'logout']);
+$router->get('/api/v1/me', ['ApiController', 'me']);
+$router->post('/api/v1/games/{id}/result', ['ApiController', 'submitResult']);
+$router->post('/api/v1/games/{id}/schedule', ['ApiController', 'scheduleGame']);
+
 // Admin area
 $router->get('/admin', ['AdminController', 'dashboard']);
 $router->get('/admin/teams', ['AdminController', 'teamsIndex']);

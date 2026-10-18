@@ -117,6 +117,19 @@ CREATE TABLE team_login_attempts (
   FOREIGN KEY (team_id) REFERENCES teams(id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
+-- Bearer tokens for the JSON API (/api/v1), used by the iOS/iPadOS app. Only a SHA-256 hash
+-- of each token is stored; resetting a team's PIN revokes all of its tokens.
+CREATE TABLE api_tokens (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  token_hash CHAR(64) NOT NULL,
+  team_id INT NOT NULL,
+  device_label VARCHAR(100) NULL,
+  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  last_used_at DATETIME NULL,
+  UNIQUE KEY uniq_token_hash (token_hash),
+  FOREIGN KEY (team_id) REFERENCES teams(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
 -- Applied data changesets (scripted bulk edits from data-changes/), see scripts/apply-changeset.php.
 CREATE TABLE data_changesets (
   id INT AUTO_INCREMENT PRIMARY KEY,
