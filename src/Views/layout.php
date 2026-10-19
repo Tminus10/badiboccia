@@ -3,7 +3,7 @@ $currentTeam = TeamAuth::current();
 $currentAdmin = AdminAuth::current();
 $flashes = flash_take();
 ?><!doctype html>
-<html lang="de-CH">
+<html lang="<?= h(I18n::htmlLang()) ?>">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5">
@@ -13,7 +13,7 @@ $flashes = flash_take();
 <link rel="stylesheet" href="<?= h(asset_url('/assets/css/style.css')) ?>">
 </head>
 <body>
-<?php if (is_dev_env()): ?><div class="dev-banner">🧪 DEV-Umgebung &ndash; nicht die Live-Website</div><?php endif; ?>
+<?php if (is_dev_env()): ?><div class="dev-banner">🧪 <?= h(t('DEV-Umgebung – nicht die Live-Website')) ?></div><?php endif; ?>
 <header class="topbar">
   <div class="topbar-inner">
     <div class="topbar-row">
@@ -23,13 +23,13 @@ $flashes = flash_take();
       </a>
       <div class="account">
         <?php if ($currentAdmin): ?>
-          <span class="pill pill-admin">Admin: <?= h($currentAdmin['display_name']) ?></span>
-          <a class="btn btn-ghost btn-sm" href="<?= h(url('/admin')) ?>">Admin-Bereich</a>
-          <a class="btn btn-ghost btn-sm" href="<?= h(url('/admin/teams')) ?>">Teams</a>
+          <span class="pill pill-admin"><?= h(t('Admin: %s', $currentAdmin['display_name'])) ?></span>
+          <a class="btn btn-ghost btn-sm" href="<?= h(url('/admin')) ?>"><?= h(t('Admin-Bereich')) ?></a>
+          <a class="btn btn-ghost btn-sm" href="<?= h(url('/admin/teams')) ?>"><?= h(t('Teams')) ?></a>
           <form method="post" action="<?= h(url('/logout')) ?>" class="inline-form">
             <?= csrf_field() ?>
             <input type="hidden" name="return_to" value="<?= h($_SERVER['REQUEST_URI']) ?>">
-            <button class="btn btn-ghost btn-sm" type="submit">Abmelden</button>
+            <button class="btn btn-ghost btn-sm" type="submit"><?= h(t('Abmelden')) ?></button>
           </form>
         <?php elseif ($currentTeam): ?>
           <a class="pill team-pill" href="<?= h(url('/team/' . $currentTeam['id'])) ?>" style="--dot: <?= h($currentTeam['color_hex']) ?>">
@@ -38,19 +38,22 @@ $flashes = flash_take();
           <form method="post" action="<?= h(url('/logout')) ?>" class="inline-form">
             <?= csrf_field() ?>
             <input type="hidden" name="return_to" value="<?= h($_SERVER['REQUEST_URI']) ?>">
-            <button class="btn btn-ghost btn-sm" type="submit">Abmelden</button>
+            <button class="btn btn-ghost btn-sm" type="submit"><?= h(t('Abmelden')) ?></button>
           </form>
         <?php else: ?>
-          <a class="btn btn-primary btn-sm" href="<?= h(url('/login')) ?>">Anmelden</a>
+          <a class="btn btn-primary btn-sm" href="<?= h(url('/login')) ?>"><?= h(t('Anmelden')) ?></a>
         <?php endif; ?>
       </div>
     </div>
     <nav class="topnav">
-      <a href="<?= h(url('/')) ?>">Übersicht</a>
-      <a href="<?= h(url('/bracket')) ?>">Turnierbaum</a>
-      <a href="<?= h(url('/calendar')) ?>">Kalender</a>
-      <a href="<?= h(url('/archive')) ?>">Archiv</a>
-      <a href="<?= h(url('/regeln')) ?>">Regeln</a>
+      <a href="<?= h(url('/')) ?>"><?= h(t('Übersicht')) ?></a>
+      <a href="<?= h(url('/bracket')) ?>"><?= h(t('Turnierbaum')) ?></a>
+      <a href="<?= h(url('/calendar')) ?>"><?= h(t('Kalender')) ?></a>
+      <a href="<?= h(url('/archive')) ?>"><?= h(t('Archiv')) ?></a>
+      <a href="<?= h(url('/regeln')) ?>"><?= h(t('Regeln')) ?></a>
+      <?php foreach (I18n::LANGUAGES as $code => [$languageName]): ?>
+        <?php if ($code !== I18n::locale()): ?><a class="topnav-lang" href="<?= h(lang_url($code)) ?>" hreflang="<?= h($code) ?>" lang="<?= h($code) ?>"><?= h($languageName) ?></a><?php endif; ?>
+      <?php endforeach; ?>
     </nav>
   </div>
 </header>
@@ -68,7 +71,13 @@ $flashes = flash_take();
 </main>
 
 <footer class="site-footer">
-  <p>Badi Boccia Buochs &middot; <a href="<?= h(url('/archive')) ?>">Archiv</a> &middot; <?php if (!$currentAdmin): ?><a href="<?= h(url('/admin/login')) ?>">Admin-Login</a><?php endif; ?></p>
+  <p>Badi Boccia Buochs &middot; <a href="<?= h(url('/archive')) ?>"><?= h(t('Archiv')) ?></a> &middot; <?php if (!$currentAdmin): ?><a href="<?= h(url('/admin/login')) ?>"><?= h(t('Admin-Login')) ?></a> &middot; <?php endif; ?>
+    <span class="lang-switch">
+      <?php foreach (I18n::LANGUAGES as $code => [$languageName]): ?>
+        <?php if ($code === I18n::locale()): ?><strong><?= h($languageName) ?></strong><?php else: ?><a href="<?= h(lang_url($code)) ?>" hreflang="<?= h($code) ?>" lang="<?= h($code) ?>"><?= h($languageName) ?></a><?php endif; ?>
+      <?php endforeach; ?>
+    </span>
+  </p>
 </footer>
 </body>
 </html>

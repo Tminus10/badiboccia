@@ -55,7 +55,7 @@ final class AuthController
 
         $pin = (string) ($_POST['pin'] ?? '');
         if (TeamAuth::attempt($teamId, $pin)) {
-            flash_set('success', 'Willkommen, ' . $team['name'] . '!');
+            flash_set('success', t('Willkommen, %s!', $team['name']));
             $returnTo = $_POST['return_to'] ?? ('/team/' . $teamId);
             redirect($returnTo);
             return;
@@ -79,7 +79,7 @@ final class AuthController
         $password = (string) ($_POST['password'] ?? '');
 
         if (AdminAuth::attempt($username, $password)) {
-            flash_set('success', 'Als Admin angemeldet.');
+            flash_set('success', t('Als Admin angemeldet.'));
             redirect('/admin');
             return;
         }
@@ -91,7 +91,7 @@ final class AuthController
     {
         TeamAuth::logout();
         AdminAuth::logout();
-        flash_set('success', 'Abgemeldet.');
+        flash_set('success', t('Abgemeldet.'));
         $returnTo = $_POST['return_to'] ?? '/';
         redirect($returnTo);
     }

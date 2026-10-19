@@ -11,10 +11,7 @@
  * @var string $feedUrl
  * @var array|null $admin
  */
-$pageTitle = 'Kalender';
-$monthNames = ['Januar', 'Februar', 'März', 'April', 'Mai', 'Juni', 'Juli', 'August', 'September', 'Oktober', 'November', 'Dezember'];
-$weekdayShort = ['Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa', 'So'];
-$weekdayLong = ['Montag', 'Dienstag', 'Mittwoch', 'Donnerstag', 'Freitag', 'Samstag', 'Sonntag'];
+$pageTitle = t('Kalender');
 $durationOptions = calendar_duration_options();
 
 $byDate = [];
@@ -46,33 +43,33 @@ $itemDisplay = function (array $item) use ($teamsById, $groupsById, $isCurrent, 
 ?>
 <div class="page-head">
   <div>
-    <?php if (!$isCurrent): ?><p class="eyebrow"><a href="<?= h(url('/archive')) ?>">Archiv</a></p><?php endif; ?>
-    <h1>Kalender <?php if (!$isCurrent): ?><span class="badge badge-archive">Archiviert</span><?php endif; ?></h1>
+    <?php if (!$isCurrent): ?><p class="eyebrow"><a href="<?= h(url('/archive')) ?>"><?= h(t('Archiv')) ?></a></p><?php endif; ?>
+    <h1><?= h(t('Kalender')) ?> <?php if (!$isCurrent): ?><span class="badge badge-archive"><?= h(t('Archiviert')) ?></span><?php endif; ?></h1>
     <p class="muted"><?= h($season['label']) ?></p>
   </div>
 </div>
 
 <?php if ($admin !== null && $isCurrent): ?>
   <section class="card">
-    <h2>Termin hinzufügen</h2>
-    <p class="muted">Für alles ohne eigenes Spiel &ndash; Gruppenauslosung, Siegerehrung usw. Erscheint für alle im Kalender und im ICS-Feed.</p>
+    <h2><?= h(t('Termin hinzufügen')) ?></h2>
+    <p class="muted"><?= h(t('Für alles ohne eigenes Spiel – Gruppenauslosung, Siegerehrung usw. Erscheint für alle im Kalender und im ICS-Feed.')) ?></p>
     <form method="post" action="<?= h(url('/admin/season/' . $season['id'] . '/calendar-event')) ?>" class="stack-form calendar-event-form">
       <?= csrf_field() ?>
       <label>
-        <span>Titel</span>
+        <span><?= h(t('Titel')) ?></span>
         <input type="text" name="title" required maxlength="150">
       </label>
       <div class="field-row">
         <label>
-          <span>Datum</span>
+          <span><?= h(t('Datum')) ?></span>
           <input type="date" name="event_date" required>
         </label>
         <label>
-          <span>Zeit <span class="muted">(optional)</span></span>
+          <span><?= h(t('Zeit')) ?> <span class="muted">(<?= h(t('optional')) ?>)</span></span>
           <input type="time" name="event_time">
         </label>
         <label>
-          <span>Dauer <span class="muted">(nur bei Uhrzeit)</span></span>
+          <span><?= h(t('Dauer')) ?> <span class="muted">(<?= h(t('nur bei Uhrzeit')) ?>)</span></span>
           <select name="duration_minutes">
             <?php foreach ($durationOptions as $minutes => $optLabel): ?>
               <option value="<?= $minutes ?>"<?= $minutes === 60 ? ' selected' : '' ?>><?= h($optLabel) ?></option>
@@ -81,14 +78,14 @@ $itemDisplay = function (array $item) use ($teamsById, $groupsById, $isCurrent, 
         </label>
       </div>
       <label>
-        <span>Ort <span class="muted">(optional)</span></span>
+        <span><?= h(t('Ort')) ?> <span class="muted">(<?= h(t('optional')) ?>)</span></span>
         <input type="text" name="location" maxlength="255" placeholder="Strandbad Buochs-Ennetbürgen">
       </label>
       <label class="checkbox-label">
         <input type="checkbox" name="reminder" value="1" checked>
-        <span>Erinnerung 1 Stunde vorher (nur bei Uhrzeit)</span>
+        <span><?= h(t('Erinnerung 1 Stunde vorher (nur bei Uhrzeit)')) ?></span>
       </label>
-      <button class="btn btn-primary btn-sm" type="submit">Termin speichern</button>
+      <button class="btn btn-primary btn-sm" type="submit"><?= h(t('Termin speichern')) ?></button>
     </form>
 
     <?php if (!empty($customEvents)): ?>
@@ -100,28 +97,28 @@ $itemDisplay = function (array $item) use ($teamsById, $groupsById, $isCurrent, 
               <span><?= h(format_datetime_ch($e['event_date'], $e['event_time'])) ?> &middot; <strong><?= h($e['title']) ?></strong><?php if (!empty($e['location'])): ?> &middot; <span class="muted"><?= h($e['location']) ?></span><?php endif; ?></span>
               <form method="post" action="<?= h(url('/admin/calendar-event/' . $e['id'] . '/delete')) ?>" class="inline-form">
                 <?= csrf_field() ?>
-                <button class="btn btn-ghost btn-sm" type="submit">Löschen</button>
+                <button class="btn btn-ghost btn-sm" type="submit"><?= h(t('Löschen')) ?></button>
               </form>
             </div>
             <details class="admin-team-edit">
-              <summary>Bearbeiten</summary>
+              <summary><?= h(t('Bearbeiten')) ?></summary>
               <form method="post" action="<?= h(url('/admin/calendar-event/' . $e['id'] . '/update')) ?>" class="stack-form">
                 <?= csrf_field() ?>
                 <label>
-                  <span>Titel</span>
+                  <span><?= h(t('Titel')) ?></span>
                   <input type="text" name="title" value="<?= h($e['title']) ?>" required maxlength="150">
                 </label>
                 <div class="field-row">
                   <label>
-                    <span>Datum</span>
+                    <span><?= h(t('Datum')) ?></span>
                     <input type="date" name="event_date" value="<?= h($e['event_date']) ?>" required>
                   </label>
                   <label>
-                    <span>Zeit <span class="muted">(optional)</span></span>
+                    <span><?= h(t('Zeit')) ?> <span class="muted">(<?= h(t('optional')) ?>)</span></span>
                     <input type="time" name="event_time" value="<?= h(format_time_ch($e['event_time'])) ?>">
                   </label>
                   <label>
-                    <span>Dauer <span class="muted">(nur bei Uhrzeit)</span></span>
+                    <span><?= h(t('Dauer')) ?> <span class="muted">(<?= h(t('nur bei Uhrzeit')) ?>)</span></span>
                     <select name="duration_minutes">
                       <?php foreach ($durationOptions as $minutes => $optLabel): ?>
                         <option value="<?= $minutes ?>"<?= $minutes === (int) $eDuration ? ' selected' : '' ?>><?= h($optLabel) ?></option>
@@ -130,14 +127,14 @@ $itemDisplay = function (array $item) use ($teamsById, $groupsById, $isCurrent, 
                   </label>
                 </div>
                 <label>
-                  <span>Ort <span class="muted">(optional)</span></span>
+                  <span><?= h(t('Ort')) ?> <span class="muted">(<?= h(t('optional')) ?>)</span></span>
                   <input type="text" name="location" value="<?= h($e['location'] ?? '') ?>" maxlength="255">
                 </label>
                 <label class="checkbox-label">
                   <input type="checkbox" name="reminder" value="1" <?= !empty($e['reminder']) ? 'checked' : '' ?>>
-                  <span>Erinnerung 1 Stunde vorher (nur bei Uhrzeit)</span>
+                  <span><?= h(t('Erinnerung 1 Stunde vorher (nur bei Uhrzeit)')) ?></span>
                 </label>
-                <button class="btn btn-primary btn-sm" type="submit">Speichern</button>
+                <button class="btn btn-primary btn-sm" type="submit"><?= h(t('Speichern')) ?></button>
               </form>
             </details>
           </li>
@@ -149,21 +146,23 @@ $itemDisplay = function (array $item) use ($teamsById, $groupsById, $isCurrent, 
 
 <section class="calendar-section" id="calendar">
   <nav class="page-head-actions calendar-view-toggle">
-    <a class="btn btn-sm <?= $view === 'month' ? 'btn-primary' : 'btn-secondary' ?>" href="<?= h($baseUrl . '?view=month&month=' . $month) ?>#calendar">Monat</a>
-    <a class="btn btn-sm <?= $view === 'list' ? 'btn-primary' : 'btn-secondary' ?>" href="<?= h($baseUrl . '?view=list') ?>#calendar">Liste</a>
+    <a class="btn btn-sm <?= $view === 'month' ? 'btn-primary' : 'btn-secondary' ?>" href="<?= h($baseUrl . '?view=month&month=' . $month) ?>#calendar"><?= h(t('Monat')) ?></a>
+    <a class="btn btn-sm <?= $view === 'list' ? 'btn-primary' : 'btn-secondary' ?>" href="<?= h($baseUrl . '?view=list') ?>#calendar"><?= h(t('Liste')) ?></a>
   </nav>
 
   <?php if ($unscheduledCount > 0): ?>
-    <p class="hint">Für <?= (int) $unscheduledCount ?> Spiel<?= $unscheduledCount === 1 ? '' : 'e' ?> mit bekanntem Gegner ist noch kein Termin festgelegt.</p>
+    <p class="hint"><?= h($unscheduledCount === 1
+        ? t('Für 1 Spiel mit bekanntem Gegner ist noch kein Termin festgelegt.')
+        : t('Für %d Spiele mit bekanntem Gegner ist noch kein Termin festgelegt.', $unscheduledCount)) ?></p>
   <?php endif; ?>
 
   <?php if (empty($items)): ?>
-    <p class="empty-state">Für diese Saison sind noch keine Termine geplant.</p>
+    <p class="empty-state"><?= h(t('Für diese Saison sind noch keine Termine geplant.')) ?></p>
   <?php elseif ($view === 'list'): ?>
     <section class="calendar-list">
       <?php foreach ($byDate as $date => $dayItems): ?>
         <?php $ts = strtotime($date); ?>
-        <h2 class="calendar-list-day"><?= h($weekdayLong[(int) date('N', $ts) - 1]) ?>, <?= (int) date('j', $ts) ?>. <?= h($monthNames[(int) date('n', $ts) - 1]) ?> <?= (int) date('Y', $ts) ?></h2>
+        <h2 class="calendar-list-day"><?= h(format_long_date($date)) ?></h2>
         <ol class="fixture-list">
           <?php foreach ($dayItems as $item): ?>
             <?php
@@ -172,7 +171,7 @@ $itemDisplay = function (array $item) use ($teamsById, $groupsById, $isCurrent, 
             ?>
             <li class="fixture-card">
               <div class="fixture-teams">
-                <span class="fixture-num calendar-event-time"><?= $item['time'] ? h(format_time_ch($item['time'])) : 'Ganztägig' ?></span>
+                <span class="fixture-num calendar-event-time"><?= h($item['time'] ? format_time_ch($item['time']) : t('Ganztags')) ?></span>
                 <?php if ($item['kind'] === 'game'): ?>
                   <?php
                     $teamA = $g['team_a_id'] !== null ? ($teamsById[$g['team_a_id']] ?? null) : null;
@@ -208,12 +207,12 @@ $itemDisplay = function (array $item) use ($teamsById, $groupsById, $isCurrent, 
       $gridEnd = $monthEnd->modify('+' . (7 - (int) $monthEnd->format('N')) . ' days');
     ?>
     <nav class="calendar-nav">
-      <a class="calendar-nav-arrow" href="<?= h($baseUrl . '?view=month&month=' . $prevMonth) ?>#calendar" aria-label="Vorheriger Monat">‹</a>
-      <h2><?= h($monthNames[(int) $monthStart->format('n') - 1]) ?> <?= h($monthStart->format('Y')) ?></h2>
-      <a class="calendar-nav-arrow" href="<?= h($baseUrl . '?view=month&month=' . $nextMonth) ?>#calendar" aria-label="Nächster Monat">›</a>
+      <a class="calendar-nav-arrow" href="<?= h($baseUrl . '?view=month&month=' . $prevMonth) ?>#calendar" aria-label="<?= h(t('Vorheriger Monat')) ?>">‹</a>
+      <h2><?= h(month_name((int) $monthStart->format('n'))) ?> <?= h($monthStart->format('Y')) ?></h2>
+      <a class="calendar-nav-arrow" href="<?= h($baseUrl . '?view=month&month=' . $nextMonth) ?>#calendar" aria-label="<?= h(t('Nächster Monat')) ?>">›</a>
     </nav>
     <div class="calendar-grid">
-      <?php foreach ($weekdayShort as $wd): ?><div class="calendar-weekday"><?= h($wd) ?></div><?php endforeach; ?>
+      <?php for ($wd = 1; $wd <= 7; $wd++): ?><div class="calendar-weekday"><?= h(weekday_name($wd, true)) ?></div><?php endfor; ?>
       <?php for ($day = $gridStart; $day <= $gridEnd; $day = $day->modify('+1 day')): ?>
         <?php
           $dateStr = $day->format('Y-m-d');
@@ -229,7 +228,7 @@ $itemDisplay = function (array $item) use ($teamsById, $groupsById, $isCurrent, 
               $title = $display['subtitle'] !== null && $display['subtitle'] !== ''
                   ? $display['title'] . ' (' . $display['subtitle'] . ')'
                   : $display['title'];
-              $meta = ($item['time'] ? format_time_ch($item['time']) . ' · ' : '') . ($display['subtitle'] ?? ($item['kind'] === 'event' ? 'Termin' : ''));
+              $meta = ($item['time'] ? format_time_ch($item['time']) . ' · ' : '') . ($display['subtitle'] ?? ($item['kind'] === 'event' ? t('Termin') : ''));
             ?>
             <?php if ($display['href'] !== null): ?>
               <a class="calendar-event" href="<?= h($display['href']) ?>" title="<?= h($title) ?>">
@@ -250,16 +249,16 @@ $itemDisplay = function (array $item) use ($teamsById, $groupsById, $isCurrent, 
 </section>
 
 <section class="card calendar-subscribe">
-  <h2>Kalender abonnieren</h2>
-  <p class="muted">Damit erscheinen alle geplanten Spiele automatisch in deiner Kalender-App &ndash; neue Termine werden laufend nachgeladen.</p>
+  <h2><?= h(t('Kalender abonnieren')) ?></h2>
+  <p class="muted"><?= h(t('Damit erscheinen alle geplanten Spiele automatisch in deiner Kalender-App – neue Termine werden laufend nachgeladen.')) ?></p>
   <div class="calendar-subscribe-row">
     <input type="text" class="calendar-feed-url" id="calendar-feed-url" readonly value="<?= h($feedUrl) ?>" onclick="this.select()">
-    <button type="button" class="btn btn-secondary btn-sm" id="calendar-feed-copy">Kopieren</button>
-    <span class="muted small" id="calendar-feed-copied" hidden>Kopiert!</span>
+    <button type="button" class="btn btn-secondary btn-sm" id="calendar-feed-copy"><?= h(t('Kopieren')) ?></button>
+    <span class="muted small" id="calendar-feed-copied" hidden><?= h(t('Kopiert!')) ?></span>
   </div>
   <p class="hint">
-    <a href="<?= h($webcalUrl) ?>">Direkt abonnieren</a> (Apple Kalender, Outlook)
-    &middot; für Google Kalender die Adresse oben unter &bdquo;Über URL&ldquo; einfügen.
+    <a href="<?= h($webcalUrl) ?>"><?= h(t('Direkt abonnieren')) ?></a> (<?= h(t('Apple Kalender, Outlook')) ?>)
+    &middot; <?= h(t('für Google Kalender die Adresse oben unter „Über URL“ einfügen.')) ?>
   </p>
 </section>
 

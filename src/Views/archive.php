@@ -1,11 +1,11 @@
 <?php
 /** @var array[] $seasons */
-$pageTitle = 'Archiv';
+$pageTitle = t('Archiv');
 ?>
-<div class="page-head"><div><h1>Archiv</h1><p class="muted">Vergangene Saisons zum Nachschauen.</p></div></div>
+<div class="page-head"><div><h1><?= h(t('Archiv')) ?></h1><p class="muted"><?= h(t('Vergangene Saisons zum Nachschauen.')) ?></p></div></div>
 
 <?php if (empty($seasons)): ?>
-  <p class="empty-state">Noch keine archivierten Saisons vorhanden.</p>
+  <p class="empty-state"><?= h(t('Noch keine archivierten Saisons vorhanden.')) ?></p>
 <?php else: ?>
   <ul class="season-list">
     <?php foreach ($seasons as $season): ?>
@@ -14,7 +14,7 @@ $pageTitle = 'Archiv';
           <strong><?= h($season['label']) ?></strong>
           <span class="muted"><?= (int) $season['year'] ?></span>
         </a>
-        <a class="card-link" href="<?= h(url('/calendar/' . $season['id'])) ?>">Kalender →</a>
+        <a class="card-link" href="<?= h(url('/calendar/' . $season['id'])) ?>"><?= h(t('Kalender')) ?> →</a>
       </li>
     <?php endforeach; ?>
   </ul>

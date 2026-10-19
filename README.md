@@ -16,6 +16,8 @@ build step — designed to run on ordinary shared hosting (hostpoint.ch Standard
   accounts, and can correct any result. Every result change is written to an
   audit log.
 - A season that isn't the *current* one is fully read-only (the Archive).
+- Everything is available in **German** (Swiss spelling) and **English** – website,
+  admin area, calendar feed, API messages and the iOS app. See [Languages](#languages).
 
 ## Requirements
 
@@ -109,6 +111,34 @@ Deploy to it with:
 ./scripts/deploy.sh dev
 ```
 
+## Languages
+
+German is the source language: every user-facing text is written in German and wrapped in
+`t('…')` (placeholders sprintf-style: `t('Gruppe %s', $name)`), and `lang/en.php` maps those
+German texts to English. That is the same model as the iOS app's string catalog, so a text has
+the same German key on both platforms.
+
+- The language comes from `?lang=de|en` (remembered in a cookie; the footer and the
+  navigation link to it), else the browser's `Accept-Language`, else German. The API answers
+  in the request's `Accept-Language`, so the app gets messages in its own language; the app
+  opens website pages with `?lang=` in its language. The calendar feed URL carries the
+  language of the page it was copied from.
+- The rules page is one template per language: `src/Views/rules/<code>.php`.
+- Shared terms (Saison/Season, Turnierbaum/Bracket, Spiel/Game …) are fixed in
+  `lang/glossary.json`. After changing any text, run
+
+  ```
+  php dev/check-translations.php
+  ```
+
+  It reports missing or unused translations, mismatched placeholders, "ß", and texts that
+  don't use the glossary terms – for the website and for the app's
+  `../badiboccia-ios/BocciaScore/Resources/Localizable.xcstrings`.
+- **Adding a language** (e.g. French): add it to `I18n::LANGUAGES`, copy `lang/en.php` to
+  `lang/fr.php` and translate it, add `src/Views/rules/fr.php`, add a `fr` column to
+  `lang/glossary.json`, and add the language to the app's string catalog (Xcode) and its
+  `CFBundleLocalizations`. The check script then lists everything still missing.
+
 ## JSON API (for the iOS/iPadOS app)
 
 `/api/v1` serves the native app (separate repo: `../badiboccia-ios`). Reading
@@ -130,7 +160,8 @@ validation, audit log, schedule-clash check). Team PINs are never part of any re
 | POST | `/api/v1/teams/{id}/photo` | multipart field `photo` (JPG/PNG/WEBP, max. 8 MB) → `{"team"}`; own team only |
 
 Send the token as `Authorization: Bearer <token>` (or `X-Api-Token: <token>`, for hosts that drop
-the Authorization header). Errors are `{"error": "<code>", "message": "<German text>"}`.
+the Authorization header). Errors are `{"error": "<code>", "message": "<text>"}`, the message in
+the request's `Accept-Language` (German or English).
 Tokens live in `api_tokens` (SHA-256 hashes only, see `migrations/004_api_tokens.sql`);
 resetting a team's PIN in the admin area logs that team out of the app everywhere.
 

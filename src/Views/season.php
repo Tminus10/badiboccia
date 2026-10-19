@@ -11,13 +11,13 @@ $pageTitle = $season['label'];
 <div class="page-head">
   <div>
     <h1><?= h($season['label']) ?></h1>
-    <?php if (!$isCurrent): ?><span class="badge badge-archive">Archiviert</span><?php endif; ?>
+    <?php if (!$isCurrent): ?><span class="badge badge-archive"><?= h(t('Archiviert')) ?></span><?php endif; ?>
   </div>
-  <a class="btn btn-secondary" href="<?= h(url($isCurrent ? '/bracket' : '/bracket/' . $season['id'])) ?>">Turnierbaum ansehen →</a>
+  <a class="btn btn-secondary" href="<?= h(url($isCurrent ? '/bracket' : '/bracket/' . $season['id'])) ?>"><?= h(t('Turnierbaum ansehen')) ?> →</a>
 </div>
 
 <?php if (empty($groupData)): ?>
-  <p class="empty-state">Für diese Saison sind noch keine Gruppen angelegt.</p>
+  <p class="empty-state"><?= h(t('Für diese Saison sind noch keine Gruppen angelegt.')) ?></p>
 <?php endif; ?>
 
 <div class="group-grid">
@@ -25,15 +25,15 @@ $pageTitle = $season['label'];
     <?php $group = $entry['group']; $standings = $entry['standings']; ?>
     <section class="card group-card">
       <header class="group-card-head">
-        <h2>Gruppe <?= h($group['name']) ?></h2>
-        <span class="muted"><?= (int) $entry['gamesPlayed'] ?>/<?= (int) $entry['gamesTotal'] ?> Spiele</span>
+        <h2><?= h(t('Gruppe %s', $group['name'])) ?></h2>
+        <span class="muted"><?= h(t('%1$d/%2$d Spiele', (int) $entry['gamesPlayed'], (int) $entry['gamesTotal'])) ?></span>
       </header>
       <?php if (empty($standings)): ?>
-        <p class="empty-state small">Noch keine Teams.</p>
+        <p class="empty-state small"><?= h(t('Noch keine Teams.')) ?></p>
       <?php else: ?>
         <table class="standings-table standings-compact">
           <thead>
-            <tr><th class="rank-col">#</th><th>Team</th><th>Sp</th><th>Pkt</th></tr>
+            <tr><th class="rank-col">#</th><th><?= h(t('Team')) ?></th><th><?= h(t('Sp')) ?></th><th><?= h(t('Pkt')) ?></th></tr>
           </thead>
           <tbody>
             <?php foreach ($standings as $row): ?>
@@ -47,7 +47,7 @@ $pageTitle = $season['label'];
           </tbody>
         </table>
       <?php endif; ?>
-      <a class="card-link" href="<?= h(url('/group/' . $group['id'])) ?>">Alle Spiele & Resultate →</a>
+      <a class="card-link" href="<?= h(url('/group/' . $group['id'])) ?>"><?= h(t('Alle Spiele & Resultate')) ?> →</a>
     </section>
   <?php endforeach; ?>
 </div>

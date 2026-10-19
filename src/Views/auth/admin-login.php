@@ -1,20 +1,20 @@
 <?php
 /** @var string|null $error */
-$pageTitle = 'Admin-Login';
+$pageTitle = t('Admin-Login');
 ?>
 <div class="pin-page">
-  <h1>Admin-Login</h1>
+  <h1><?= h(t('Admin-Login')) ?></h1>
   <?php if ($error): ?>
-    <p class="form-error">Benutzername oder Passwort falsch.</p>
+    <p class="form-error"><?= h(t('Benutzername oder Passwort falsch.')) ?></p>
   <?php endif; ?>
   <form method="post" action="<?= h(url('/admin/login')) ?>" class="admin-login-form">
     <?= csrf_field() ?>
-    <label>Benutzername
+    <label><?= h(t('Benutzername')) ?>
       <input type="text" name="username" autocomplete="username" required autofocus>
     </label>
-    <label>Passwort
+    <label><?= h(t('Passwort')) ?>
       <input type="password" name="password" autocomplete="current-password" required>
     </label>
-    <button class="btn btn-primary btn-lg" type="submit">Anmelden</button>
+    <button class="btn btn-primary btn-lg" type="submit"><?= h(t('Anmelden')) ?></button>
   </form>
 </div>

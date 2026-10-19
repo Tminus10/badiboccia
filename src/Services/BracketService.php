@@ -170,14 +170,14 @@ final class BracketService
         return $slots === null ? null : array_map([self::class, 'slotLabel'], $slots);
     }
 
-    /** German label for one structured placeholder slot from recommendedQfPairingSlots()/feederSlots(). */
+    /** Label for one structured placeholder slot from recommendedQfPairingSlots()/feederSlots(). */
     public static function slotLabel(array $slot): string
     {
         return match ($slot['type']) {
-            'group_winner' => 'Sieger Gruppe ' . $slot['group'],
-            'group_runner_up' => 'Zweiter Gruppe ' . $slot['group'],
-            'winner' => 'Sieger ' . phase_label($slot['phase']) . ' ' . $slot['slot'],
-            'loser' => 'Verlierer ' . phase_label($slot['phase']) . ' ' . $slot['slot'],
+            'group_winner' => t('Sieger Gruppe %s', $slot['group']),
+            'group_runner_up' => t('Zweiter Gruppe %s', $slot['group']),
+            'winner' => t('Sieger %1$s %2$d', phase_label($slot['phase']), $slot['slot']),
+            'loser' => t('Verlierer %1$s %2$d', phase_label($slot['phase']), $slot['slot']),
         };
     }
 }

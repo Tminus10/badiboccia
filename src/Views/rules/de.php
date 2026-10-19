@@ -1,4 +1,7 @@
-<?php $pageTitle = 'Regeln'; ?>
+<?php
+// The rules in German; one file per language (see I18n). Keep the translations in step with this one.
+$pageTitle = 'Regeln';
+?>
 <div class="page-head"><div><h1>Regeln</h1></div></div>
 
 <section class="card rules-card">
@@ -16,10 +19,10 @@
     <li><strong>Unentschieden 1:1</strong> – je 1 Punkt (falls ein Spiel nicht zu Ende gespielt werden kann, z.B. wegen Wetter)</li>
   </ul>
 
-  <h2>Viertelfinale und K.-o.-Phase</h2>
+  <h2>Viertelfinal und K.-o.-Phase</h2>
   <p>
-    Die ersten beiden Teams jeder Gruppe erreichen das Viertelfinale. Ab hier
-    wird im K.-o.-System gespielt – Viertelfinale, Halbfinale, Finale – und die
+    Die ersten beiden Teams jeder Gruppe erreichen das Viertelfinal. Ab hier
+    wird im K.-o.-System gespielt – Viertelfinal, Halbfinal, Final – und die
     Sätze gehen bis <strong>21 Punkte</strong>. Die beiden Verlierer der Halbfinals spielen
     zusätzlich im <strong>Spiel um Platz 3</strong> gegeneinander.
   </p>

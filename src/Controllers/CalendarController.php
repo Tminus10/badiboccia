@@ -119,7 +119,8 @@ final class CalendarController
             'unscheduledCount' => Game::countUnscheduled($seasonId),
             'view' => $view,
             'month' => $month,
-            'feedUrl' => absolute_url('/calendar.ics'),
+            // The feed is in the page's language; calendar apps don't send the website's cookie.
+            'feedUrl' => absolute_url('/calendar.ics') . (I18n::locale() !== I18n::DEFAULT ? '?lang=' . I18n::locale() : ''),
             'admin' => AdminAuth::current(),
         ]);
     }

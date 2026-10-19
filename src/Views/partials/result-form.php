@@ -44,10 +44,10 @@ if ($teamA === null || $teamB === null) {
         [$leftWin20, $leftWin21, $rightWin20, $rightWin21] = ['2-0', '2-1', '0-2', '1-2'];
     }
     $options = [
-        [$leftWin20, $leftTeam['name'] . ' gewinnt 2:0'],
-        [$rightWin20, $rightTeam['name'] . ' gewinnt 2:0'],
-        [$leftWin21, $leftTeam['name'] . ' gewinnt 2:1'],
-        [$rightWin21, $rightTeam['name'] . ' gewinnt 2:1'],
+        [$leftWin20, t('%s gewinnt', $leftTeam['name']) . ' 2:0'],
+        [$rightWin20, t('%s gewinnt', $rightTeam['name']) . ' 2:0'],
+        [$leftWin21, t('%s gewinnt', $leftTeam['name']) . ' 2:1'],
+        [$rightWin21, t('%s gewinnt', $rightTeam['name']) . ' 2:1'],
     ];
 }
 ?>
@@ -59,36 +59,36 @@ if ($teamA === null || $teamB === null) {
 <?php elseif ($complete): ?>
   <?php if (!$hideDate && !empty($game['played_date'])): ?><span class="played-date"><?= h(format_datetime_ch($game['played_date'], $game['game_time'] ?? null)) ?></span><?php endif; ?>
 <?php elseif ($teamA === null || $teamB === null): ?>
-  <?php if (!$hidePendingNote): ?><span class="result-pending">Gegner steht noch nicht fest</span><?php endif; ?>
+  <?php if (!$hidePendingNote): ?><span class="result-pending"><?= h(t('Gegner noch offen')) ?></span><?php endif; ?>
 <?php elseif (!empty($game['played_date'])): ?>
   <div class="result-chip result-chip-scheduled">
-    <span class="scheduled-label">Geplant</span>
+    <span class="scheduled-label"><?= h(t('Geplant')) ?></span>
     <?php if (!$hideDate): ?><span class="played-date"><?= h(format_datetime_ch($game['played_date'], $game['game_time'] ?? null)) ?></span><?php endif; ?>
   </div>
 <?php endif; ?>
 
 <?php if ($canEdit && $teamA !== null && $teamB !== null && !$complete): ?>
-  <?php $scheduleLabel = empty($game['played_date']) ? 'Termin festlegen' : 'Termin ändern'; ?>
+  <?php $scheduleLabel = empty($game['played_date']) ? t('Termin festlegen') : t('Termin ändern'); ?>
   <?php $scheduleForm = function () use ($game, $returnTo, $scheduleDefaultDate, $useDialog) { ?>
     <form method="post" action="<?= h(url('/game/' . $game['id'] . '/schedule')) ?>" class="score-form">
       <?= csrf_field() ?>
       <input type="hidden" name="return_to" value="<?= h($returnTo) ?>">
-      <p class="score-hint">Für die anderen Teams sichtbar, sobald gespeichert. Erscheint auch im Kalender.</p>
+      <p class="score-hint"><?= h(t('Für die anderen Teams sichtbar, sobald gespeichert. Erscheint auch im Kalender.')) ?></p>
       <label class="date-field">
-        <span>Datum</span>
+        <span><?= h(t('Datum')) ?></span>
         <input type="date" name="played_date" value="<?= h($game['played_date'] ?? $scheduleDefaultDate) ?>" required>
       </label>
       <label class="date-field">
-        <span>Zeit <span class="muted">(optional)</span></span>
+        <span><?= h(t('Zeit')) ?> <span class="muted">(<?= h(t('optional')) ?>)</span></span>
         <input type="time" name="game_time" value="<?= h(format_time_ch($game['game_time'] ?? null)) ?>">
       </label>
       <?php if ($useDialog): ?>
         <div class="dialog-actions">
-          <button type="button" class="btn btn-secondary btn-sm result-cancel">Abbrechen</button>
-          <button class="btn btn-primary btn-sm" type="submit">Termin speichern</button>
+          <button type="button" class="btn btn-secondary btn-sm result-cancel"><?= h(t('Abbrechen')) ?></button>
+          <button class="btn btn-primary btn-sm" type="submit"><?= h(t('Termin speichern')) ?></button>
         </div>
       <?php else: ?>
-        <button class="btn btn-primary btn-sm" type="submit">Termin speichern</button>
+        <button class="btn btn-primary btn-sm" type="submit"><?= h(t('Termin speichern')) ?></button>
       <?php endif; ?>
     </form>
   <?php }; ?>
@@ -105,7 +105,7 @@ if ($teamA === null || $teamB === null) {
 <?php endif; ?>
 
 <?php if ($canEdit && $options): ?>
-  <?php $resultLabel = $complete ? 'Resultat korrigieren' : 'Resultat eintragen'; ?>
+  <?php $resultLabel = $complete ? t('Resultat korrigieren') : t('Resultat eintragen'); ?>
   <?php $resultForm = function () use ($game, $returnTo, $scheduleDefaultDate, $today, $options, $allowTie, $currentValue, $useDialog) { ?>
     <form method="post" action="<?= h(url('/game/' . $game['id'] . '/result')) ?>" class="score-form">
       <?= csrf_field() ?>
@@ -113,27 +113,27 @@ if ($teamA === null || $teamB === null) {
       <?php $resultDateDefault = $game['played_date'] ?? $scheduleDefaultDate; ?>
       <input type="hidden" name="played_date_default" value="<?= h($resultDateDefault) ?>">
       <label class="date-field">
-        <span>Datum <span class="muted">(optional, falls bekannt)</span></span>
+        <span><?= h(t('Datum')) ?> <span class="muted">(<?= h(t('optional, falls bekannt')) ?>)</span></span>
         <input type="date" name="played_date" value="<?= h($resultDateDefault) ?>" max="<?= h($today) ?>">
       </label>
       <label class="date-field">
-        <span>Zeit <span class="muted">(optional)</span></span>
+        <span><?= h(t('Zeit')) ?> <span class="muted">(<?= h(t('optional')) ?>)</span></span>
         <input type="time" name="game_time" value="<?= h(format_time_ch($game['game_time'] ?? null)) ?>">
       </label>
-      <p class="score-hint">Zum Speichern das Ergebnis antippen:</p>
+      <p class="score-hint"><?= h(t('Zum Speichern das Resultat antippen:')) ?></p>
       <div class="score-buttons">
         <?php foreach ($options as [$value, $label]): ?>
           <?php $isCurrent = $value === $currentValue; ?>
-          <button type="submit" name="score" value="<?= h($value) ?>" class="score-btn<?= $isCurrent ? ' score-btn-current' : '' ?>"><?= h($label) ?><?= $isCurrent ? ' (aktuell)' : '' ?></button>
+          <button type="submit" name="score" value="<?= h($value) ?>" class="score-btn<?= $isCurrent ? ' score-btn-current' : '' ?>"><?= h($label) ?><?= $isCurrent ? ' (' . h(t('aktuell')) . ')' : '' ?></button>
         <?php endforeach; ?>
         <?php if ($allowTie): ?>
           <?php $isCurrentTie = $currentValue === '1-1'; ?>
-          <button type="submit" name="score" value="1-1" class="score-btn score-btn-tie<?= $isCurrentTie ? ' score-btn-current' : '' ?>">Unentschieden 1:1<?= $isCurrentTie ? ' (aktuell)' : '' ?></button>
+          <button type="submit" name="score" value="1-1" class="score-btn score-btn-tie<?= $isCurrentTie ? ' score-btn-current' : '' ?>"><?= h(t('Unentschieden')) ?> 1:1<?= $isCurrentTie ? ' (' . h(t('aktuell')) . ')' : '' ?></button>
         <?php endif; ?>
       </div>
       <?php if ($useDialog): ?>
         <div class="dialog-actions">
-          <button type="button" class="btn btn-secondary btn-sm result-cancel">Abbrechen</button>
+          <button type="button" class="btn btn-secondary btn-sm result-cancel"><?= h(t('Abbrechen')) ?></button>
         </div>
       <?php endif; ?>
     </form>

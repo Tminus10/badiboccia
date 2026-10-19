@@ -13,6 +13,7 @@ session_set_cookie_params([
     'samesite' => 'Lax',
 ]);
 session_start();
+I18n::init();
 
 $router = new Router();
 

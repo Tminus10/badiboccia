@@ -50,6 +50,56 @@ function asset_url(string $path): string
 }
 
 /** Escapes a value for safe HTML output. */
+/**
+ * Translates a German source text into the current language (see I18n), then fills in
+ * sprintf-style placeholders: t('Gruppe %s', $name). Translations may reorder them ("%2$s").
+ * Always pass the German text as a literal, so dev/check-translations.php can find it.
+ */
+function t(string $text, string|int|float ...$args): string
+{
+    $translated = I18n::translate($text);
+    return $args === [] ? $translated : vsprintf($translated, $args);
+}
+
+/**
+ * The current page in another language (the ?lang= link also remembers the choice). Pages
+ * answering a form post (e.g. the schedule conflict) can't be reloaded, so those link home.
+ */
+function lang_url(string $code): string
+{
+    if (($_SERVER['REQUEST_METHOD'] ?? 'GET') !== 'GET') {
+        return url('/') . '?lang=' . rawurlencode($code);
+    }
+    $query = $_GET;
+    $query['lang'] = $code;
+    $path = parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH) ?: '/';
+    return $path . '?' . http_build_query($query);
+}
+
+/** Month name (1-12) in the current language. */
+function month_name(int $month): string
+{
+    $names = [t('Januar'), t('Februar'), t('März'), t('April'), t('Mai'), t('Juni'), t('Juli'),
+        t('August'), t('September'), t('Oktober'), t('November'), t('Dezember')];
+    return $names[$month - 1];
+}
+
+/** Weekday name (ISO: 1 = Monday) in the current language, optionally abbreviated. */
+function weekday_name(int $isoDay, bool $short = false): string
+{
+    $names = $short
+        ? [t('Mo'), t('Di'), t('Mi'), t('Do'), t('Fr'), t('Sa'), t('So')]
+        : [t('Montag'), t('Dienstag'), t('Mittwoch'), t('Donnerstag'), t('Freitag'), t('Samstag'), t('Sonntag')];
+    return $names[$isoDay - 1];
+}
+
+/** "Montag, 6. Juli 2026" / "Monday, 6 July 2026". */
+function format_long_date(string $date): string
+{
+    $ts = strtotime($date);
+    return t('%1$s, %2$d. %3$s %4$d', weekday_name((int) date('N', $ts)), (int) date('j', $ts), month_name((int) date('n', $ts)), (int) date('Y', $ts));
+}
+
 function h(?string $value): string
 {
     return htmlspecialchars($value ?? '', ENT_QUOTES, 'UTF-8');
@@ -219,23 +269,14 @@ function parse_time_input(string $value): ?string
     return $m[1] . ':' . $m[2] . ':00';
 }
 
-/** Selectable durations (minutes => German label) for a custom calendar event's duration field. */
+/** Selectable durations (minutes => label) for a custom calendar event's duration field. */
 function calendar_duration_options(): array
 {
-    return [
-        30 => '30 Minuten',
-        60 => '1 Stunde',
-        90 => '1½ Stunden',
-        120 => '2 Stunden',
-        150 => '2½ Stunden',
-        180 => '3 Stunden',
-        210 => '3½ Stunden',
-        240 => '4 Stunden',
-        270 => '4½ Stunden',
-        300 => '5 Stunden',
-        330 => '5½ Stunden',
-        360 => '6 Stunden',
-    ];
+    $options = [30 => t('30 Minuten')];
+    for ($minutes = 60; $minutes <= 360; $minutes += 30) {
+        $options[$minutes] = format_hours($minutes);
+    }
+    return $options;
 }
 
 /** Parses a duration <select> value (whole minutes) into an int, or null if empty/invalid. */
@@ -271,31 +312,30 @@ function format_game_slot_ch(?string $date, ?string $time, int $slotMinutes): st
 }
 
 /** "1½ Stunden", "2 Stunden", "2½ Stunden" -- for slot lengths in whole or half hours. */
-function format_hours_de(int $minutes): string
+function format_hours(int $minutes): string
 {
-    $whole = intdiv($minutes, 60);
-    $half = $minutes % 60 >= 30 ? '½' : '';
-    return $whole . $half . ' ' . ($whole === 1 && $half === '' ? 'Stunde' : 'Stunden');
+    $amount = intdiv($minutes, 60) . ($minutes % 60 >= 30 ? '½' : '');
+    return $amount === '1' ? t('1 Stunde') : t('%s Stunden', $amount);
 }
 
-/** German label for a game's phase, as used on the bracket, team pages, and calendar. */
+/** Label for a game's phase, as used on the bracket, team pages, and calendar. */
 function phase_label(string $phase): string
 {
-    static $labels = [
-        'group' => 'Gruppenphase',
-        'qf' => 'Viertelfinal',
-        'sf' => 'Halbfinal',
-        'final' => 'Final',
-        'third' => 'Spiel um Platz 3',
-    ];
-    return $labels[$phase] ?? $phase;
+    return match ($phase) {
+        'group' => t('Gruppenphase'),
+        'qf' => t('Viertelfinal'),
+        'sf' => t('Halbfinal'),
+        'final' => t('Final'),
+        'third' => t('Spiel um Platz 3'),
+        default => $phase,
+    };
 }
 
 /** "Gruppe A" for a group-phase game (looked up via $groupsById), or the phase label otherwise. */
 function game_phase_label(array $game, array $groupsById): string
 {
     if ($game['phase'] === 'group' && $game['group_id'] !== null && isset($groupsById[$game['group_id']])) {
-        return 'Gruppe ' . $groupsById[$game['group_id']]['name'];
+        return t('Gruppe %s', $groupsById[$game['group_id']]['name']);
     }
     return phase_label($game['phase']);
 }

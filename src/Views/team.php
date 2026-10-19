@@ -18,26 +18,26 @@ $returnTo = $showAllSeasons ? url('/team/' . $teamId) . '?season=all' : url('/te
   <?= render_partial('partials/team-avatar', ['team' => $targetTeam, 'size' => 'lg', 'linked' => false]) ?>
   <div>
     <?php if ($showAllSeasons): ?>
-      <p class="eyebrow">Alle Saisons</p>
+      <p class="eyebrow"><?= h(t('Alle Saisons')) ?></p>
     <?php elseif ($season !== null && $group !== null): ?>
-      <p class="eyebrow"><a href="<?= h(url('/group/' . $group['id'])) ?>">Gruppe <?= h($group['name']) ?></a> &middot; <?= h($season['label']) ?></p>
+      <p class="eyebrow"><a href="<?= h(url('/group/' . $group['id'])) ?>"><?= h(t('Gruppe %s', $group['name'])) ?></a> &middot; <?= h($season['label']) ?></p>
     <?php endif; ?>
     <h1><?= h($targetTeam['name']) ?></h1>
     <?php $subtitle = team_players_subtitle($targetTeam); ?>
     <?php if ($subtitle !== null): ?><p class="muted"><?= h($subtitle) ?></p><?php endif; ?>
     <?php if ($showAllSeasons): ?>
-      <a class="card-link" href="<?= h(url('/team/' . $teamId)) ?>">← Nur aktuelle Saison anzeigen</a>
+      <a class="card-link" href="<?= h(url('/team/' . $teamId)) ?>">← <?= h(t('Nur aktuelle Saison anzeigen')) ?></a>
     <?php else: ?>
-      <a class="card-link" href="<?= h(url('/team/' . $teamId)) ?>?season=all">Alle Saisons anzeigen →</a>
+      <a class="card-link" href="<?= h(url('/team/' . $teamId)) ?>?season=all"><?= h(t('Alle Saisons anzeigen')) ?> →</a>
     <?php endif; ?>
     <?php if (TeamController::canEditPhoto($teamId)): ?>
       <details class="team-photo-edit">
-        <summary><?= team_photo_url($targetTeam) !== null ? 'Foto ändern' : 'Foto hinzufügen' ?></summary>
+        <summary><?= h(team_photo_url($targetTeam) !== null ? t('Foto ändern') : t('Foto hinzufügen')) ?></summary>
         <form method="post" action="<?= h(url('/team/' . $teamId . '/photo')) ?>" enctype="multipart/form-data" class="stack-form">
           <?= csrf_field() ?>
           <?php if (isset($_GET['season'])): ?><input type="hidden" name="season" value="<?= h((string) $_GET['season']) ?>"><?php endif; ?>
-          <label>Foto (wird quadratisch zugeschnitten) <input type="file" name="photo" accept="image/png,image/jpeg,image/webp" required></label>
-          <button class="btn btn-secondary btn-sm" type="submit">Foto hochladen</button>
+          <label><?= h(t('Foto (wird quadratisch zugeschnitten)')) ?> <input type="file" name="photo" accept="image/png,image/jpeg,image/webp" required></label>
+          <button class="btn btn-secondary btn-sm" type="submit"><?= h(t('Foto hochladen')) ?></button>
         </form>
       </details>
     <?php endif; ?>
@@ -45,9 +45,9 @@ $returnTo = $showAllSeasons ? url('/team/' . $teamId) . '?season=all' : url('/te
 </div>
 
 <section class="fixtures">
-  <h2>Spiele</h2>
+  <h2><?= h(t('Spiele')) ?></h2>
   <?php if (empty($games)): ?>
-    <p class="empty-state">Noch keine Spiele.</p>
+    <p class="empty-state"><?= h(t('Noch keine Spiele.')) ?></p>
   <?php else: ?>
     <ol class="fixture-list">
       <?php $lastGroupKey = null; ?>
@@ -60,7 +60,7 @@ $returnTo = $showAllSeasons ? url('/team/' . $teamId) . '?season=all' : url('/te
         <?php if ($groupKey !== $lastGroupKey): ?>
           <?php $lastGroupKey = $groupKey; ?>
           <li class="fixture-phase-label">
-            <?= h(phase_label($game['phase'])) ?><?php if ($gameSeason !== null): ?> &middot; <?= h($gameSeason['label']) ?><?php if ($gameGroup !== null): ?> (Gruppe <?= h($gameGroup['name']) ?>)<?php endif; ?><?php endif; ?>
+            <?= h(phase_label($game['phase'])) ?><?php if ($gameSeason !== null): ?> &middot; <?= h($gameSeason['label']) ?><?php if ($gameGroup !== null): ?> (<?= h(t('Gruppe %s', $gameGroup['name'])) ?>)<?php endif; ?><?php endif; ?>
           </li>
         <?php endif; ?>
         <?php
@@ -77,11 +77,11 @@ $returnTo = $showAllSeasons ? url('/team/' . $teamId) . '?season=all' : url('/te
         <li class="fixture-card team-fixture-card">
           <div class="fixture-teams">
             <?= render_partial('partials/team-dot', ['team' => $targetTeam, 'seasonId' => (int) $game['season_id']]) ?>
-            <span class="vs">vs.</span>
+            <span class="vs"><?= h(t('vs.')) ?></span>
             <?php if ($opponent): ?>
               <?= render_partial('partials/team-dot', ['team' => $opponent, 'seasonId' => (int) $game['season_id']]) ?>
             <?php else: ?>
-              <span class="result-pending">noch offen</span>
+              <span class="result-pending"><?= h(t('noch offen')) ?></span>
             <?php endif; ?>
           </div>
           <div class="fixture-result">

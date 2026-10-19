@@ -5,22 +5,22 @@
  * @var array[] $teamsById
  * @var array[] $gamesById
  */
-$pageTitle = 'Änderungsprotokoll – ' . $season['label'];
+$pageTitle = t('Änderungsprotokoll') . ' – ' . $season['label'];
 ?>
 <div class="page-head">
   <div>
     <p class="eyebrow"><a href="<?= h(url('/admin/season/' . $season['id'])) ?>"><?= h($season['label']) ?></a></p>
-    <h1>Änderungsprotokoll</h1>
+    <h1><?= h(t('Änderungsprotokoll')) ?></h1>
   </div>
 </div>
 
 <?php if (empty($entries)): ?>
-  <p class="empty-state">Noch keine Änderungen erfasst.</p>
+  <p class="empty-state"><?= h(t('Noch keine Änderungen erfasst.')) ?></p>
 <?php else: ?>
   <div class="table-scroll">
     <table class="audit-table">
       <thead>
-        <tr><th>Zeit</th><th>Spiel</th><th>Von</th><th>Alt</th><th>Neu</th></tr>
+        <tr><th><?= h(t('Zeit')) ?></th><th><?= h(t('Spiel')) ?></th><th><?= h(t('Von')) ?></th><th><?= h(t('Alt')) ?></th><th><?= h(t('Neu')) ?></th></tr>
       </thead>
       <tbody>
         <?php foreach ($entries as $entry): ?>

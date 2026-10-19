@@ -40,7 +40,7 @@ final class AdminController
         $player2 = trim((string) ($_POST['player2'] ?? ''));
 
         if ($name === '' || $player1 === '' || $player2 === '') {
-            flash_set('error', 'Bitte alle Felder ausfüllen.');
+            flash_set('error', t('Bitte alle Felder ausfüllen.'));
             redirect('/admin/teams');
             return;
         }
@@ -48,7 +48,7 @@ final class AdminController
         $teamId = Team::create($name, $player1, $player2);
         $pin = Team::find($teamId)['pin'];
 
-        flash_set('success', "Team \"$name\" erstellt. PIN für den Login: $pin. Füge das Team über eine Saison einer Gruppe hinzu.");
+        flash_set('success', t('Team «%1$s» erstellt. PIN für den Login: %2$s. Füge das Team über eine Saison einer Gruppe hinzu.', $name, $pin));
         redirect('/admin/teams');
     }
 
@@ -69,7 +69,7 @@ final class AdminController
         }
 
         Team::deleteCompletely($teamId);
-        flash_set('success', 'Team "' . $team['name'] . '" und seine gesamte Geschichte wurden gelöscht.');
+        flash_set('success', t('Team «%s» und seine gesamte Geschichte wurden gelöscht.', $team['name']));
         redirect('/admin/teams');
     }
 
@@ -161,7 +161,7 @@ final class AdminController
             $groupCount = 4;
         }
         if ($label === '') {
-            flash_set('error', 'Bitte einen Namen für die Saison angeben.');
+            flash_set('error', t('Bitte einen Namen für die Saison angeben.'));
             redirect('/admin');
             return;
         }
@@ -169,7 +169,7 @@ final class AdminController
         if (!empty($_POST['make_current'])) {
             Season::setCurrent($id);
         }
-        flash_set('success', 'Saison "' . $label . '" erstellt.');
+        flash_set('success', t('Saison «%s» erstellt.', $label));
         redirect('/admin/season/' . $id);
     }
 
@@ -182,7 +182,7 @@ final class AdminController
         }
         $id = (int) $params['id'];
         Season::setCurrent($id);
-        flash_set('success', 'Saison ist jetzt aktiv.');
+        flash_set('success', t('Saison ist jetzt aktiv.'));
         redirect('/admin/season/' . $id);
     }
 
@@ -195,7 +195,7 @@ final class AdminController
         }
         $id = (int) $params['id'];
         Season::deactivate($id);
-        flash_set('success', 'Saison ist jetzt archiviert (nicht mehr bearbeitbar).');
+        flash_set('success', t('Saison ist jetzt archiviert (nicht mehr bearbeitbar).'));
         redirect('/admin/season/' . $id);
     }
 
@@ -217,13 +217,13 @@ final class AdminController
         $year = (int) ($_POST['year'] ?? 0);
 
         if ($label === '' || $year === 0) {
-            flash_set('error', 'Bitte Bezeichnung und Jahr angeben.');
+            flash_set('error', t('Bitte Bezeichnung und Jahr angeben.'));
             redirect('/admin/season/' . $id);
             return;
         }
 
         Season::update($id, $label, $year);
-        flash_set('success', 'Saison aktualisiert.');
+        flash_set('success', t('Saison aktualisiert.'));
         redirect('/admin/season/' . $id);
     }
 
@@ -243,7 +243,7 @@ final class AdminController
         }
 
         Season::delete($id);
-        flash_set('success', 'Saison "' . $season['label'] . '" und alle zugehörigen Gruppen, Spiele und Resultate wurden gelöscht.');
+        flash_set('success', t('Saison «%s» und alle zugehörigen Gruppen, Spiele und Resultate wurden gelöscht.', $season['label']));
         redirect('/admin');
     }
 
@@ -257,7 +257,7 @@ final class AdminController
             return;
         }
         if (!self::isSeasonCurrent($seasonId)) {
-            flash_set('error', 'Diese Saison ist archiviert. Teams können nur in der aktiven Saison hinzugefügt werden.');
+            flash_set('error', t('Diese Saison ist archiviert. Teams können nur in der aktiven Saison hinzugefügt werden.'));
             self::redirectAfterTeamAction($seasonId, $groupId);
             return;
         }
@@ -267,7 +267,7 @@ final class AdminController
         $player2 = trim((string) ($_POST['player2'] ?? ''));
 
         if ($name === '' || $player1 === '' || $player2 === '' || $groupId === 0) {
-            flash_set('error', 'Bitte alle Felder ausfüllen.');
+            flash_set('error', t('Bitte alle Felder ausfüllen.'));
             self::redirectAfterTeamAction($seasonId, $groupId);
             return;
         }
@@ -275,7 +275,7 @@ final class AdminController
         $teamId = Team::createAndEnroll($seasonId, $groupId, $name, $player1, $player2);
         $pin = Team::find($teamId)['pin'];
 
-        flash_set('success', "Team \"$name\" erstellt. PIN für den Login: $pin (bitte dem Team mitteilen).");
+        flash_set('success', t('Team «%1$s» erstellt. PIN für den Login: %2$s (bitte dem Team mitteilen).', $name, $pin));
         self::redirectAfterTeamAction($seasonId, $groupId);
     }
 
@@ -290,7 +290,7 @@ final class AdminController
             return;
         }
         if (!self::isSeasonCurrent($seasonId)) {
-            flash_set('error', 'Diese Saison ist archiviert. Teams können nur in der aktiven Saison hinzugefügt werden.');
+            flash_set('error', t('Diese Saison ist archiviert. Teams können nur in der aktiven Saison hinzugefügt werden.'));
             self::redirectAfterTeamAction($seasonId, $groupId);
             return;
         }
@@ -299,13 +299,13 @@ final class AdminController
         $team = Team::find($teamId);
 
         if ($team === null || $groupId === 0) {
-            flash_set('error', 'Bitte ein Team und eine Gruppe wählen.');
+            flash_set('error', t('Bitte ein Team und eine Gruppe wählen.'));
             self::redirectAfterTeamAction($seasonId, $groupId);
             return;
         }
 
         Team::enroll($teamId, $seasonId, $groupId);
-        flash_set('success', 'Team "' . $team['name'] . '" zur Saison hinzugefügt.');
+        flash_set('success', t('Team «%s» zur Saison hinzugefügt.', $team['name']));
         self::redirectAfterTeamAction($seasonId, $groupId);
     }
 
@@ -360,10 +360,10 @@ final class AdminController
                 if (self::isSeasonCurrent($seasonId)) {
                     Team::updateGroup($teamId, $seasonId, $groupId);
                 } else {
-                    flash_set('error', 'Diese Saison ist archiviert. Die Gruppe wurde nicht geändert.');
+                    flash_set('error', t('Diese Saison ist archiviert. Die Gruppe wurde nicht geändert.'));
                 }
             }
-            flash_set('success', 'Team aktualisiert.');
+            flash_set('success', t('Team aktualisiert.'));
         }
 
         self::redirectAfterTeamAction($seasonId, $groupId);
@@ -389,7 +389,7 @@ final class AdminController
         try {
             $path = PhotoUploader::handle($teamId, $_FILES['photo'] ?? []);
             Team::setPhoto($teamId, $path);
-            flash_set('success', 'Foto gespeichert.');
+            flash_set('success', t('Foto gespeichert.'));
         } catch (RuntimeException $e) {
             flash_set('error', $e->getMessage());
         }
@@ -417,7 +417,7 @@ final class AdminController
         $pin = str_pad((string) random_int(0, 9999), 4, '0', STR_PAD_LEFT);
         Team::resetPin($teamId, $pin);
         ApiAuth::revokeAllForTeam($teamId);
-        flash_set('success', 'Neuer PIN für ' . $team['name'] . ': ' . $pin);
+        flash_set('success', t('Neuer PIN für %1$s: %2$s', $team['name'], $pin));
         self::redirectAfterTeamAction($seasonId, $groupId);
     }
 
@@ -451,7 +451,7 @@ final class AdminController
         }
 
         Team::removeFromSeason($teamId, $seasonId);
-        flash_set('success', 'Team aus der Saison entfernt.');
+        flash_set('success', t('Team aus der Saison entfernt.'));
         self::redirectAfterTeamAction($seasonId, $groupId);
     }
 
@@ -473,14 +473,14 @@ final class AdminController
 
         $existing = Game::forGroup($groupId);
         if (count($existing) > 0) {
-            flash_set('error', 'Für diese Gruppe wurden die Spiele bereits erstellt.');
+            flash_set('error', t('Für diese Gruppe wurden die Spiele bereits erstellt.'));
             self::redirectAfterTeamAction($seasonId, $groupId);
             return;
         }
 
         $teams = Team::byGroup($groupId);
         if (count($teams) < 2) {
-            flash_set('error', 'Eine Gruppe braucht mindestens 2 Teams.');
+            flash_set('error', t('Eine Gruppe braucht mindestens 2 Teams.'));
             self::redirectAfterTeamAction($seasonId, $groupId);
             return;
         }
@@ -488,7 +488,7 @@ final class AdminController
         $teamIds = array_map(fn ($t) => (int) $t['id'], $teams);
         Game::createGroupFixtures($seasonId, $groupId, $teamIds);
 
-        flash_set('success', count(RoundRobinScheduler::generate($teamIds)) . ' Spiele erstellt.');
+        flash_set('success', t('%d Spiele erstellt', count(RoundRobinScheduler::generate($teamIds))) . '.');
         self::redirectAfterTeamAction($seasonId, $groupId);
     }
 
@@ -514,13 +514,13 @@ final class AdminController
         }
 
         if (count(Team::byGroup($groupId)) > 0) {
-            flash_set('error', 'Gruppe ' . $group['name'] . ' enthält noch Teams und kann nicht gelöscht werden.');
+            flash_set('error', t('Gruppe %s enthält noch Teams und kann nicht gelöscht werden.', $group['name']));
             redirect('/admin/season/' . $seasonId);
             return;
         }
 
         TeamGroup::delete($groupId);
-        flash_set('success', 'Gruppe ' . $group['name'] . ' wurde gelöscht.');
+        flash_set('success', t('Gruppe %s wurde gelöscht.', $group['name']));
         redirect('/admin/season/' . $seasonId);
     }
 
@@ -553,7 +553,7 @@ final class AdminController
             Game::setQfTeam((int) $game['id'], 'b', $teamB !== '' ? (int) $teamB : null);
         }
 
-        flash_set('success', 'Viertelfinal-Paarungen gespeichert.');
+        flash_set('success', t('Viertelfinal-Paarungen gespeichert.'));
         redirect('/admin/season/' . $seasonId);
     }
 
@@ -569,18 +569,18 @@ final class AdminController
         $displayName = trim((string) ($_POST['display_name'] ?? ''));
 
         if ($username === '' || strlen($password) < 6 || $displayName === '') {
-            flash_set('error', 'Benutzername, Anzeigename und ein Passwort (min. 6 Zeichen) sind nötig.');
+            flash_set('error', t('Benutzername, Anzeigename und ein Passwort (min. 6 Zeichen) sind nötig.'));
             redirect('/admin');
             return;
         }
         if (Admin::findByUsername($username) !== null) {
-            flash_set('error', 'Dieser Benutzername existiert bereits.');
+            flash_set('error', t('Dieser Benutzername existiert bereits.'));
             redirect('/admin');
             return;
         }
 
         Admin::create($username, $password, $displayName);
-        flash_set('success', 'Admin "' . $displayName . '" erstellt.');
+        flash_set('success', t('Admin «%s» erstellt.', $displayName));
         redirect('/admin');
     }
 
@@ -603,24 +603,24 @@ final class AdminController
         $password = (string) ($_POST['password'] ?? '');
 
         if ($username === '' || $displayName === '') {
-            flash_set('error', 'Benutzername und Anzeigename sind nötig.');
+            flash_set('error', t('Benutzername und Anzeigename sind nötig.'));
             redirect('/admin');
             return;
         }
         if ($password !== '' && strlen($password) < 6) {
-            flash_set('error', 'Das neue Passwort muss mindestens 6 Zeichen haben.');
+            flash_set('error', t('Das neue Passwort muss mindestens 6 Zeichen haben.'));
             redirect('/admin');
             return;
         }
         $existing = Admin::findByUsername($username);
         if ($existing !== null && (int) $existing['id'] !== $id) {
-            flash_set('error', 'Dieser Benutzername existiert bereits.');
+            flash_set('error', t('Dieser Benutzername existiert bereits.'));
             redirect('/admin');
             return;
         }
 
         Admin::update($id, $username, $displayName, $password !== '' ? $password : null);
-        flash_set('success', 'Admin "' . $displayName . '" aktualisiert.');
+        flash_set('success', t('Admin «%s» aktualisiert.', $displayName));
         redirect('/admin');
     }
 
@@ -634,7 +634,7 @@ final class AdminController
         $id = (int) $params['id'];
 
         if (Admin::count() <= 1) {
-            flash_set('error', 'Der letzte Admin-Account kann nicht gelöscht werden.');
+            flash_set('error', t('Der letzte Admin-Account kann nicht gelöscht werden.'));
             redirect('/admin');
             return;
         }
@@ -643,7 +643,7 @@ final class AdminController
         if ((int) $current['id'] === $id) {
             AdminAuth::logout();
         }
-        flash_set('success', 'Admin gelöscht.');
+        flash_set('success', t('Admin gelöscht.'));
         redirect('/admin');
     }
 
@@ -663,7 +663,7 @@ final class AdminController
             return;
         }
         if (!self::isSeasonCurrent($seasonId)) {
-            flash_set('error', 'Diese Saison ist archiviert. Termine können nur in der aktiven Saison hinzugefügt werden.');
+            flash_set('error', t('Diese Saison ist archiviert. Termine können nur in der aktiven Saison hinzugefügt werden.'));
             redirect(self::calendarUrl($season));
             return;
         }
@@ -676,7 +676,7 @@ final class AdminController
         $reminder = !empty($_POST['reminder']);
 
         if ($title === '' || !preg_match('/^\d{4}-\d{2}-\d{2}$/', $date)) {
-            flash_set('error', 'Bitte Titel und Datum angeben.');
+            flash_set('error', t('Bitte Titel und Datum angeben.'));
             redirect(self::calendarUrl($season));
             return;
         }
@@ -684,7 +684,7 @@ final class AdminController
         $admin = AdminAuth::current();
         CalendarEvent::create($seasonId, $title, $location !== '' ? $location : null, $date, $time, $duration, $reminder, (int) $admin['id']);
 
-        flash_set('success', 'Termin "' . $title . '" gespeichert.');
+        flash_set('success', t('Termin «%s» gespeichert.', $title));
         redirect(self::calendarUrl($season));
     }
 
@@ -703,7 +703,7 @@ final class AdminController
             return;
         }
         if (!self::isSeasonCurrent((int) $event['season_id'])) {
-            flash_set('error', 'Diese Saison ist archiviert. Termine können nicht mehr bearbeitet werden.');
+            flash_set('error', t('Diese Saison ist archiviert. Termine können nicht mehr bearbeitet werden.'));
             redirect(self::calendarUrl($season));
             return;
         }
@@ -716,14 +716,14 @@ final class AdminController
         $reminder = !empty($_POST['reminder']);
 
         if ($title === '' || !preg_match('/^\d{4}-\d{2}-\d{2}$/', $date)) {
-            flash_set('error', 'Bitte Titel und Datum angeben.');
+            flash_set('error', t('Bitte Titel und Datum angeben.'));
             redirect(self::calendarUrl($season));
             return;
         }
 
         CalendarEvent::update((int) $event['id'], $title, $location !== '' ? $location : null, $date, $time, $duration, $reminder);
 
-        flash_set('success', 'Termin "' . $title . '" aktualisiert.');
+        flash_set('success', t('Termin «%s» aktualisiert.', $title));
         redirect(self::calendarUrl($season));
     }
 
@@ -742,13 +742,13 @@ final class AdminController
             return;
         }
         if (!self::isSeasonCurrent((int) $event['season_id'])) {
-            flash_set('error', 'Diese Saison ist archiviert. Termine können nicht mehr gelöscht werden.');
+            flash_set('error', t('Diese Saison ist archiviert. Termine können nicht mehr gelöscht werden.'));
             redirect(self::calendarUrl($season));
             return;
         }
 
         CalendarEvent::delete((int) $event['id']);
-        flash_set('success', 'Termin "' . $event['title'] . '" gelöscht.');
+        flash_set('success', t('Termin «%s» gelöscht.', $event['title']));
         redirect(self::calendarUrl($season));
     }
 

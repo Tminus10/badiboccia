@@ -55,7 +55,7 @@ final class IcsBuilder
 
         $description = $phaseWithSeason;
         if (Game::isComplete($game)) {
-            $description .= ' · Resultat: ' . $game['sets_a'] . ':' . $game['sets_b'];
+            $description .= ' · ' . t('Resultat: %s', $game['sets_a'] . ':' . $game['sets_b']);
         }
 
         $lines = ['BEGIN:VEVENT'];
@@ -122,7 +122,7 @@ final class IcsBuilder
         return [
             'BEGIN:VALARM',
             'ACTION:DISPLAY',
-            'DESCRIPTION:Erinnerung',
+            'DESCRIPTION:' . self::escape(t('Erinnerung')),
             'TRIGGER:-PT1H',
             'END:VALARM',
         ];

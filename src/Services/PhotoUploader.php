@@ -13,15 +13,15 @@ final class PhotoUploader
     public static function handle(int $teamId, array $file): string
     {
         if (($file['error'] ?? UPLOAD_ERR_NO_FILE) !== UPLOAD_ERR_OK) {
-            throw new RuntimeException('Upload fehlgeschlagen.');
+            throw new RuntimeException(t('Upload fehlgeschlagen.'));
         }
         if ($file['size'] > self::MAX_BYTES) {
-            throw new RuntimeException('Bild ist zu gross (max. 8 MB).');
+            throw new RuntimeException(t('Bild ist zu gross (max. 8 MB).'));
         }
 
         $info = @getimagesize($file['tmp_name']);
         if ($info === false) {
-            throw new RuntimeException('Datei ist kein gültiges Bild.');
+            throw new RuntimeException(t('Datei ist kein gültiges Bild.'));
         }
 
         $source = match ($info['mime']) {
@@ -31,7 +31,7 @@ final class PhotoUploader
             default => false,
         };
         if ($source === false) {
-            throw new RuntimeException('Bildformat wird nicht unterstützt (nutze JPG, PNG oder WEBP).');
+            throw new RuntimeException(t('Bildformat wird nicht unterstützt (nutze JPG, PNG oder WEBP).'));
         }
         if ($info['mime'] === 'image/jpeg') {
             $source = self::applyExifOrientation($source, $file['tmp_name']);

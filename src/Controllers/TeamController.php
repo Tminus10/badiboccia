@@ -90,7 +90,7 @@ final class TeamController
             . ($seasonParam === 'all' || ctype_digit($seasonParam) ? '?season=' . $seasonParam : '');
 
         if (!csrf_check()) {
-            flash_set('error', 'Ungültige Anfrage. Bitte erneut versuchen.');
+            flash_set('error', t('Ungültige Anfrage. Bitte versuche es nochmals.'));
             redirect($returnTo);
         }
 
@@ -102,14 +102,14 @@ final class TeamController
         }
 
         if (!self::canEditPhoto($teamId)) {
-            flash_set('error', 'Bitte melde dich als dieses Team an, um das Foto zu ändern.');
+            flash_set('error', t('Bitte melde dich als dieses Team an, um das Foto zu ändern.'));
             redirect($returnTo);
         }
 
         try {
             $path = PhotoUploader::handle($teamId, $_FILES['photo'] ?? []);
             Team::setPhoto($teamId, $path);
-            flash_set('success', 'Foto gespeichert.');
+            flash_set('success', t('Foto gespeichert.'));
         } catch (RuntimeException $e) {
             flash_set('error', $e->getMessage());
         }

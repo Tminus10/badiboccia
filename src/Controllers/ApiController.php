@@ -6,7 +6,8 @@
  * as GameController: only the two participating teams, only in the current season. With the
  * token a team can also replace its own photo.
  *
- * Errors are {"error": "<code>", "message": "<German text>"}; the app localizes by code.
+ * Errors are {"error": "<code>", "message": "<text>"}; the message is in the request's
+ * Accept-Language (see I18n), but the app localizes known codes itself.
  */
 final class ApiController
 {
@@ -30,7 +31,7 @@ final class ApiController
     {
         $season = Season::current();
         if ($season === null) {
-            self::error(404, 'no_current_season', 'Es gibt aktuell keine laufende Saison.');
+            self::error(404, 'no_current_season', t('Es läuft gerade keine Saison.'));
         }
         self::respond(self::seasonDetail($season));
     }
@@ -39,7 +40,7 @@ final class ApiController
     {
         $season = Season::find((int) $params['id']);
         if ($season === null) {
-            self::error(404, 'not_found', 'Saison nicht gefunden.');
+            self::error(404, 'not_found', t('Saison nicht gefunden.'));
         }
         self::respond(self::seasonDetail($season));
     }
@@ -49,7 +50,7 @@ final class ApiController
     {
         $team = Team::find((int) $params['id']);
         if ($team === null) {
-            self::error(404, 'not_found', 'Team nicht gefunden.');
+            self::error(404, 'not_found', t('Team nicht gefunden.'));
         }
         $teamId = (int) $team['id'];
         $games = Game::forTeam($teamId);
@@ -98,13 +99,13 @@ final class ApiController
         $pin = is_string($body['pin'] ?? null) ? $body['pin'] : '';
         $team = $teamId > 0 ? Team::find($teamId) : null;
         if ($team === null) {
-            self::error(404, 'not_found', 'Team nicht gefunden.');
+            self::error(404, 'not_found', t('Team nicht gefunden.'));
         }
         if (TeamAuth::isLockedOut($teamId)) {
-            self::error(429, 'locked_out', 'Zu viele Fehlversuche. Bitte in 15 Minuten erneut versuchen.');
+            self::error(429, 'locked_out', t('Zu viele Fehlversuche. Bitte versuche es in 15 Minuten erneut.'));
         }
         if (!TeamAuth::checkPin($teamId, $pin)) {
-            self::error(401, 'wrong_pin', 'Falscher PIN.');
+            self::error(401, 'wrong_pin', t('Falscher PIN. Bitte versuche es nochmals.'));
         }
 
         $device = isset($body['device']) && is_string($body['device']) ? trim($body['device']) : null;
@@ -139,10 +140,10 @@ final class ApiController
         $setsA = $body['sets_a'] ?? null;
         $setsB = $body['sets_b'] ?? null;
         if (!is_int($setsA) || !is_int($setsB) || !in_array([$setsA, $setsB], GameController::VALID_SCORES, true)) {
-            self::error(422, 'invalid_score', 'Ungültiges Resultat. Erlaubt sind 2:0, 2:1, 1:2, 0:2, 1:1.');
+            self::error(422, 'invalid_score', t('Ungültiges Resultat. Erlaubt sind 2:0, 2:1, 1:2, 0:2 und 1:1.'));
         }
         if ($setsA === $setsB && $game['phase'] !== 'group') {
-            self::error(422, 'draw_not_allowed', 'Ein Unentschieden ist nur in der Gruppenphase möglich, da hier ein Sieger feststehen muss.');
+            self::error(422, 'draw_not_allowed', t('Ein Unentschieden ist nur in der Gruppenphase möglich.'));
         }
 
         $date = array_key_exists('played_date', $body) ? self::parseDate($body['played_date'], true) : $game['played_date'];
@@ -171,7 +172,7 @@ final class ApiController
             if ($conflicts !== []) {
                 self::respond([
                     'error' => 'schedule_conflict',
-                    'message' => 'Zu dieser Zeit ist bereits ein anderes Spiel geplant.',
+                    'message' => t('Zu dieser Zeit ist bereits ein anderes Spiel geplant.'),
                     'slot_minutes' => Game::slotMinutes($game['phase']),
                     'conflicts' => array_map(fn (array $g): array => self::gameJson($g), $conflicts),
                 ], 409);
@@ -190,7 +191,7 @@ final class ApiController
     {
         $team = self::requireTeam();
         if ((int) $params['id'] !== (int) $team['id']) {
-            self::error(403, 'not_own_team', 'Du kannst nur das Foto deines eigenen Teams ändern.');
+            self::error(403, 'not_own_team', t('Du kannst nur das Foto deines eigenen Teams ändern.'));
         }
 
         try {
@@ -204,7 +205,7 @@ final class ApiController
 
     public static function notFound(): void
     {
-        self::error(404, 'not_found', 'Unbekannter API-Endpunkt.');
+        self::error(404, 'not_found', t('Nicht gefunden.'));
     }
 
     // ---------------------------------------------------------------------------------------
@@ -341,7 +342,7 @@ final class ApiController
     {
         $team = ApiAuth::currentTeam();
         if ($team === null) {
-            self::error(401, 'unauthorized', 'Bitte melde dich mit dem PIN deines Teams an.');
+            self::error(401, 'unauthorized', t('Bitte melde dich mit dem PIN deines Teams an.'));
         }
         return $team;
     }
@@ -351,17 +352,17 @@ final class ApiController
     {
         $game = Game::find($gameId);
         if ($game === null) {
-            self::error(404, 'not_found', 'Spiel nicht gefunden.');
+            self::error(404, 'not_found', t('Spiel nicht gefunden.'));
         }
         $season = Season::find((int) $game['season_id']);
         if ($season === null || (int) $season['is_current'] !== 1) {
-            self::error(403, 'season_archived', 'Diese Saison ist archiviert und kann nicht mehr bearbeitet werden.');
+            self::error(403, 'season_archived', t('Diese Saison ist archiviert und kann nicht mehr bearbeitet werden.'));
         }
         if (!Game::isParticipant($game, (int) $team['id'])) {
-            self::error(403, 'not_participant', 'Nur die beiden beteiligten Teams können dieses Spiel bearbeiten.');
+            self::error(403, 'not_participant', t('Nur die beiden beteiligten Teams können dieses Spiel bearbeiten.'));
         }
         if ($game['team_a_id'] === null || $game['team_b_id'] === null) {
-            self::error(422, 'opponent_unknown', 'Für dieses Spiel steht der Gegner noch nicht fest.');
+            self::error(422, 'opponent_unknown', t('Für dieses Spiel steht der Gegner noch nicht fest.'));
         }
         return $game;
     }
@@ -372,7 +373,7 @@ final class ApiController
             return null;
         }
         if (!is_string($value) || !preg_match('/^\d{4}-\d{2}-\d{2}$/', $value) || !checkdate((int) substr($value, 5, 2), (int) substr($value, 8, 2), (int) substr($value, 0, 4))) {
-            self::error(422, 'invalid_date', 'Ungültiges Datum.');
+            self::error(422, 'invalid_date', t('Ungültiges Datum.'));
         }
         return $value;
     }
@@ -384,7 +385,7 @@ final class ApiController
         }
         $time = is_string($value) ? parse_time_input($value) : null;
         if ($time === null) {
-            self::error(422, 'invalid_time', 'Ungültige Uhrzeit.');
+            self::error(422, 'invalid_time', t('Ungültige Uhrzeit.'));
         }
         return $time;
     }
@@ -394,7 +395,7 @@ final class ApiController
         $raw = file_get_contents('php://input');
         $data = $raw !== false && $raw !== '' ? json_decode($raw, true) : [];
         if (!is_array($data)) {
-            self::error(400, 'invalid_json', 'Ungültige Anfrage.');
+            self::error(400, 'invalid_json', t('Ungültige Anfrage. Bitte versuche es nochmals.'));
         }
         return $data;
     }

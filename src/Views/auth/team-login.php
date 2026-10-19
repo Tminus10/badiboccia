@@ -3,18 +3,18 @@
  * @var array[] $groupData
  * @var string|null $error
  */
-$pageTitle = 'Team-Login';
+$pageTitle = t('Team-Login');
 ?>
-<div class="page-head"><div><h1>Team-Login</h1><p class="muted">Wähle euer Team, um ein Resultat einzutragen.</p></div></div>
+<div class="page-head"><div><h1><?= h(t('Team-Login')) ?></h1><p class="muted"><?= h(t('Wähle euer Team, um ein Resultat einzutragen.')) ?></p></div></div>
 
 <?php if ($season === null): ?>
-  <p class="empty-state">Es ist keine aktive Saison eingerichtet.</p>
+  <p class="empty-state"><?= h(t('Es ist keine aktive Saison eingerichtet.')) ?></p>
 <?php else: ?>
   <?php foreach ($groupData as $entry): ?>
     <section class="login-group">
-      <h2>Gruppe <?= h($entry['group']['name']) ?></h2>
+      <h2><?= h(t('Gruppe %s', $entry['group']['name'])) ?></h2>
       <?php if (empty($entry['teams'])): ?>
-        <p class="empty-state small">Keine Teams.</p>
+        <p class="empty-state small"><?= h(t('Keine Teams.')) ?></p>
       <?php else: ?>
         <div class="team-pick-grid">
           <?php foreach ($entry['teams'] as $team): ?>

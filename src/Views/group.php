@@ -8,10 +8,8 @@
  * @var array|null $viewerTeam
  * @var array|null $admin
  */
-$qualifierWords = [2 => 'zwei', 3 => 'drei'];
-$qualifierWord = $qualifierWords[$qualifiers] ?? (string) $qualifiers;
 $isCurrent = (int) $season['is_current'] === 1;
-$pageTitle = 'Gruppe ' . $group['name'];
+$pageTitle = t('Gruppe %s', $group['name']);
 $returnTo = '/group/' . $group['id'];
 $anyPlayed = false;
 foreach ($games as $g) {
@@ -24,12 +22,12 @@ foreach ($games as $g) {
 <div class="page-head">
   <div>
     <p class="eyebrow"><a href="<?= h(url($isCurrent ? '/' : '/season/' . $season['id'])) ?>"><?= h($season['label']) ?></a></p>
-    <h1>Gruppe <?= h($group['name']) ?></h1>
+    <h1><?= h(t('Gruppe %s', $group['name'])) ?></h1>
   </div>
 </div>
 
 <?php if (empty($standings)): ?>
-  <p class="empty-state">Für diese Gruppe sind noch keine Teams angelegt.</p>
+  <p class="empty-state"><?= h(t('Für diese Gruppe sind noch keine Teams angelegt.')) ?></p>
 <?php else: ?>
   <section class="card">
     <div class="table-scroll">
@@ -37,13 +35,13 @@ foreach ($games as $g) {
       <thead>
         <tr>
           <th class="rank-col">#</th>
-          <th>Team</th>
-          <th>Sp</th>
-          <th>S</th>
-          <th>N</th>
-          <th>U</th>
-          <th>Sätze</th>
-          <th>Pkt</th>
+          <th><?= h(t('Team')) ?></th>
+          <th><abbr title="<?= h(t('Spiele')) ?>"><?= h(t('Sp')) ?></abbr></th>
+          <th><abbr title="<?= h(t('Siege')) ?>"><?= h(t('S')) ?></abbr></th>
+          <th><abbr title="<?= h(t('Niederlagen')) ?>"><?= h(t('N')) ?></abbr></th>
+          <th><abbr title="<?= h(t('Unentschieden')) ?>"><?= h(t('U')) ?></abbr></th>
+          <th><?= h(t('Sätze')) ?></th>
+          <th><abbr title="<?= h(t('Punkte')) ?>"><?= h(t('Pkt')) ?></abbr></th>
         </tr>
       </thead>
       <tbody>
@@ -62,14 +60,14 @@ foreach ($games as $g) {
       </tbody>
     </table>
     </div>
-    <p class="hint">Die ersten <?= h($qualifierWord) ?> Teams (hervorgehoben) kommen für das Viertelfinale in Frage.</p>
+    <p class="hint"><?= h(t('Die ersten %d Teams (hervorgehoben) kommen für das Viertelfinal in Frage.', $qualifiers)) ?></p>
   </section>
 <?php endif; ?>
 
 <section class="fixtures">
-  <h2>Spiele</h2>
+  <h2><?= h(t('Spiele')) ?></h2>
   <?php if (empty($games)): ?>
-    <p class="empty-state">Noch keine Spiele erstellt.</p>
+    <p class="empty-state"><?= h(t('Noch keine Spiele erstellt.')) ?></p>
   <?php else: ?>
     <ol class="fixture-list">
       <?php foreach ($games as $i => $game): ?>
@@ -81,7 +79,7 @@ foreach ($games as $g) {
         ?>
         <li class="fixture-card">
           <div class="fixture-teams">
-            <span class="fixture-num">Spiel <?= $i + 1 ?></span>
+            <span class="fixture-num"><?= h(t('Spiel %d', $i + 1)) ?></span>
             <?php if ($teamA): ?><?= render_partial('partials/team-dot', ['team' => $teamA, 'seasonId' => (int) $season['id']]) ?><?php endif; ?>
             <span class="vs">–</span>
             <?php if ($teamB): ?><?= render_partial('partials/team-dot', ['team' => $teamB, 'seasonId' => (int) $season['id']]) ?><?php endif; ?>

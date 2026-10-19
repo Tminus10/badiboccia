@@ -10,7 +10,7 @@
  * @var array|null $admin
  */
 $isCurrent = (int) $season['is_current'] === 1;
-$pageTitle = 'Turnierbaum – ' . $season['label'];
+$pageTitle = t('Turnierbaum') . ' – ' . $season['label'];
 $returnTo = $isCurrent ? '/bracket' : '/bracket/' . $season['id'];
 
 $renderGame = function (array $game) use ($teamsById, $returnTo, $viewerTeam, $admin, $isCurrent, $season, $qfLabelSuggestions): void {
@@ -58,37 +58,37 @@ $thirdGame = $phases['third'][0] ?? null;
 <div class="page-head">
   <div>
     <p class="eyebrow"><?= h($season['label']) ?></p>
-    <h1>Turnierbaum</h1>
+    <h1><?= h(t('Turnierbaum')) ?></h1>
   </div>
-  <a class="btn btn-secondary" href="<?= h(url($isCurrent ? '/' : '/season/' . $season['id'])) ?>">Übersicht ansehen →</a>
+  <a class="btn btn-secondary" href="<?= h(url($isCurrent ? '/' : '/season/' . $season['id'])) ?>"><?= h(t('Übersicht ansehen')) ?> →</a>
 </div>
 
 <?php if ($podium !== null): ?>
   <section class="card podium-card">
-    <h2>Rangliste</h2>
+    <h2><?= h(t('Rangliste')) ?></h2>
     <ul class="podium-list">
       <li class="podium-row podium-1">
         <span class="podium-medal" aria-hidden="true">🥇</span>
         <span class="podium-meta">
-          <span class="podium-place">1. Platz</span>
+          <span class="podium-place"><?= h(t('1. Platz')) ?></span>
           <?= render_partial('partials/team-dot', ['team' => $podium['champion'], 'seasonId' => (int) $season['id']]) ?>
         </span>
       </li>
       <li class="podium-row podium-2">
         <span class="podium-medal" aria-hidden="true">🥈</span>
         <span class="podium-meta">
-          <span class="podium-place">2. Platz</span>
+          <span class="podium-place"><?= h(t('2. Platz')) ?></span>
           <?= render_partial('partials/team-dot', ['team' => $podium['runnerUp'], 'seasonId' => (int) $season['id']]) ?>
         </span>
       </li>
       <li class="podium-row podium-3">
         <span class="podium-medal" aria-hidden="true">🥉</span>
         <span class="podium-meta">
-          <span class="podium-place">3. Platz</span>
+          <span class="podium-place"><?= h(t('3. Platz')) ?></span>
           <?php if ($podium['third'] !== null): ?>
             <?= render_partial('partials/team-dot', ['team' => $podium['third'], 'seasonId' => (int) $season['id']]) ?>
           <?php else: ?>
-            <span class="muted">Spiel um Platz 3 steht noch aus</span>
+            <span class="muted"><?= h(t('Spiel um Platz 3 steht noch aus')) ?></span>
           <?php endif; ?>
         </span>
       </li>
@@ -97,23 +97,23 @@ $thirdGame = $phases['third'][0] ?? null;
 <?php endif; ?>
 
 <div class="bracket-titles">
-  <h2 class="bt-groups">Gruppenphase</h2>
+  <h2 class="bt-groups"><?= h(t('Gruppenphase')) ?></h2>
   <div class="bt-tree">
-    <h2 class="bt-qf">Viertelfinal</h2>
-    <h2 class="bt-sf">Halbfinal</h2>
-    <h2 class="bt-final">🏆 Final</h2>
+    <h2 class="bt-qf"><?= h(t('Viertelfinal')) ?></h2>
+    <h2 class="bt-sf"><?= h(t('Halbfinal')) ?></h2>
+    <h2 class="bt-final">🏆 <?= h(t('Final')) ?></h2>
   </div>
 </div>
 
 <div class="bracket">
   <div class="bracket-col bracket-col-groups">
-    <h2 class="bracket-col-title-mobile">Gruppenphase</h2>
+    <h2 class="bracket-col-title-mobile"><?= h(t('Gruppenphase')) ?></h2>
     <?php foreach ($groupData as $entry): ?>
       <?php $group = $entry['group']; ?>
       <div class="bracket-group-card">
-        <a class="bracket-group-title" href="<?= h(url('/group/' . $group['id'])) ?>">Gruppe <?= h($group['name']) ?></a>
+        <a class="bracket-group-title" href="<?= h(url('/group/' . $group['id'])) ?>"><?= h(t('Gruppe %s', $group['name'])) ?></a>
         <?php if (empty($entry['standings'])): ?>
-          <p class="empty-state small">Noch keine Teams.</p>
+          <p class="empty-state small"><?= h(t('Noch keine Teams.')) ?></p>
         <?php else: ?>
           <table class="standings-table standings-compact">
             <tbody>
@@ -133,7 +133,7 @@ $thirdGame = $phases['third'][0] ?? null;
 
   <div class="bracket-tree">
     <div class="bracket-col bracket-col-qf">
-      <h2 class="bracket-col-title-mobile">Viertelfinal</h2>
+      <h2 class="bracket-col-title-mobile"><?= h(t('Viertelfinal')) ?></h2>
       <?php foreach ($phases['qf'] as $i => $game): ?>
         <div class="bracket-game bracket-qf-row-<?= $i + 1 ?>"><?php $renderGame($game); ?></div>
       <?php endforeach; ?>
@@ -143,7 +143,7 @@ $thirdGame = $phases['third'][0] ?? null;
     <div class="bracket-wire bracket-wire-b"></div>
 
     <div class="bracket-col bracket-col-sf">
-      <h2 class="bracket-col-title-mobile">Halbfinal</h2>
+      <h2 class="bracket-col-title-mobile"><?= h(t('Halbfinal')) ?></h2>
       <?php foreach ($sfPair as $i => $game): ?>
         <div class="bracket-game bracket-sf-row-<?= $i + 1 ?>"><?php $renderGame($game); ?></div>
       <?php endforeach; ?>
@@ -154,7 +154,7 @@ $thirdGame = $phases['third'][0] ?? null;
     <div class="bracket-wire bracket-wire-c-stub"></div>
 
     <div class="bracket-col bracket-col-final">
-      <h2 class="bracket-col-title-mobile">🏆 Final</h2>
+      <h2 class="bracket-col-title-mobile">🏆 <?= h(t('Final')) ?></h2>
       <?php if ($finalGame !== null): ?>
         <div class="bracket-game bracket-game-final"><?php $renderGame($finalGame); ?></div>
       <?php endif; ?>
@@ -164,8 +164,8 @@ $thirdGame = $phases['third'][0] ?? null;
   <?php if ($thirdGame !== null): ?>
     <div class="bracket-third-row">
       <div class="bracket-third-col">
-        <h2>Spiel um Platz 3</h2>
-        <p class="bracket-third-hint">Verlierer der Halbfinals</p>
+        <h2><?= h(t('Spiel um Platz 3')) ?></h2>
+        <p class="bracket-third-hint"><?= h(t('Verlierer der Halbfinals')) ?></p>
         <div class="bracket-game bracket-game-third"><?php $renderGame($thirdGame); ?></div>
       </div>
     </div>
