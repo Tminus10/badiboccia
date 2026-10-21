@@ -47,6 +47,13 @@ done
      GRANT ALL PRIVILEGES ON badiboccia.* TO 'badiboccia'@'localhost';
      FLUSH PRIVILEGES;"
 
-"$MYSQL_CLIENT" --socket="$SOCKET" -uroot badiboccia < "$DEV_DIR/../migrations/001_init.sql"
+# 001_init.sql is the full current schema (002+ only upgrade databases created before it
+# included them), so it's imported once into an empty database and skipped afterwards.
+TABLE_COUNT="$("$MYSQL_CLIENT" --socket="$SOCKET" -uroot -N -e \
+    "SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = 'badiboccia'")"
+if [ "$TABLE_COUNT" -eq 0 ]; then
+    echo "Importing schema (migrations/001_init.sql) ..."
+    "$MYSQL_CLIENT" --socket="$SOCKET" -uroot badiboccia < "$DEV_DIR/../migrations/001_init.sql"
+fi
 
 echo "Dev database ready. Socket: $SOCKET  Port: $PORT  DB: badiboccia  User/Pass: badiboccia/badiboccia"
