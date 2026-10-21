@@ -134,12 +134,11 @@ $pdo->prepare("DELETE FROM team_login_attempts WHERE team_id IN ($placeholders)"
 // --- Games ------------------------------------------------------------------------------------
 
 mt_srand(2026); // same results on every run
-$scores = [[2, 0], [2, 1], [2, 1], [1, 2], [1, 2], [0, 2], [2, 0], [0, 2], [1, 1]];
+// No 1:1 -- a draw only happens when a game is interrupted, and it looks odd in a showcase.
+$scores = [[2, 0], [2, 1], [2, 1], [1, 2], [1, 2], [0, 2], [2, 0], [0, 2]];
 $evening = ['18:00', '18:30', '19:00', '19:30', '20:00'];
-$play = function (int $gameId, string $date, string $time, bool $knockout) use ($scores): void {
-    do {
-        [$a, $b] = $scores[mt_rand(0, count($scores) - 1)];
-    } while ($knockout && $a === $b);
+$play = function (int $gameId, string $date, string $time) use ($scores): void {
+    [$a, $b] = $scores[mt_rand(0, count($scores) - 1)];
     Game::recordResult($gameId, $a, $b, $date, $time, 'admin', 0, 'Demo');
 };
 
@@ -147,7 +146,7 @@ $play = function (int $gameId, string $date, string $time, bool $knockout) use (
 foreach ($teamIdsByGroup as $groupName => $teamIds) {
     Game::createGroupFixtures($seasonId, $groupIds[$groupName], $teamIds);
     foreach (Game::forGroup($groupIds[$groupName]) as $i => $game) {
-        $play((int) $game['id'], $day(-55 + $i * 7 + mt_rand(0, 3)), $evening[mt_rand(0, count($evening) - 1)], false);
+        $play((int) $game['id'], $day(-55 + $i * 7 + mt_rand(0, 3)), $evening[mt_rand(0, count($evening) - 1)]);
     }
 }
 
@@ -160,7 +159,7 @@ foreach ($phases['qf'] as $game) {
     [$teamA, $teamB] = $pairings[(int) $game['slot_index']];
     Game::setQfTeam((int) $game['id'], 'a', $teamA);
     Game::setQfTeam((int) $game['id'], 'b', $teamB);
-    $play((int) $game['id'], $day(-9 + (int) $game['slot_index']), (int) $game['slot_index'] % 2 === 1 ? '18:00' : '19:30', true);
+    $play((int) $game['id'], $day(-9 + (int) $game['slot_index']), (int) $game['slot_index'] % 2 === 1 ? '18:00' : '19:30');
 }
 
 // Semi-finals tonight and in two days, without results; third place and final in a week.
