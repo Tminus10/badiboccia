@@ -9,10 +9,15 @@ final class Team
         return $stmt->fetch() ?: null;
     }
 
-    /** Every team that has ever existed, for the central team-management page. */
+    /** Every league team that has ever existed (not the demo teams), for the central team-management page. */
     public static function all(): array
     {
-        return Db::pdo()->query('SELECT * FROM teams ORDER BY name ASC')->fetchAll();
+        return Db::pdo()->query('SELECT * FROM teams WHERE is_demo = 0 ORDER BY name ASC')->fetchAll();
+    }
+
+    public static function isDemo(array $team): bool
+    {
+        return (int) ($team['is_demo'] ?? 0) === 1;
     }
 
     /** Every season/group a team has been enrolled in, newest first. */
@@ -64,7 +69,7 @@ final class Team
     {
         $stmt = Db::pdo()->prepare(
             'SELECT teams.* FROM teams
-             WHERE teams.id NOT IN (
+             WHERE teams.is_demo = 0 AND teams.id NOT IN (
                  SELECT team_id FROM team_seasons WHERE season_id = ?
              )
              ORDER BY teams.name ASC'

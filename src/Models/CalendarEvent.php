@@ -21,12 +21,13 @@ final class CalendarEvent
         return $stmt->fetchAll();
     }
 
-    /** Every custom calendar entry across every season, for the all-seasons .ics feed. */
+    /** Every custom calendar entry across every league season (not the demo), for the all-seasons .ics feed. */
     public static function all(): array
     {
         $stmt = Db::pdo()->query(
-            'SELECT * FROM calendar_events
-             ORDER BY event_date ASC, (event_time IS NULL) ASC, event_time ASC, id ASC'
+            'SELECT calendar_events.* FROM calendar_events
+             JOIN seasons ON seasons.id = calendar_events.season_id AND seasons.is_demo = 0
+             ORDER BY calendar_events.event_date ASC, (calendar_events.event_time IS NULL) ASC, calendar_events.event_time ASC, calendar_events.id ASC'
         );
         return $stmt->fetchAll();
     }

@@ -2,9 +2,14 @@
 
 final class Season
 {
-    public static function all(): array
+    /** The demo teams' PIN. Public on purpose: the app shows it next to "Demo ausprobieren". */
+    public const DEMO_PIN = '1234';
+
+    /** The league's seasons, newest first; the demo season only when $includeDemo (admin area). */
+    public static function all(bool $includeDemo = false): array
     {
-        return Db::pdo()->query('SELECT * FROM seasons ORDER BY year DESC, id DESC')->fetchAll();
+        $where = $includeDemo ? '' : 'WHERE is_demo = 0 ';
+        return Db::pdo()->query("SELECT * FROM seasons {$where}ORDER BY year DESC, id DESC")->fetchAll();
     }
 
     public static function find(int $id): ?array
@@ -16,8 +21,29 @@ final class Season
 
     public static function current(): ?array
     {
-        $row = Db::pdo()->query('SELECT * FROM seasons WHERE is_current = 1 ORDER BY id DESC LIMIT 1')->fetch();
+        $row = Db::pdo()->query('SELECT * FROM seasons WHERE is_current = 1 AND is_demo = 0 ORDER BY id DESC LIMIT 1')->fetch();
         return $row ?: null;
+    }
+
+    /** The demo season (see scripts/seed-demo.php), or null if it hasn't been created. */
+    public static function demo(): ?array
+    {
+        $row = Db::pdo()->query('SELECT * FROM seasons WHERE is_demo = 1 ORDER BY id DESC LIMIT 1')->fetch();
+        return $row ?: null;
+    }
+
+    public static function isDemo(array $season): bool
+    {
+        return (int) $season['is_demo'] === 1;
+    }
+
+    /**
+     * Whether teams may still enter results and dates: the current season, and the demo season
+     * all year round. Archived seasons are read-only.
+     */
+    public static function isEditable(array $season): bool
+    {
+        return (int) $season['is_current'] === 1 || self::isDemo($season);
     }
 
     /** $groupCount is how many groups (A, B, C, ...) the group phase starts with -- 3 or 4. */

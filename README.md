@@ -111,6 +111,31 @@ Deploy to it with:
 ./scripts/deploy.sh dev
 ```
 
+## Demo season
+
+A playable sandbox on the live site, for the App Store review, the App Store screenshots and
+anyone who wants to try the app: the "Demo Cup" with 16 made-up teams (Rösti & Rivella,
+Tell & Apfel …), six of them with a picture from `scripts/demo-photos/`. Every demo team has
+the public PIN **1234** (`Season::DEMO_PIN`, also in the API info); the app offers the demo as
+"Demo ausprobieren" below the team login.
+
+- Demo seasons and demo teams (`is_demo`, `migrations/005_demo_season.sql`) are hidden in the
+  league: not in the season list, archive, calendar feed or the admin's team list, and a demo
+  team can't be enrolled in a real season. The admin area lists the demo season with a
+  "Demo" badge; it can't be made the active season.
+- Demo teams may enter results and dates all year round (`Season::isEditable()`), and are
+  never locked out after wrong PINs.
+- `php scripts/seed-demo.php` creates the demo season, or resets it: group stage and
+  quarter-finals played, a semi-final tonight, the other in two days, final in a week. The
+  results are the same on every run, only the dates move with today. Team ids stay the same,
+  so the app stays logged in; names, colors, photos and the PIN are restored.
+- Reset it every night with a cron job (hostpoint control panel → Cronjobs, or `crontab -e`
+  over SSH), e.g. at 4:00 for PROD:
+
+  ```
+  0 4 * * * php /home/reutener/www/boccia.reutener.swiss/scripts/seed-demo.php
+  ```
+
 ## Languages
 
 German is the source language: every user-facing text is written in German and wrapped in
@@ -143,13 +168,13 @@ the same German key on both platforms.
 
 `/api/v1` serves the native app (separate repo: `../badiboccia-ios`). Reading
 is public, like the website; writing needs a team token from the PIN login and follows the same
-rules as the web forms (only the two teams playing, only in the current season, same score
+rules as the web forms (only the two teams playing, only in the current season or the demo season, same score
 validation, audit log, schedule-clash check). Team PINs are never part of any response.
 
 | Method | Path | |
 |---|---|---|
-| GET  | `/api/v1` | API version, `env` (dev/prod), current season id |
-| GET  | `/api/v1/seasons` | all seasons |
+| GET  | `/api/v1` | API version, `env` (dev/prod), current season id, demo season id and PIN |
+| GET  | `/api/v1/seasons` | all seasons, without the demo season |
 | GET  | `/api/v1/seasons/current`, `/api/v1/seasons/{id}` | one season: teams, groups with standings and games, bracket (empty slots carry structured placeholders), podium, calendar entries |
 | GET  | `/api/v1/teams/{id}` | team, its seasons, all its games, its opponents |
 | POST | `/api/v1/auth/login` | `{"team_id", "pin", "device"}` → `{"token", "team"}`; same lockout as the web login |

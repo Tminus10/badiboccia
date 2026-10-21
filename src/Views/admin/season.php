@@ -28,7 +28,7 @@ $overviewText = rtrim(implode("\n", $overviewLines));
   <div>
     <p class="eyebrow"><a href="<?= h(url('/admin')) ?>"><?= h(t('Admin')) ?></a></p>
     <h1><?= h($season['label']) ?></h1>
-    <?php if ($isCurrent): ?><span class="badge badge-current"><?= h(t('Aktive Saison')) ?></span><?php else: ?><span class="badge badge-archive"><?= h(t('Archiviert')) ?></span><?php endif; ?>
+    <?php if (Season::isDemo($season)): ?><span class="badge badge-demo"><?= h(t('Demo')) ?></span> <span class="muted"><?= h(t('Wird jede Nacht von scripts/seed-demo.php zurückgesetzt.')) ?></span><?php elseif ($isCurrent): ?><span class="badge badge-current"><?= h(t('Aktive Saison')) ?></span><?php else: ?><span class="badge badge-archive"><?= h(t('Archiviert')) ?></span><?php endif; ?>
   </div>
   <div class="page-head-actions">
     <details class="season-edit-entry">
@@ -45,7 +45,8 @@ $overviewText = rtrim(implode("\n", $overviewLines));
         <button class="btn btn-ghost btn-sm btn-danger" type="submit"><?= h(t('Saison löschen')) ?></button>
       </form>
     </details>
-    <?php if ($isCurrent): ?>
+    <?php if (Season::isDemo($season)): ?>
+    <?php elseif ($isCurrent): ?>
       <form method="post" action="<?= h(url('/admin/season/' . $season['id'] . '/deactivate')) ?>" class="inline-form">
         <?= csrf_field() ?>
         <button class="btn btn-secondary btn-sm" type="submit"><?= h(t('Deaktivieren')) ?></button>

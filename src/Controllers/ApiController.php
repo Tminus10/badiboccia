@@ -3,8 +3,8 @@
 /**
  * JSON API for the iOS/iPadOS app (/api/v1). Read endpoints are public, like the website;
  * result entry and scheduling need a team bearer token (see ApiAuth) and follow the same rules
- * as GameController: only the two participating teams, only in the current season. With the
- * token a team can also replace its own photo.
+ * as GameController: only the two participating teams, only in the current season (or the demo
+ * season, see scripts/seed-demo.php). With the token a team can also replace its own photo.
  *
  * Errors are {"error": "<code>", "message": "<text>"}; the message is in the request's
  * Accept-Language (see I18n), but the app localizes known codes itself.
@@ -19,6 +19,9 @@ final class ApiController
             'api_version' => self::VERSION,
             'env' => is_dev_env() ? 'dev' : 'prod',
             'current_season_id' => ($s = Season::current()) !== null ? (int) $s['id'] : null,
+            // Not in /seasons: the app offers the demo separately ("Demo ausprobieren").
+            'demo_season_id' => ($d = Season::demo()) !== null ? (int) $d['id'] : null,
+            'demo_pin' => $d !== null ? Season::DEMO_PIN : null,
         ]);
     }
 
@@ -292,6 +295,7 @@ final class ApiController
             'label' => $season['label'],
             'year' => (int) $season['year'],
             'is_current' => (int) $season['is_current'] === 1,
+            'is_demo' => Season::isDemo($season),
         ];
     }
 
@@ -307,6 +311,7 @@ final class ApiController
             'color_hex' => $team['color_hex'],
             'photo_url' => $photo !== null ? absolute_url(substr($photo, strlen(rtrim(base_path(), '/')))) : null,
             'group_id' => isset($team['group_id']) ? (int) $team['group_id'] : null,
+            'is_demo' => Team::isDemo($team),
         ];
     }
 
@@ -347,7 +352,7 @@ final class ApiController
         return $team;
     }
 
-    /** The game, if it exists, its season is still current, and $team plays in it with a known opponent. */
+    /** The game, if it exists, its season is still editable (current or demo), and $team plays in it with a known opponent. */
     private static function editableGame(int $gameId, array $team): array
     {
         $game = Game::find($gameId);
@@ -355,7 +360,7 @@ final class ApiController
             self::error(404, 'not_found', t('Spiel nicht gefunden.'));
         }
         $season = Season::find((int) $game['season_id']);
-        if ($season === null || (int) $season['is_current'] !== 1) {
+        if ($season === null || !Season::isEditable($season)) {
             self::error(403, 'season_archived', t('Diese Saison ist archiviert und kann nicht mehr bearbeitet werden.'));
         }
         if (!Game::isParticipant($game, (int) $team['id'])) {

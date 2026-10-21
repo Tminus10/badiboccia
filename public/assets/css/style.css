@@ -226,6 +226,7 @@ input:focus, select:focus, button:focus, a:focus {
 }
 .badge-current { background: var(--accent-tint); color: var(--accent-dark); }
 .badge-archive { background: var(--surface-alt); color: var(--text-muted); }
+.badge-demo { background: #ffe2c2; color: #8a4500; }
 .badge-suggestion { background: var(--surface-alt); color: var(--text-muted); font-weight: 600; }
 
 .empty-state { color: var(--text-muted); font-style: italic; }

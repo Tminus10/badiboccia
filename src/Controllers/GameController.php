@@ -145,7 +145,7 @@ final class GameController
     }
 
     /**
-     * Checks the game's season is still current and the requester is admin or a participating
+     * Checks the game's season is still editable (current, or the demo) and the requester is admin or a participating
      * team. On failure, flashes an error, redirects, and returns null. On success returns
      * [actorType, actorId, actorLabel].
      *
@@ -154,7 +154,7 @@ final class GameController
     private static function authorizeEdit(array $game, string $returnTo, string $deniedMessage): ?array
     {
         $season = Season::find((int) $game['season_id']);
-        if ($season === null || (int) $season['is_current'] !== 1) {
+        if ($season === null || !Season::isEditable($season)) {
             flash_set('error', t('Diese Saison ist archiviert und kann nicht mehr bearbeitet werden.'));
             redirect($returnTo);
             return null;

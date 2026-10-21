@@ -7,7 +7,7 @@ final class AdminController
         $admin = AdminAuth::requireLogin();
         render('admin/dashboard', [
             'admin' => $admin,
-            'seasons' => Season::all(),
+            'seasons' => Season::all(includeDemo: true),
             'admins' => Admin::all(),
         ]);
     }
@@ -181,6 +181,12 @@ final class AdminController
             return;
         }
         $id = (int) $params['id'];
+        $season = Season::find($id);
+        if ($season !== null && Season::isDemo($season)) {
+            flash_set('error', t('Die Demo-Saison kann nicht als aktive Saison gesetzt werden.'));
+            redirect('/admin/season/' . $id);
+            return;
+        }
         Season::setCurrent($id);
         flash_set('success', t('Saison ist jetzt aktiv.'));
         redirect('/admin/season/' . $id);

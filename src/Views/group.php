@@ -75,7 +75,7 @@ foreach ($games as $g) {
           $teamA = $game['team_a_id'] !== null ? ($teamsById[$game['team_a_id']] ?? null) : null;
           $teamB = $game['team_b_id'] !== null ? ($teamsById[$game['team_b_id']] ?? null) : null;
           $viewerTeamId = $viewerTeam['id'] ?? null;
-          $canEdit = $isCurrent && ($admin !== null || ($viewerTeamId !== null && Game::isParticipant($game, (int) $viewerTeamId)));
+          $canEdit = Season::isEditable($season) && ($admin !== null || ($viewerTeamId !== null && Game::isParticipant($game, (int) $viewerTeamId)));
         ?>
         <li class="fixture-card">
           <div class="fixture-teams">

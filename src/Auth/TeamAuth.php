@@ -13,8 +13,13 @@ final class TeamAuth
         return Team::find((int) $_SESSION['team_id']);
     }
 
+    /** Demo teams are never locked out: their PIN is public anyway, and nobody should be able to lock the demo. */
     public static function isLockedOut(int $teamId): bool
     {
+        $team = Team::find($teamId);
+        if ($team !== null && Team::isDemo($team)) {
+            return false;
+        }
         $stmt = Db::pdo()->prepare(
             "SELECT COUNT(*) FROM team_login_attempts
              WHERE team_id = ? AND success = 0 AND attempted_at > (NOW() - INTERVAL ? MINUTE)"

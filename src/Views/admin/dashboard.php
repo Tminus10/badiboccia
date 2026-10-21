@@ -22,7 +22,9 @@ $pageTitle = t('Admin');
       <?php foreach ($seasons as $s): ?>
         <li>
           <a href="<?= h(url('/admin/season/' . $s['id'])) ?>"><strong><?= h($s['label']) ?></strong></a>
-          <?php if ((int) $s['is_current'] === 1): ?>
+          <?php if (Season::isDemo($s)): ?>
+            <span class="badge badge-demo"><?= h(t('Demo')) ?></span>
+          <?php elseif ((int) $s['is_current'] === 1): ?>
             <span class="badge badge-current"><?= h(t('Aktiv')) ?></span>
             <form method="post" action="<?= h(url('/admin/season/' . $s['id'] . '/deactivate')) ?>" class="inline-form">
               <?= csrf_field() ?>

@@ -70,8 +70,7 @@ $returnTo = $showAllSeasons ? url('/team/' . $teamId) . '?season=all' : url('/te
           $teamA = $game['team_a_id'] !== null ? ($teamsById[$game['team_a_id']] ?? null) : null;
           $teamB = $game['team_b_id'] !== null ? ($teamsById[$game['team_b_id']] ?? null) : null;
           $viewerTeamId = $viewerTeam['id'] ?? null;
-          $gameIsCurrent = $gameSeason !== null && (int) $gameSeason['is_current'] === 1;
-          $canEdit = $gameIsCurrent && ($admin !== null || ($viewerTeamId !== null && Game::isParticipant($game, (int) $viewerTeamId)));
+          $canEdit = $gameSeason !== null && Season::isEditable($gameSeason) && ($admin !== null || ($viewerTeamId !== null && Game::isParticipant($game, (int) $viewerTeamId)));
         ?>
         <?php $dateLabel = format_datetime_ch($game['played_date'] ?? null, $game['game_time'] ?? null); ?>
         <li class="fixture-card team-fixture-card">

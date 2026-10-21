@@ -5,6 +5,7 @@ CREATE TABLE seasons (
   label VARCHAR(100) NOT NULL,
   year INT NOT NULL,
   is_current TINYINT(1) NOT NULL DEFAULT 0,
+  is_demo TINYINT(1) NOT NULL DEFAULT 0, -- the public demo season (scripts/seed-demo.php), hidden from the league
   created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
@@ -27,6 +28,7 @@ CREATE TABLE teams (
   color_hex CHAR(7) NOT NULL,
   photo_path VARCHAR(255) NULL,
   pin VARCHAR(4) NOT NULL,
+  is_demo TINYINT(1) NOT NULL DEFAULT 0, -- plays only in the demo season, hidden from the league
   created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 

@@ -17,7 +17,7 @@ $renderGame = function (array $game) use ($teamsById, $returnTo, $viewerTeam, $a
     $teamA = $game['team_a_id'] !== null ? ($teamsById[$game['team_a_id']] ?? null) : null;
     $teamB = $game['team_b_id'] !== null ? ($teamsById[$game['team_b_id']] ?? null) : null;
     $viewerTeamId = $viewerTeam['id'] ?? null;
-    $canEdit = $isCurrent && ($admin !== null || ($viewerTeamId !== null && Game::isParticipant($game, (int) $viewerTeamId)));
+    $canEdit = Season::isEditable($season) && ($admin !== null || ($viewerTeamId !== null && Game::isParticipant($game, (int) $viewerTeamId)));
     $winnerId = Game::winnerTeamId($game);
     $complete = Game::isComplete($game);
     // Unassigned slots explain what will fill them (crossed seeding for QF, the feeding game

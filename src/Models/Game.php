@@ -249,13 +249,14 @@ final class Game
         return $stmt->fetchAll();
     }
 
-    /** Every scheduled/played game across every season, earliest first -- backs the all-seasons .ics subscription feed. */
+    /** Every scheduled/played game across every league season (not the demo), earliest first -- backs the all-seasons .ics subscription feed. */
     public static function scheduledAll(): array
     {
         $stmt = Db::pdo()->query(
-            'SELECT * FROM games
-             WHERE played_date IS NOT NULL AND team_a_id IS NOT NULL AND team_b_id IS NOT NULL
-             ORDER BY played_date ASC, (game_time IS NULL) ASC, game_time ASC, id ASC'
+            'SELECT games.* FROM games
+             JOIN seasons ON seasons.id = games.season_id AND seasons.is_demo = 0
+             WHERE games.played_date IS NOT NULL AND games.team_a_id IS NOT NULL AND games.team_b_id IS NOT NULL
+             ORDER BY games.played_date ASC, (games.game_time IS NULL) ASC, games.game_time ASC, games.id ASC'
         );
         return $stmt->fetchAll();
     }
