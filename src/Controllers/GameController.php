@@ -36,6 +36,16 @@ final class GameController
         }
 
         $score = (string) ($_POST['score'] ?? '');
+        // Admins only: teams know their real score. Stored as a placeholder 2:0 for the winner.
+        $estimated = $actorType === 'admin' && in_array($score, ['winner-a', 'winner-b'], true);
+        if ($estimated && $game['phase'] === 'group') {
+            flash_set('error', t('Ein Spiel ohne bekanntes Resultat ist nur in der K.-o.-Phase möglich.'));
+            redirect($returnTo);
+            return;
+        }
+        if ($estimated) {
+            $score = $score === 'winner-a' ? '2-0' : '0-2';
+        }
         $parts = explode('-', $score);
         if (count($parts) !== 2 || !ctype_digit($parts[0]) || !ctype_digit($parts[1])) {
             flash_set('error', t('Ungültiges Resultat. Erlaubt sind 2:0, 2:1, 1:2, 0:2 und 1:1.'));
@@ -69,9 +79,9 @@ final class GameController
         // (it starts empty), so whatever was submitted is always a deliberate choice.
         $time = parse_time_input((string) ($_POST['game_time'] ?? ''));
 
-        Game::recordResult($gameId, $setsA, $setsB, $date, $time, $actorType, $actorId, $actorLabel);
+        Game::recordResult($gameId, $setsA, $setsB, $date, $time, $actorType, $actorId, $actorLabel, $estimated);
 
-        flash_set('success', t('Resultat gespeichert: %s', $setsA . ':' . $setsB));
+        flash_set('success', $estimated ? t('Sieger gespeichert, Resultat unbekannt.') : t('Resultat gespeichert: %s', $setsA . ':' . $setsB));
         redirect($returnTo);
     }
 

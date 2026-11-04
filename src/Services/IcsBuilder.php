@@ -55,7 +55,7 @@ final class IcsBuilder
 
         $description = $phaseWithSeason;
         if (Game::isComplete($game)) {
-            $description .= ' · ' . t('Resultat: %s', $game['sets_a'] . ':' . $game['sets_b']);
+            $description .= ' · ' . (Game::isEstimated($game) ? format_result($game) : t('Resultat: %s', format_result($game)));
         }
 
         $lines = ['BEGIN:VEVENT'];

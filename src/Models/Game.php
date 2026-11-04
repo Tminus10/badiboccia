@@ -74,6 +74,12 @@ final class Game
         return $game['sets_a'] !== null && $game['sets_b'] !== null;
     }
 
+    /** Winner known but not the score: the sets are a placeholder 2:0 and must not be shown as a result. */
+    public static function isEstimated(array $game): bool
+    {
+        return !empty($game['result_estimated']);
+    }
+
     public static function winnerTeamId(array $game): ?int
     {
         if (!self::isComplete($game) || $game['sets_a'] === $game['sets_b']) {
@@ -148,27 +154,35 @@ final class Game
         $stmt->execute([$teamId, $gameId]);
     }
 
-    public static function recordResult(int $gameId, int $setsA, int $setsB, ?string $playedDate, ?string $gameTime, string $actorType, int $actorId, string $actorLabel): void
+    /**
+     * $estimated marks the sets as a placeholder for "winner known, score unknown". Knockout only:
+     * in the group phase the score decides the standings, so a guess would falsify them. Any
+     * result recorded without it is a real one, which is what clears the flag again.
+     */
+    public static function recordResult(int $gameId, int $setsA, int $setsB, ?string $playedDate, ?string $gameTime, string $actorType, int $actorId, string $actorLabel, bool $estimated = false): void
     {
         $pdo = Db::pdo();
         $game = self::find($gameId);
         if ($game === null) {
             throw new RuntimeException('Game not found');
         }
+        if ($estimated && $game['phase'] === 'group') {
+            throw new RuntimeException('Estimated results are knockout-only');
+        }
 
         $stmt = $pdo->prepare(
-            'UPDATE games SET sets_a = ?, sets_b = ?, played_date = ?, game_time = ?, updated_by_type = ?, updated_by_id = ? WHERE id = ?'
+            'UPDATE games SET sets_a = ?, sets_b = ?, result_estimated = ?, played_date = ?, game_time = ?, updated_by_type = ?, updated_by_id = ? WHERE id = ?'
         );
-        $stmt->execute([$setsA, $setsB, $playedDate, $gameTime, $actorType, $actorId, $gameId]);
+        $stmt->execute([$setsA, $setsB, (int) $estimated, $playedDate, $gameTime, $actorType, $actorId, $gameId]);
 
         $audit = $pdo->prepare(
-            'INSERT INTO audit_log (game_id, actor_type, actor_id, actor_label, old_sets_a, old_sets_b, old_played_date, new_sets_a, new_sets_b, new_played_date)
-             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)'
+            'INSERT INTO audit_log (game_id, actor_type, actor_id, actor_label, old_sets_a, old_sets_b, old_result_estimated, old_played_date, new_sets_a, new_sets_b, new_result_estimated, new_played_date)
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)'
         );
         $audit->execute([
             $gameId, $actorType, $actorId, $actorLabel,
-            $game['sets_a'], $game['sets_b'], $game['played_date'],
-            $setsA, $setsB, $playedDate,
+            $game['sets_a'], $game['sets_b'], (int) self::isEstimated($game), $game['played_date'],
+            $setsA, $setsB, (int) $estimated, $playedDate,
         ]);
 
         if ($game['phase'] !== 'group' && $game['next_game_id'] !== null && $setsA !== $setsB) {
@@ -199,13 +213,13 @@ final class Game
         $stmt->execute([$date, $time, $actorType, $actorId, $gameId]);
 
         $audit = $pdo->prepare(
-            'INSERT INTO audit_log (game_id, actor_type, actor_id, actor_label, old_sets_a, old_sets_b, old_played_date, new_sets_a, new_sets_b, new_played_date)
-             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)'
+            'INSERT INTO audit_log (game_id, actor_type, actor_id, actor_label, old_sets_a, old_sets_b, old_result_estimated, old_played_date, new_sets_a, new_sets_b, new_result_estimated, new_played_date)
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)'
         );
         $audit->execute([
             $gameId, $actorType, $actorId, $actorLabel,
-            $game['sets_a'], $game['sets_b'], $game['played_date'],
-            $game['sets_a'], $game['sets_b'], $date,
+            $game['sets_a'], $game['sets_b'], (int) self::isEstimated($game), $game['played_date'],
+            $game['sets_a'], $game['sets_b'], (int) self::isEstimated($game), $date,
         ]);
     }
 

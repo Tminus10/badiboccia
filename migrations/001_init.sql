@@ -63,6 +63,7 @@ CREATE TABLE games (
   team_b_id INT NULL,
   sets_a TINYINT NULL,
   sets_b TINYINT NULL,
+  result_estimated TINYINT(1) NOT NULL DEFAULT 0, -- knockout only: winner known, score isn't; sets are a placeholder 2:0
   played_date DATE NULL,
   game_time TIME NULL, -- optional kickoff time for played_date; NULL means "all day" in the calendar
   next_game_id INT NULL,
@@ -86,9 +87,11 @@ CREATE TABLE audit_log (
   actor_label VARCHAR(150) NULL,
   old_sets_a TINYINT NULL,
   old_sets_b TINYINT NULL,
+  old_result_estimated TINYINT(1) NOT NULL DEFAULT 0,
   old_played_date DATE NULL,
   new_sets_a TINYINT NULL,
   new_sets_b TINYINT NULL,
+  new_result_estimated TINYINT(1) NOT NULL DEFAULT 0,
   new_played_date DATE NULL,
   changed_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY (game_id) REFERENCES games(id) ON DELETE CASCADE

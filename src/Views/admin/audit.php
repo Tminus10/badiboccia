@@ -28,8 +28,9 @@ $pageTitle = t('Änderungsprotokoll') . ' – ' . $season['label'];
             $game = $gamesById[$entry['game_id']] ?? null;
             $teamA = $game && $game['team_a_id'] ? ($teamsById[$game['team_a_id']] ?? null) : null;
             $teamB = $game && $game['team_b_id'] ? ($teamsById[$game['team_b_id']] ?? null) : null;
-            $old = $entry['old_sets_a'] === null ? '–' : $entry['old_sets_a'] . ':' . $entry['old_sets_b'] . ($entry['old_played_date'] ? ' (' . format_date_ch($entry['old_played_date']) . ')' : '');
-            $new = $entry['new_sets_a'] . ':' . $entry['new_sets_b'] . ($entry['new_played_date'] ? ' (' . format_date_ch($entry['new_played_date']) . ')' : '');
+            $estimatedLabel = ' ' . t('(geschätzt)');
+            $old = $entry['old_sets_a'] === null ? '–' : $entry['old_sets_a'] . ':' . $entry['old_sets_b'] . ($entry['old_result_estimated'] ? $estimatedLabel : '') . ($entry['old_played_date'] ? ' (' . format_date_ch($entry['old_played_date']) . ')' : '');
+            $new = $entry['new_sets_a'] . ':' . $entry['new_sets_b'] . ($entry['new_result_estimated'] ? $estimatedLabel : '') . ($entry['new_played_date'] ? ' (' . format_date_ch($entry['new_played_date']) . ')' : '');
           ?>
           <tr>
             <td class="nowrap"><?= h(date('d.m.Y H:i', strtotime($entry['changed_at']))) ?></td>

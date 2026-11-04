@@ -333,6 +333,7 @@ final class ApiController
             'team_b_id' => $game['team_b_id'] !== null ? (int) $game['team_b_id'] : null,
             'sets_a' => $game['sets_a'] !== null ? (int) $game['sets_a'] : null,
             'sets_b' => $game['sets_b'] !== null ? (int) $game['sets_b'] : null,
+            'result_estimated' => Game::isEstimated($game),
             'played_date' => $game['played_date'],
             'game_time' => $game['game_time'] !== null ? substr($game['game_time'], 0, 5) : null,
             'slot_minutes' => Game::slotMinutes($game['phase']),

@@ -202,6 +202,10 @@ function format_result(array $game, ?int $perspectiveTeamId = null): string
     if (!Game::isComplete($game)) {
         return '–';
     }
+    if (Game::isEstimated($game)) {
+        $winner = Team::find((int) Game::winnerTeamId($game));
+        return $winner !== null ? t('Sieger: %s (Resultat unbekannt)', $winner['name']) : t('Resultat unbekannt');
+    }
     if ($perspectiveTeamId !== null && (int) $game['team_b_id'] === $perspectiveTeamId) {
         return $game['sets_b'] . ':' . $game['sets_a'];
     }

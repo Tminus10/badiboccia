@@ -19,6 +19,7 @@ $hideScore = $hideScore ?? false;
 $hidePendingNote = $hidePendingNote ?? false;
 $useDialog = $useDialog ?? false;
 $complete = Game::isComplete($game);
+$estimated = Game::isEstimated($game);
 // Whose name goes on the left: the page we're on (a team's own page) takes priority over
 // who happens to be logged in, so admins/spectators see the same layout as the team itself.
 $orientTeamId = $targetTeamId ?? $viewerTeamId;
@@ -28,7 +29,8 @@ $scheduleDefaultDate = sprintf('%04d-07-15', $seasonYear ?? (int) date('Y'));
 if ($scheduleDefaultDate > $today) {
     $scheduleDefaultDate = $today;
 }
-$currentValue = $complete ? $game['sets_a'] . '-' . $game['sets_b'] : null;
+// An estimated result is shown as its own option: its placeholder 2:0 isn't the "current" score.
+$currentValue = $complete && !$estimated ? $game['sets_a'] . '-' . $game['sets_b'] : null;
 // A tie (1:1) only makes sense in the group phase -- knockout games need a winner to advance.
 $allowTie = ($game['phase'] ?? 'group') === 'group';
 
@@ -50,6 +52,14 @@ if ($teamA === null || $teamB === null) {
         [$rightWin21, t('%s gewinnt', $rightTeam['name']) . ' 2:1'],
     ];
 }
+// "Winner known, result unknown" is for admins filling in the past; teams know their real score.
+$estimatedOptions = [];
+if ($options && AdminAuth::current() !== null && !$allowTie) {
+    $estimatedOptions = [
+        ['winner-a', t('%s gewinnt', $teamA['name']) . ' – ' . t('Resultat unbekannt'), $estimated && Game::winnerTeamId($game) === (int) $teamA['id']],
+        ['winner-b', t('%s gewinnt', $teamB['name']) . ' – ' . t('Resultat unbekannt'), $estimated && Game::winnerTeamId($game) === (int) $teamB['id']],
+    ];
+}
 ?>
 <?php if ($complete && !$hideScore): ?>
   <div class="result-chip">
@@ -57,6 +67,7 @@ if ($teamA === null || $teamB === null) {
     <?php if (!$hideDate && !empty($game['played_date'])): ?><span class="played-date"><?= h(format_datetime_ch($game['played_date'], $game['game_time'] ?? null)) ?></span><?php endif; ?>
   </div>
 <?php elseif ($complete): ?>
+  <?php if ($estimated): ?><span class="result-pending"><?= h(t('Sieger bekannt, Resultat unbekannt')) ?></span><?php endif; ?>
   <?php if (!$hideDate && !empty($game['played_date'])): ?><span class="played-date"><?= h(format_datetime_ch($game['played_date'], $game['game_time'] ?? null)) ?></span><?php endif; ?>
 <?php elseif ($teamA === null || $teamB === null): ?>
   <?php if (!$hidePendingNote): ?><span class="result-pending"><?= h(t('Gegner noch offen')) ?></span><?php endif; ?>
@@ -105,8 +116,8 @@ if ($teamA === null || $teamB === null) {
 <?php endif; ?>
 
 <?php if ($canEdit && $options): ?>
-  <?php $resultLabel = $complete ? t('Resultat korrigieren') : t('Resultat eintragen'); ?>
-  <?php $resultForm = function () use ($game, $returnTo, $scheduleDefaultDate, $today, $options, $allowTie, $currentValue, $useDialog) { ?>
+  <?php $resultLabel = $complete && !$estimated ? t('Resultat korrigieren') : t('Resultat eintragen'); ?>
+  <?php $resultForm = function () use ($game, $returnTo, $scheduleDefaultDate, $today, $options, $estimatedOptions, $allowTie, $currentValue, $useDialog) { ?>
     <form method="post" action="<?= h(url('/game/' . $game['id'] . '/result')) ?>" class="score-form">
       <?= csrf_field() ?>
       <input type="hidden" name="return_to" value="<?= h($returnTo) ?>">
@@ -130,6 +141,9 @@ if ($teamA === null || $teamB === null) {
           <?php $isCurrentTie = $currentValue === '1-1'; ?>
           <button type="submit" name="score" value="1-1" class="score-btn score-btn-tie<?= $isCurrentTie ? ' score-btn-current' : '' ?>"><?= h(t('Unentschieden')) ?> 1:1<?= $isCurrentTie ? ' (' . h(t('aktuell')) . ')' : '' ?></button>
         <?php endif; ?>
+        <?php foreach ($estimatedOptions as [$value, $label, $isCurrent]): ?>
+          <button type="submit" name="score" value="<?= h($value) ?>" class="score-btn score-btn-tie<?= $isCurrent ? ' score-btn-current' : '' ?>"><?= h($label) ?><?= $isCurrent ? ' (' . h(t('aktuell')) . ')' : '' ?></button>
+        <?php endforeach; ?>
       </div>
       <?php if ($useDialog): ?>
         <div class="dialog-actions">

@@ -187,7 +187,9 @@ validation, audit log, schedule-clash check). Team PINs are never part of any re
 Send the token as `Authorization: Bearer <token>` (or `X-Api-Token: <token>`, for hosts that drop
 the Authorization header). Errors are `{"error": "<code>", "message": "<text>"}`, the message in
 the request's `Accept-Language` (German or English).
-Tokens live in `api_tokens` (SHA-256 hashes only, see `migrations/004_api_tokens.sql`);
+Games carry `result_estimated`: `true` means the winner is known but not the score, so `sets_a`/`sets_b`
+are a placeholder 2:0 (knockout only) and must be shown as "result unknown", not as a score. Submitting a
+real result clears it. Tokens live in `api_tokens` (SHA-256 hashes only, see `migrations/004_api_tokens.sql`);
 resetting a team's PIN in the admin area logs that team out of the app everywhere.
 
 ## Notes on the domain rules
@@ -195,6 +197,9 @@ resetting a team's PIN in the admin area logs that team out of the app everywher
 - Group phase: single round-robin (every team plays every other team in its
   group once), games to 15 points, best-of-3 sets. Standings points: 2:0 win = 3,
   2:1 win = 2, loss = 1.
+- Knockout games from past seasons where only the winner is known are stored as a placeholder 2:0 with
+  `games.result_estimated` set, and shown as "winner known, result unknown". Group games are never
+  estimated: the score decides the standings.
 - Top 2 of each group advance to a single-elimination knockout (QF → SF → Final),
   games to 21 points. The admin manually assigns the 8 qualifiers into the QF
   slots (no fixed seeding formula existed on the old paper sheets); semifinal and

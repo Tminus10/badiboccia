@@ -339,4 +339,10 @@ return [
     'Termin «%s» gelöscht.' => 'Event “%s” deleted.',
     'Termin «%s» gespeichert.' => 'Event “%s” saved.',
     'Viertelfinal-Paarungen gespeichert.' => 'Quarter-final pairings saved.',
+    'Sieger: %s (Resultat unbekannt)' => 'Winner: %s (result unknown)',
+    'Sieger bekannt, Resultat unbekannt' => 'Winner known, result unknown',
+    'Sieger gespeichert, Resultat unbekannt.' => 'Winner saved, result unknown.',
+    'Resultat unbekannt' => 'Result unknown',
+    '(geschätzt)' => '(estimated)',
+    'Ein Spiel ohne bekanntes Resultat ist nur in der K.-o.-Phase möglich.' => 'A game without a known result is only possible in the knockout stage.',
 ];

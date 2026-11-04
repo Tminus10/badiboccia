@@ -19,7 +19,7 @@ $renderGame = function (array $game) use ($teamsById, $returnTo, $viewerTeam, $a
     $viewerTeamId = $viewerTeam['id'] ?? null;
     $canEdit = Season::isEditable($season) && ($admin !== null || ($viewerTeamId !== null && Game::isParticipant($game, (int) $viewerTeamId)));
     $winnerId = Game::winnerTeamId($game);
-    $complete = Game::isComplete($game);
+    $showSets = Game::isComplete($game) && !Game::isEstimated($game);
     // Unassigned slots explain what will fill them (crossed seeding for QF, the feeding game
     // after that) instead of a bare "?".
     $slotLabels = $game['phase'] === 'qf'
@@ -28,11 +28,11 @@ $renderGame = function (array $game) use ($teamsById, $returnTo, $viewerTeam, $a
     ?>
     <div class="bracket-team<?= $teamA !== null && $winnerId === (int) $teamA['id'] ? ' winner' : '' ?>">
       <?= render_bracket_slot($teamA, (int) $season['id'], $slotLabels[0] ?? '?') ?>
-      <?php if ($complete): ?><span class="bracket-score"><?= (int) $game['sets_a'] ?></span><?php endif; ?>
+      <?php if ($showSets): ?><span class="bracket-score"><?= (int) $game['sets_a'] ?></span><?php endif; ?>
     </div>
     <div class="bracket-team<?= $teamB !== null && $winnerId === (int) $teamB['id'] ? ' winner' : '' ?>">
       <?= render_bracket_slot($teamB, (int) $season['id'], $slotLabels[1] ?? '?') ?>
-      <?php if ($complete): ?><span class="bracket-score"><?= (int) $game['sets_b'] ?></span><?php endif; ?>
+      <?php if ($showSets): ?><span class="bracket-score"><?= (int) $game['sets_b'] ?></span><?php endif; ?>
     </div>
     <div class="fixture-result">
       <?= render_partial('partials/result-form', [

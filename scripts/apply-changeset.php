@@ -76,6 +76,35 @@ final class Changeset
         $this->report[] = "OK   #{$game['id']} $label: result $setsA:$setsB" . ($date !== null ? ", date $date " . ($newTime ?? '') : '') . "  [$source]";
     }
 
+    /**
+     * Records a knockout game where only the winner is known: a placeholder 2:0 for $winner,
+     * flagged as estimated. A later setResult() with the real score clears the flag.
+     */
+    public function setWinner(int $year, string $phase, string $teamA, string $teamB, string $winner, ?string $date, ?string $time, array $expect, string $source): void
+    {
+        $label = "$year $phase $teamA – $teamB";
+        if ($phase === 'group' || ($winner !== $teamA && $winner !== $teamB)) {
+            $this->skip("$label: winner-only needs a knockout game and one of its teams as winner");
+            return;
+        }
+        $game = $this->findGame($year, $phase, $teamA, $teamB, $label);
+        if ($game === null) {
+            return;
+        }
+        $mismatch = $this->mismatch($game, $expect);
+        if ($mismatch !== null) {
+            $this->skip("#{$game['id']} $label: $mismatch");
+            return;
+        }
+
+        [$dbA, $dbB] = $winner === $game['team_a_name'] ? [2, 0] : [0, 2];
+        $newTime = $time === null ? null : (strlen($time) === 5 ? "$time:00" : $time);
+        Game::recordResult((int) $game['id'], $dbA, $dbB, $date, $newTime, 'import', 0, $this->actorLabel, true);
+
+        $this->changed++;
+        $this->report[] = "OK   #{$game['id']} $label: winner $winner, result unknown" . ($date !== null ? ", date $date " . ($newTime ?? '') : '') . "  [$source]";
+    }
+
     /** Creates a season with its groups (Season::create) unless one with that year already exists. */
     public function createSeason(string $label, int $year, int $groupCount): void
     {
@@ -326,12 +355,12 @@ final class Changeset
     private function audit(array $game, $newSetsA, $newSetsB, ?string $newDate): void
     {
         $this->pdo->prepare(
-            'INSERT INTO audit_log (game_id, actor_type, actor_id, actor_label, old_sets_a, old_sets_b, old_played_date, new_sets_a, new_sets_b, new_played_date)
-             VALUES (?, ?, 0, ?, ?, ?, ?, ?, ?, ?)'
+            'INSERT INTO audit_log (game_id, actor_type, actor_id, actor_label, old_sets_a, old_sets_b, old_result_estimated, old_played_date, new_sets_a, new_sets_b, new_result_estimated, new_played_date)
+             VALUES (?, ?, 0, ?, ?, ?, ?, ?, ?, ?, ?, ?)'
         )->execute([
             $game['id'], 'import', $this->actorLabel,
-            $game['sets_a'], $game['sets_b'], $game['played_date'],
-            $newSetsA, $newSetsB, $newDate,
+            $game['sets_a'], $game['sets_b'], (int) Game::isEstimated($game), $game['played_date'],
+            $newSetsA, $newSetsB, (int) Game::isEstimated($game), $newDate,
         ]);
     }
 
