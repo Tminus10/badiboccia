@@ -78,9 +78,10 @@ final class Changeset
 
     /**
      * Records a knockout game where only the winner is known: a placeholder 2:0 for $winner,
-     * flagged as estimated. A later setResult() with the real score clears the flag.
+     * flagged as estimated, keeping the game's date and time. A later setResult() with the real
+     * score clears the flag.
      */
-    public function setWinner(int $year, string $phase, string $teamA, string $teamB, string $winner, ?string $date, ?string $time, array $expect, string $source): void
+    public function setWinner(int $year, string $phase, string $teamA, string $teamB, string $winner, array $expect, string $source): void
     {
         $label = "$year $phase $teamA – $teamB";
         if ($phase === 'group' || ($winner !== $teamA && $winner !== $teamB)) {
@@ -98,11 +99,10 @@ final class Changeset
         }
 
         [$dbA, $dbB] = $winner === $game['team_a_name'] ? [2, 0] : [0, 2];
-        $newTime = $time === null ? null : (strlen($time) === 5 ? "$time:00" : $time);
-        Game::recordResult((int) $game['id'], $dbA, $dbB, $date, $newTime, 'import', 0, $this->actorLabel, true);
+        Game::recordResult((int) $game['id'], $dbA, $dbB, $game['played_date'], $game['game_time'], 'import', 0, $this->actorLabel, true);
 
         $this->changed++;
-        $this->report[] = "OK   #{$game['id']} $label: winner $winner, result unknown" . ($date !== null ? ", date $date " . ($newTime ?? '') : '') . "  [$source]";
+        $this->report[] = "OK   #{$game['id']} $label: winner $winner, result unknown  [$source]";
     }
 
     /** Creates a season with its groups (Season::create) unless one with that year already exists. */
