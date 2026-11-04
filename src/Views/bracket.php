@@ -88,7 +88,7 @@ $thirdGame = $phases['third'][0] ?? null;
           <?php if ($podium['third'] !== null): ?>
             <?= render_partial('partials/team-dot', ['team' => $podium['third'], 'seasonId' => (int) $season['id']]) ?>
           <?php else: ?>
-            <span class="muted"><?= h(t('Spiel um Platz 3 steht noch aus')) ?></span>
+            <span class="muted"><?= h(Season::isEditable($season) ? t('Spiel um Platz 3 steht noch aus') : t('Resultat unbekannt')) ?></span>
           <?php endif; ?>
         </span>
       </li>
