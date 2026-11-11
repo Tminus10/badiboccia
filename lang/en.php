@@ -90,6 +90,7 @@ return [
     'Foto ändern' => 'Change Photo',
     'Foto hinzufügen' => 'Add Photo',
     'Foto (wird quadratisch zugeschnitten)' => 'Photo (cropped to a square)',
+    'Foto vergrössern' => 'Enlarge Photo',
     'Foto hochladen' => 'Upload Photo',
     'Noch keine Spiele.' => 'No games yet.',
     'noch offen' => 'not set yet',

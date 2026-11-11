@@ -14,8 +14,18 @@ $pageTitle = $targetTeam['name'];
 $teamId = (int) $targetTeam['id'];
 $returnTo = $showAllSeasons ? url('/team/' . $teamId) . '?season=all' : url('/team/' . $teamId);
 ?>
+<?php $photoUrl = team_photo_url($targetTeam); ?>
 <div class="team-header card">
-  <?= render_partial('partials/team-avatar', ['team' => $targetTeam, 'size' => 'lg', 'linked' => false]) ?>
+  <?php if ($photoUrl !== null): ?>
+    <button type="button" class="avatar-zoom" id="team-photo-open" aria-label="<?= h(t('Foto vergrössern')) ?>">
+      <?= render_partial('partials/team-avatar', ['team' => $targetTeam, 'size' => 'lg', 'linked' => false]) ?>
+    </button>
+    <dialog class="photo-dialog" id="team-photo-dialog">
+      <img src="<?= h($photoUrl) ?>" alt="<?= h($targetTeam['name']) ?>">
+    </dialog>
+  <?php else: ?>
+    <?= render_partial('partials/team-avatar', ['team' => $targetTeam, 'size' => 'lg', 'linked' => false]) ?>
+  <?php endif; ?>
   <div>
     <?php if ($showAllSeasons): ?>
       <p class="eyebrow"><?= h(t('Alle Saisons')) ?></p>
@@ -102,3 +112,14 @@ $returnTo = $showAllSeasons ? url('/team/' . $teamId) . '?season=all' : url('/te
     </ol>
   <?php endif; ?>
 </section>
+
+<?php if ($photoUrl !== null): ?>
+<script>
+(function () {
+  var dialog = document.getElementById('team-photo-dialog');
+  document.getElementById('team-photo-open').addEventListener('click', function () { dialog.showModal(); });
+  // A click anywhere (photo or backdrop) closes it again; Esc works natively.
+  dialog.addEventListener('click', function () { dialog.close(); });
+})();
+</script>
+<?php endif; ?>

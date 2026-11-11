@@ -340,6 +340,19 @@ input:focus, select:focus, button:focus, a:focus {
 .avatar-sm { width: 40px; height: 40px; font-size: 0.85rem; }
 .avatar-md { width: 56px; height: 56px; font-size: 1.1rem; }
 .avatar-lg { width: 88px; height: 88px; font-size: 1.6rem; border-width: 3px; }
+.avatar-zoom { padding: 0; border: none; background: none; cursor: zoom-in; border-radius: 25%; flex-shrink: 0; }
+.photo-dialog {
+  padding: 0; border: none; background: none; overflow: visible;
+  width: min(90vw, 500px); max-width: none; cursor: zoom-out; outline: none;
+}
+.photo-dialog img {
+  display: block; width: 100%; height: auto;
+  border-radius: 12%; box-shadow: 0 12px 40px rgba(0, 0, 0, 0.35);
+}
+@supports (corner-shape: squircle) {
+  .photo-dialog img { corner-shape: squircle; border-radius: 25%; }
+}
+.photo-dialog::backdrop { background: rgba(10, 20, 15, 0.75); }
 
 .team-header { display: flex; align-items: center; gap: 1rem; }
 .team-header h1 { margin-bottom: 0.1em; }
