@@ -159,6 +159,9 @@ a:hover { text-decoration: underline; }
 .btn-ghost { background: transparent; color: var(--text-muted); }
 .btn-ghost:hover { background: var(--surface-alt); }
 .btn-danger { color: var(--error-text); }
+.btn-danger-solid, .btn-danger-solid:hover { background: var(--error-text); color: #fff; }
+.btn-danger-solid:disabled { opacity: 0.45; cursor: not-allowed; }
+.danger-zone { border: 1px solid var(--error-text); }
 .btn-sm { padding: 0.45rem 0.8rem; font-size: 0.85rem; min-height: 36px; }
 .btn-lg { width: 100%; font-size: 1.1rem; padding: 0.9rem; min-height: 52px; }
 .inline-form { display: inline-block; }
@@ -209,7 +212,6 @@ input:focus, select:focus, button:focus, a:focus {
   padding: 0.9rem; margin-top: 0.2rem;
 }
 .season-edit-entry[open] summary { margin-bottom: 0.7rem; }
-.season-edit-entry .inline-form { display: block; margin-top: 0.6rem; }
 
 .card {
   background: var(--surface);

@@ -82,6 +82,12 @@ final class Season
         $stmt->execute([$id]);
     }
 
+    /** The phrase an admin has to type before a season may be deleted, e.g. "SAISON 2026 LÖSCHEN". */
+    public static function deleteConfirmationPhrase(array $season): string
+    {
+        return t('SAISON %d LÖSCHEN', (int) $season['year']);
+    }
+
     /** Permanently deletes a season and everything scoped to it (groups, team enrollments, games, audit log) via cascade. */
     public static function delete(int $id): void
     {

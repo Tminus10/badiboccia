@@ -39,11 +39,6 @@ $overviewText = rtrim(implode("\n", $overviewLines));
         <label><?= h(t('Jahr')) ?> <input type="number" name="year" value="<?= (int) $season['year'] ?>" required></label>
         <button class="btn btn-primary btn-sm" type="submit"><?= h(t('Speichern')) ?></button>
       </form>
-
-      <form method="post" action="<?= h(url('/admin/season/' . $season['id'] . '/delete')) ?>" class="inline-form" onsubmit="return confirm(<?= h(json_encode(t('Saison «%s» wirklich unwiderruflich löschen? Alle Gruppen, Spiele und Resultate dieser Saison gehen dabei verloren.', $season['label']))) ?>);">
-        <?= csrf_field() ?>
-        <button class="btn btn-ghost btn-sm btn-danger" type="submit"><?= h(t('Saison löschen')) ?></button>
-      </form>
     </details>
     <?php if (Season::isDemo($season)): ?>
     <?php elseif ($isCurrent): ?>
@@ -279,3 +274,35 @@ $overviewText = rtrim(implode("\n", $overviewLines));
 })();
 </script>
 <?php endif; ?>
+
+<?php $deletePhrase = Season::deleteConfirmationPhrase($season); ?>
+<section class="card danger-zone">
+  <h2><?= h(t('Saison löschen')) ?></h2>
+  <p class="muted"><?= h(t('Löscht die Saison unwiderruflich, mit allen Gruppen, Spielen und Resultaten. Die Teams selbst bleiben erhalten.')) ?></p>
+  <button type="button" class="btn btn-secondary btn-sm btn-danger" id="season-delete-start" data-confirm="<?= h(t('Saison «%s» wirklich unwiderruflich löschen? Alle Gruppen, Spiele und Resultate dieser Saison gehen dabei verloren.', $season['label'])) ?>"><?= h(t('Saison löschen …')) ?></button>
+  <form method="post" action="<?= h(url('/admin/season/' . $season['id'] . '/delete')) ?>" class="stack-form" id="season-delete-form" hidden>
+    <?= csrf_field() ?>
+    <label><?= h(t('Zur Bestätigung «%s» eingeben:', $deletePhrase)) ?>
+      <input type="text" name="confirm_phrase" id="season-delete-phrase" data-phrase="<?= h($deletePhrase) ?>" autocomplete="off" autocapitalize="characters" spellcheck="false" required>
+    </label>
+    <button class="btn btn-danger-solid" type="submit" id="season-delete-submit" disabled><?= h(t('Saison endgültig löschen')) ?></button>
+  </form>
+</section>
+<script>
+(function () {
+  var start = document.getElementById('season-delete-start');
+  var form = document.getElementById('season-delete-form');
+  var input = document.getElementById('season-delete-phrase');
+  var submit = document.getElementById('season-delete-submit');
+
+  start.addEventListener('click', function () {
+    if (!confirm(start.dataset.confirm)) return;
+    start.hidden = true;
+    form.hidden = false;
+    input.focus();
+  });
+  input.addEventListener('input', function () {
+    submit.disabled = input.value.trim().toUpperCase() !== input.dataset.phrase.toUpperCase();
+  });
+})();
+</script>

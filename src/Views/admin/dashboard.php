@@ -36,10 +36,6 @@ $pageTitle = t('Admin');
               <button class="btn btn-ghost btn-sm" type="submit"><?= h(t('Als aktiv setzen')) ?></button>
             </form>
           <?php endif; ?>
-          <form method="post" action="<?= h(url('/admin/season/' . $s['id'] . '/delete')) ?>" class="inline-form" onsubmit="return confirm(<?= h(json_encode(t('Saison «%s» wirklich unwiderruflich löschen? Alle Gruppen, Spiele und Resultate dieser Saison gehen dabei verloren.', $s['label']))) ?>);">
-            <?= csrf_field() ?>
-            <button class="btn btn-ghost btn-sm btn-danger" type="submit"><?= h(t('Löschen')) ?></button>
-          </form>
         </li>
       <?php endforeach; ?>
     </ul>

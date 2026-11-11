@@ -247,6 +247,12 @@ final class AdminController
             redirect('/admin/season/' . $id);
             return;
         }
+        $typed = trim((string) ($_POST['confirm_phrase'] ?? ''));
+        if (mb_strtoupper($typed) !== mb_strtoupper(Season::deleteConfirmationPhrase($season))) {
+            flash_set('error', t('Saison nicht gelöscht: Die Bestätigung wurde nicht korrekt eingegeben.'));
+            redirect('/admin/season/' . $id);
+            return;
+        }
 
         Season::delete($id);
         flash_set('success', t('Saison «%s» und alle zugehörigen Gruppen, Spiele und Resultate wurden gelöscht.', $season['label']));
