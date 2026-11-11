@@ -76,6 +76,7 @@ $router->post('/admin/season/{id}/calendar-event', ['AdminController', 'calendar
 $router->post('/admin/calendar-event/{id}/update', ['AdminController', 'calendarEventUpdate']);
 $router->post('/admin/calendar-event/{id}/delete', ['AdminController', 'calendarEventDelete']);
 $router->get('/admin/season/{id}/audit', ['AdminController', 'auditLog']);
+$router->get('/admin/season/{id}/scorecards', ['AdminController', 'scorecards']);
 $router->post('/admin/team/{id}', ['AdminController', 'teamUpdate']);
 $router->post('/admin/team/{id}/photo', ['AdminController', 'teamPhoto']);
 $router->post('/admin/team/{id}/pin', ['AdminController', 'teamPinReset']);

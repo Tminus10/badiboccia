@@ -773,6 +773,73 @@ final class AdminController
         return (int) $season['is_current'] === 1 ? '/calendar' : '/calendar/' . $season['id'];
     }
 
+    /**
+     * Printable A4 scorecards, one per group, to hang up at the Badi so teams can note their
+     * game dates and results by hand. Games are listed in RoundRobinScheduler order, with the
+     * teams numbered the way the schedule was created, so the card reads like the old paper
+     * ones. Groups whose schedule isn't created yet show the pairings it will get.
+     */
+    public static function scorecards(array $params): void
+    {
+        AdminAuth::requireLogin();
+        $season = Season::find((int) $params['id']);
+        if ($season === null) {
+            http_response_code(404);
+            render('404');
+            return;
+        }
+
+        $groups = Season::groups((int) $season['id']);
+        $cards = [];
+        foreach ($groups as $group) {
+            $teams = Team::byGroup((int) $group['id']);
+            if (empty($teams)) {
+                continue;
+            }
+            $teamsById = array_column($teams, null, 'id');
+            $games = Game::forGroup((int) $group['id']);
+            usort($games, fn ($x, $y) => (int) $x['id'] <=> (int) $y['id']);
+
+            // Number the teams in the order the schedule was created with (the order they first
+            // appear in its games); teams without games yet follow alphabetically. Teams removed
+            // from the season since are left out, along with their games.
+            $order = [];
+            foreach ($games as $g) {
+                $order[] = (int) $g['team_a_id'];
+                $order[] = (int) $g['team_b_id'];
+            }
+            $order = array_values(array_unique(array_merge($order, array_map('intval', array_column($teams, 'id')))));
+            $order = array_values(array_filter($order, fn ($id) => isset($teamsById[$id])));
+
+            $pairings = RoundRobinScheduler::generate($order);
+            if ($games) {
+                // Show only the games that really exist (a team added later has none yet).
+                $existing = [];
+                foreach ($games as $g) {
+                    $existing[self::pairKey((int) $g['team_a_id'], (int) $g['team_b_id'])] = true;
+                }
+                $pairings = array_values(array_filter($pairings, fn ($p) => isset($existing[self::pairKey($p[0], $p[1])])));
+            }
+
+            $cards[] = [
+                'group' => $group,
+                'teams' => array_map(fn ($id) => $teamsById[$id], $order),
+                'pairings' => array_map(fn ($p) => [$teamsById[$p[0]], $teamsById[$p[1]]], $pairings),
+            ];
+        }
+
+        echo render_partial('admin/scorecards', [
+            'season' => $season,
+            'cards' => $cards,
+            'groupCount' => count($groups),
+        ]);
+    }
+
+    private static function pairKey(int $a, int $b): string
+    {
+        return min($a, $b) . '-' . max($a, $b);
+    }
+
     public static function auditLog(array $params): void
     {
         $admin = AdminAuth::requireLogin();
