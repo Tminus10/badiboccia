@@ -52,8 +52,8 @@ $overviewText = rtrim(implode("\n", $overviewLines));
         <button class="btn btn-secondary btn-sm" type="submit"><?= h(t('Als aktiv setzen')) ?></button>
       </form>
     <?php endif; ?>
-    <a class="btn btn-secondary" href="<?= h(url('/admin/season/' . $season['id'] . '/scorecards')) ?>" target="_blank"><?= h(t('Spielblätter drucken')) ?></a>
-    <a class="btn btn-secondary" href="<?= h(url('/admin/season/' . $season['id'] . '/audit')) ?>"><?= h(t('Änderungsprotokoll')) ?></a>
+    <a class="btn btn-secondary btn-sm" href="<?= h(url('/admin/season/' . $season['id'] . '/scorecards')) ?>" target="_blank"><?= h(t('Spielblätter drucken')) ?></a>
+    <a class="btn btn-secondary btn-sm" href="<?= h(url('/admin/season/' . $season['id'] . '/audit')) ?>"><?= h(t('Änderungsprotokoll')) ?></a>
   </div>
 </div>
 
