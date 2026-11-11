@@ -324,11 +324,16 @@ input:focus, select:focus, button:focus, a:focus {
 .avatar-link { display: inline-block; }
 .avatar {
   display: inline-flex; align-items: center; justify-content: center;
-  border-radius: 50%;
+  /* Squircle like an iOS app icon, matching the app's TeamAvatar: a true superellipse where
+     corner-shape is supported, plain rounded corners of about the same size elsewhere. */
+  border-radius: 25%;
   background: color-mix(in srgb, var(--team-color, var(--accent)) 22%, white);
   border: 3px solid var(--team-color, var(--accent));
   overflow: hidden;
   flex-shrink: 0;
+}
+@supports (corner-shape: squircle) {
+  .avatar { border-radius: 50%; corner-shape: squircle; }
 }
 .avatar img { width: 100%; height: 100%; object-fit: cover; display: block; }
 .avatar-fallback { font-weight: 800; color: var(--text); }
