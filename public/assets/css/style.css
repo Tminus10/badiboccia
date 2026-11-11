@@ -328,7 +328,7 @@ input:focus, select:focus, button:focus, a:focus {
      corner-shape is supported, plain rounded corners of about the same size elsewhere. */
   border-radius: 25%;
   background: color-mix(in srgb, var(--team-color, var(--accent)) 22%, white);
-  border: 3px solid var(--team-color, var(--accent));
+  border: 2px solid var(--team-color, var(--accent));
   overflow: hidden;
   flex-shrink: 0;
 }
@@ -339,7 +339,7 @@ input:focus, select:focus, button:focus, a:focus {
 .avatar-fallback { font-weight: 800; color: var(--text); }
 .avatar-sm { width: 40px; height: 40px; font-size: 0.85rem; }
 .avatar-md { width: 56px; height: 56px; font-size: 1.1rem; }
-.avatar-lg { width: 88px; height: 88px; font-size: 1.6rem; border-width: 4px; }
+.avatar-lg { width: 88px; height: 88px; font-size: 1.6rem; border-width: 3px; }
 
 .team-header { display: flex; align-items: center; gap: 1rem; }
 .team-header h1 { margin-bottom: 0.1em; }
