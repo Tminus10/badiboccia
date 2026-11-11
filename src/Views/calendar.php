@@ -43,8 +43,9 @@ $itemDisplay = function (array $item) use ($teamsById, $groupsById, $isCurrent, 
 ?>
 <div class="page-head">
   <div>
-    <?php if (!$isCurrent): ?><p class="eyebrow"><a href="<?= h(url('/archive')) ?>"><?= h(t('Archiv')) ?></a></p><?php endif; ?>
-    <h1><?= h(t('Kalender')) ?> <?php if (!$isCurrent): ?><span class="badge badge-archive"><?= h(t('Archiviert')) ?></span><?php endif; ?></h1>
+    <?php $isUpcoming = !$isCurrent && Season::isUpcoming($season); ?>
+    <?php if (!$isCurrent && !$isUpcoming): ?><p class="eyebrow"><a href="<?= h(url('/archive')) ?>"><?= h(t('Archiv')) ?></a></p><?php endif; ?>
+    <h1><?= h(t('Kalender')) ?> <?php if ($isUpcoming): ?><span class="badge badge-upcoming"><?= h(t('Bevorstehend')) ?></span><?php elseif (!$isCurrent): ?><span class="badge badge-archive"><?= h(t('Archiviert')) ?></span><?php endif; ?></h1>
     <p class="muted"><?= h($season['label']) ?></p>
   </div>
 </div>

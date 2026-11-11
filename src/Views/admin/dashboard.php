@@ -31,6 +31,7 @@ $pageTitle = t('Admin');
               <button class="btn btn-ghost btn-sm" type="submit"><?= h(t('Deaktivieren')) ?></button>
             </form>
           <?php else: ?>
+            <?php if (Season::isUpcoming($s)): ?><span class="badge badge-upcoming"><?= h(t('Bevorstehend')) ?></span><?php endif; ?>
             <form method="post" action="<?= h(url('/admin/season/' . $s['id'] . '/activate')) ?>" class="inline-form">
               <?= csrf_field() ?>
               <button class="btn btn-ghost btn-sm" type="submit"><?= h(t('Als aktiv setzen')) ?></button>

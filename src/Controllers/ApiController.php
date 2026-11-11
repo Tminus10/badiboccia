@@ -296,6 +296,7 @@ final class ApiController
             'year' => (int) $season['year'],
             'is_current' => (int) $season['is_current'] === 1,
             'is_demo' => Season::isDemo($season),
+            'is_upcoming' => Season::isUpcoming($season),
         ];
     }
 

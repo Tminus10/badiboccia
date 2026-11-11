@@ -41,6 +41,7 @@ return [
 
     // Seasons, groups and standings
     'Archiviert' => 'Archived',
+    'Bevorstehend' => 'Upcoming',
     'Turnierbaum ansehen' => 'View Bracket',
     'Übersicht ansehen' => 'View Overview',
     'Für diese Saison sind noch keine Gruppen angelegt.' => 'No groups have been set up for this season yet.',

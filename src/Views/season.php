@@ -11,7 +11,7 @@ $pageTitle = $season['label'];
 <div class="page-head">
   <div>
     <h1><?= h($season['label']) ?></h1>
-    <?php if (!$isCurrent): ?><span class="badge badge-archive"><?= h(t('Archiviert')) ?></span><?php endif; ?>
+    <?php if (!$isCurrent): ?><?php if (Season::isUpcoming($season)): ?><span class="badge badge-upcoming"><?= h(t('Bevorstehend')) ?></span><?php else: ?><span class="badge badge-archive"><?= h(t('Archiviert')) ?></span><?php endif; ?><?php endif; ?>
   </div>
   <a class="btn btn-secondary" href="<?= h(url($isCurrent ? '/bracket' : '/bracket/' . $season['id'])) ?>"><?= h(t('Turnierbaum ansehen')) ?> →</a>
 </div>

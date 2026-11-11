@@ -46,6 +46,20 @@ final class Season
         return (int) $season['is_current'] === 1 || self::isDemo($season);
     }
 
+    /**
+     * Whether a season lies ahead rather than behind: not active, this year or later, and no game
+     * played yet -- e.g. next summer's season, set up in autumn. Such a season isn't "archived".
+     */
+    public static function isUpcoming(array $season): bool
+    {
+        if ((int) $season['is_current'] === 1 || self::isDemo($season) || (int) $season['year'] < (int) date('Y')) {
+            return false;
+        }
+        $stmt = Db::pdo()->prepare('SELECT 1 FROM games WHERE season_id = ? AND sets_a IS NOT NULL LIMIT 1');
+        $stmt->execute([(int) $season['id']]);
+        return $stmt->fetchColumn() === false;
+    }
+
     /** $groupCount is how many groups (A, B, C, ...) the group phase starts with -- 3 or 4. */
     public static function create(string $label, int $year, int $groupCount = 4): int
     {
