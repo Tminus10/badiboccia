@@ -20,7 +20,7 @@ $returnTo = $showAllSeasons ? url('/team/' . $teamId) . '?season=all' : url('/te
     <button type="button" class="avatar-zoom" id="team-photo-open" aria-label="<?= h(t('Foto vergrössern')) ?>">
       <?= render_partial('partials/team-avatar', ['team' => $targetTeam, 'size' => 'lg', 'linked' => false]) ?>
     </button>
-    <dialog class="photo-dialog" id="team-photo-dialog">
+    <dialog class="photo-dialog" id="team-photo-dialog" style="--team-color: <?= h($targetTeam['color_hex']) ?>">
       <img src="<?= h($photoUrl) ?>" alt="<?= h($targetTeam['name']) ?>">
     </dialog>
   <?php else: ?>

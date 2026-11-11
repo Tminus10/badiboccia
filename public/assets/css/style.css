@@ -347,6 +347,7 @@ input:focus, select:focus, button:focus, a:focus {
 }
 .photo-dialog img {
   display: block; width: 100%; height: auto;
+  border: 3px solid var(--team-color, var(--accent));
   border-radius: 12%; box-shadow: 0 12px 40px rgba(0, 0, 0, 0.35);
 }
 @supports (corner-shape: squircle) {
